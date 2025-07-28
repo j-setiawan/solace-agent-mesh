@@ -23,7 +23,11 @@ jobs:
     with:
       ENVIRONMENT: pypi
       version: ${{ github.event.inputs.version }}
-      npm_package_path: web-visualizer
+      whitesource_project_name: "solace-agent-mesh"
+      whitesource_product_name: "solaceai"
+      whitesource_config_file: "wss-unified-agent.config"
+      slack_notification_profile: "ai-connector"
+      npm_package_path: client/webui/frontend
       node_version: 20
       npm_lock_file: package-lock.json
       pypi-project: solace-agent-mesh
@@ -31,6 +35,11 @@ jobs:
     secrets:
       COMMIT_KEY: ${{ secrets.COMMIT_KEY }}
       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+      WHITESOURCE_API_KEY: ${{ secrets.WHITESOURCE_API_KEY }}
+      MANIFEST_AWS_REGION: ${{ secrets.MANIFEST_AWS_REGION }}
+      MANIFEST_AWS_ACCESS_KEY_ID: ${{ secrets.MANIFEST_READ_ONLY_AWS_ACCESS_KEY_ID }}
+      MANIFEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.MANIFEST_READ_ONLY_AWS_SECRET_ACCESS_KEY }}
+
 
   build_and_push_docker:
     name: Build and Push Docker Image
