@@ -411,7 +411,7 @@ def shared_solace_connector(
 
     # Allow time for agent card discovery messages to be exchanged before any test runs
     print("shared_solace_connector fixture: Waiting for agent discovery...")
-    time.sleep(2)
+    time.sleep(5)
     print("shared_solace_connector fixture: Agent discovery wait complete.")
 
     yield connector
@@ -605,12 +605,6 @@ def _clear_agent_component_state(agent_app: SamAgentApp):
         with component.active_tasks_lock:
             component.active_tasks.clear()
 
-        # The following state is still managed at the component level and needs
-        # to be cleared for test isolation.
-        if hasattr(component, "_agent_registry") and component._agent_registry:
-            component._agent_registry.clear()
-        if hasattr(component, "peer_agents") and component.peer_agents:
-            component.peer_agents.clear()
         if (
             hasattr(component, "invocation_monitor")
             and component.invocation_monitor

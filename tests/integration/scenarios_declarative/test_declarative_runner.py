@@ -973,12 +973,12 @@ async def test_declarative_scenario(
     """
     Executes a single declarative test scenario discovered by pytest_generate_tests.
     """
+    scenario_id = declarative_scenario.get("test_case_id", "N/A")
+    scenario_description = declarative_scenario.get("description", "No description")
     if scenario_id in SKIPPED_MERMAID_DIAGRAM_GENERATOR_SCENARIOS:
         pytest.skip(
             f"Skipping test '{scenario_id}' because the 'mermaid_diagram_generator' requires Playwright, which is not available in this environment."
         )
-    scenario_id = declarative_scenario.get("test_case_id", "N/A")
-    scenario_description = declarative_scenario.get("description", "No description")
     print(f"\nRunning declarative scenario: {scenario_id} - {scenario_description}")
 
     # --- Phase 1: Setup Environment (including config overrides) ---
