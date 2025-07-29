@@ -91,7 +91,7 @@ export default function OrchestratorSetup({ data, updateData, onNext, onPrevious
   const [artifactHandlingMode, setArtifactHandlingMode] = useState(data.artifact_handling_mode || 'embed');
   const [enableEmbedResolution, setEnableEmbedResolution] = useState(data.enable_embed_resolution !== false);
   const [enableArtifactContentInstruction, setEnableArtifactContentInstruction] = useState(data.enable_artifact_content_instruction !== false);
-  const [agentCardDescription, setAgentCardDescription] = useState(data.agent_card_description || 'The Orchestrator component. It manages tasks, and coordinating multi-agent workflows.');
+  const [agentCardDescription, setAgentCardDescription] = useState(data.agent_card_description || 'The Orchestrator component. It manages tasks and coordinates multi-agent workflows.');
   const [defaultInputModes, setDefaultInputModes] = useState<string[]>(stringToArray(data.agent_card_default_input_modes, ['text']));
   const [defaultOutputModes, setDefaultOutputModes] = useState<string[]>(stringToArray(data.agent_card_default_output_modes, ['text', 'file']));
   const [agentDiscoveryEnabled, setAgentDiscoveryEnabled] = useState(data.agent_discovery_enabled !== false);

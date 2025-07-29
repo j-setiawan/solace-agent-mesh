@@ -18,7 +18,7 @@ ORCHESTRATOR_DEFAULTS = {
         "artifact_scope": "namespace",
     },
     "agent_card": {
-        "description": "The Orchestrator component. It manages tasks, and coordinating multi-agent workflows.",
+        "description": "The Orchestrator component. It manages tasks and coordinates multi-agent workflows.",
         "defaultInputModes": ["text"],
         "defaultOutputModes": ["text", "file"],
         "skills": [],

@@ -64,7 +64,7 @@ apps:
 
       # Agent Card Definition (Simplified)
       agent_card:
-        description: "The Orchestrator component. It manages tasks, and coordinating multi-agent workflows."
+        description: "The Orchestrator component. It manages tasks and coordinates multi-agent workflows."
         defaultInputModes: ["text"] # Optional, Defaults to ["text"] if omitted
         defaultOutputModes: ["text", "file"] # Indicate potential file output
         skills: [] # Keep, but now optional (defaults to empty list)
