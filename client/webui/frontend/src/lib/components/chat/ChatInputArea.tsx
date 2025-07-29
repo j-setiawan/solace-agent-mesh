@@ -63,6 +63,10 @@ export const ChatInputArea: React.FC<{ agents: AgentCard[] }> = ({ agents }) => 
         if (event.target) {
             event.target.value = "";
         }
+
+        setTimeout(() => {
+            chatInputRef.current?.focus();
+        }, 100);
     };
 
     const handlePaste = (event: ClipboardEvent<HTMLTextAreaElement>) => {
