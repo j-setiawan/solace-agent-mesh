@@ -35,9 +35,12 @@ class EvaluationConfig:
     # Constants
     DEFAULT_STARTUP_WAIT_TIME = 20
     DEFAULT_TEST_TIMEOUT = 60
-    API_BASE_URL = "http://localhost:8080/api/v2"
 
     def __init__(self, config_data: Dict[str, Any]):
+        load_dotenv()
+        host = os.getenv("REST_API_HOST", "0.0.0.0")
+        port = os.getenv("REST_API_PORT", "8080")
+        self.API_BASE_URL = f"http://{host}:{port}/api/v2"
         self.config_data = config_data
         self.agents = config_data.get("agents", [])
         self.test_cases = config_data.get("test_cases", [])

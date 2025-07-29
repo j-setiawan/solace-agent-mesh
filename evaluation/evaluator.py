@@ -270,7 +270,7 @@ class ResponseMatchEvaluator(EvaluationStrategy):
     def evaluate(
         self, test_case: Dict[str, Any], summary_data: Dict[str, Any]
     ) -> Optional[float]:
-        """Evaluate response matching score using ROUGE-L."""
+        """Evaluate response matching score using a weighted ROUGE average."""
         try:
             expected_response = test_case["evaluation"]["expected_response"]
             actual_response = summary_data.get("final_message", "")
@@ -278,8 +278,16 @@ class ResponseMatchEvaluator(EvaluationStrategy):
             if not actual_response or not expected_response:
                 return 0.0
 
-            scores = self.rouge.get_scores(actual_response, expected_response)
-            return scores[0]["rouge-l"]["f"]
+            scores = self.rouge.get_scores(actual_response, expected_response)[0]
+
+            # Weighted average of ROUGE-1, ROUGE-2, and ROUGE-L f-scores
+            rouge_1_f = scores.get("rouge-1", {}).get("f", 0.0)
+            rouge_2_f = scores.get("rouge-2", {}).get("f", 0.0)
+            rouge_l_f = scores.get("rouge-l", {}).get("f", 0.0)
+
+            weighted_score = (0.2 * rouge_1_f) + (0.3 * rouge_2_f) + (0.5 * rouge_l_f)
+
+            return weighted_score
 
         except (ValueError, KeyError, TypeError) as e:
             logger.warning(f"Error in response match evaluation: {e}")
