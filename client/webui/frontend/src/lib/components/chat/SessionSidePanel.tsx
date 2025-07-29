@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Menu, Edit } from "lucide-react";
+import { PanelLeftIcon, Edit } from "lucide-react";
 
 import { Button } from "@/lib/components/ui";
 import { useChatContext } from "@/lib/hooks";
@@ -22,10 +22,10 @@ export const SessionSidePanel: React.FC<SessionSidePanelProps> = ({ onToggle }) 
         <div className={`bg-background flex h-full w-100 flex-col border-r`}>
             <div className="flex items-center justify-between px-4 pt-[35px] pb-3">
                 <Button variant="ghost" onClick={onToggle} className="p-2" tooltip="Collapse Sessions Panel">
-                    <Menu className="h-5 w-5" />
+                    <PanelLeftIcon className="size-5" />
                 </Button>
-                <Button variant="ghost" onClick={handleNewSessionClick} className="justify-start" title="Start New Chat Session">
-                    <Edit className="mr-2 h-4 w-4" />
+                <Button variant="ghost" onClick={handleNewSessionClick} tooltip="Start New Chat Session">
+                    <Edit className="size-5" />
                     New chat
                 </Button>
             </div>
