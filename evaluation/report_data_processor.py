@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any, Set, Tuple
 from pathlib import Path
 from collections import defaultdict, Counter
+import random
 
 # Import test case loader
 from .test_case_loader import load_test_case
@@ -345,6 +346,7 @@ class ChartDataService:
             "gemini-pro": "#f59e0b",
             "gemini-2.5-pro": "#f59e0b",
             "gemini-flash": "#8b5cf6",
+            "gemini-2.5-flash": "#a855f7",
             "gpt-3.5-turbo": "#ef4444",
             "claude-3-haiku": "#84cc16",
         }
@@ -358,7 +360,12 @@ class ChartDataService:
                 score = category_scores[category].get(model_name, 0)
                 model_data.append(round(score, 3))
 
-            color = model_colors.get(model_name, "#6b7280")
+            color = model_colors.get(model_name)
+            if color is None:
+                # Generate a random color if not in the predefined list
+                r = lambda: random.randint(0, 255)
+                color = f"#{r():02x}{r():02x}{r():02x}"
+
             chart_datasets.append(
                 {
                     "label": model_name,

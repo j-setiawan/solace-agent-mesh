@@ -159,7 +159,7 @@ class ConfigService:
     def get_artifact_config(cls) -> Tuple[str, str]:
         """Get artifact service configuration from eval backend config."""
         try:
-            webui_config = cls.load_yaml_with_includes("evaluation/eval_backend.yaml")
+            webui_config = cls.load_yaml_with_includes("configs/eval_backend.yaml")
 
             # Find the correct app_config
             for app in webui_config.get("apps", []):
