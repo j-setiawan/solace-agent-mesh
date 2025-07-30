@@ -304,10 +304,13 @@ def create_orchestrator_config(
             f"  Configured: {logging_config_dest_path.relative_to(project_root)}"
         )
     except Exception as e:
+        error_message = (
+            f"Error configuring file {logging_config_dest_path}: {e}"
+            if logging_config_dest_path
+            else f"Error configuring logging configuration: {e}"
+        )
         click.echo(
-            click.style(
-                f"Error configuring file {logging_config_dest_path}: {e}", fg="red"
-            ),
+            click.style(error_message, fg="red"),
             err=True,
         )
         return False
