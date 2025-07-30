@@ -14,24 +14,25 @@ interface FileAttachmentMessageProps {
 }
 
 export const FileAttachmentMessage: React.FC<Readonly<FileAttachmentMessageProps>> = ({ fileAttachment }) => {
-    return <FileMessage filename={fileAttachment.name} onDownload={() => downloadFile(fileAttachment)} />;
+    return <FileMessage filename={fileAttachment.name} onDownload={() => downloadFile(fileAttachment)} className="ml-4" />;
 };
 
 interface FileMessageProps {
     filename: string;
+    className?: string;
     onDownload?: () => void;
 }
 
-export const FileMessage: React.FC<Readonly<FileMessageProps>> = ({ filename, onDownload }) => {
+export const FileMessage: React.FC<Readonly<FileMessageProps>> = ({ filename, className, onDownload }) => {
     const { artifacts, setPreviewArtifact, openSidePanelTab } = useChatContext();
 
     const artifact: ArtifactInfo | undefined = useMemo(() => artifacts.find(artifact => artifact.filename === filename), [artifacts, filename]);
     const FileIcon = useMemo(() => getFileIcon(artifact), [artifact]);
 
     return (
-        <div className="ml-4 flex flex-shrink items-center gap-2 rounded-lg bg-[var(--accent-background)] px-2 py-1 h-11 max-w-xs">
+        <div className={`flex flex-shrink items-center gap-2 rounded-lg bg-[var(--accent-background)] px-2 py-1 h-11 max-w-xs ${className || ""}`}>
             {FileIcon}
-            <span className="min-w-0 h-9 flex-1 truncate text-sm leading-9" title={filename}>
+            <span className="min-w-0 flex-1 truncate text-sm leading-9" title={filename}>
                 <strong>
                     <code>{filename}</code>
                 </strong>
