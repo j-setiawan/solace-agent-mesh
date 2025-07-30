@@ -90,8 +90,9 @@ extra-dependencies = [
 ]
 
 # Override to ensure integration tests are explicitly skipped in CI
-# [tool.hatch.envs.hatch-test.overrides]
-# env.CI.env-vars = "PYTEST_ADDOPTS=--ignore=tests/integration --tb=short --strict-markers --disable-warnings -p pytest_asyncio"
+[tool.hatch.envs.hatch-test.overrides]
+env.CI.env-vars = "PYTEST_ADDOPTS=-n 0 --ignore=tests/integration --tb=short --strict-markers --disable-warnings -p pytest_asyncio"
+# env.CI.env-vars = "PYTEST_ADDOPTS=-n 0 --tb=short --strict-markers --disable-warnings -p pytest_asyncio"
 
 [[tool.hatch.envs.hatch-test.matrix]]
 python = ["3.10", "3.13"]
@@ -152,5 +153,3 @@ path = ".github/helper_scripts/build_frontend.py"
 
 [tool.hatch.version]
 path = "cli/__init__.py"
-
-
