@@ -11,7 +11,6 @@ from typing import Dict, Any, List, Union, Optional, Tuple
 
 from sam_test_infrastructure.llm_server.server import (
     TestLLMServer,
-    ChatCompletionResponse,
     ChatCompletionRequest,
 )
 
