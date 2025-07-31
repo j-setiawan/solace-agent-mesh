@@ -12,7 +12,7 @@ pip install sam-rest-client
 
 ## Prerequisite
 
-Hve an instance of solace agent mesh running with the [REST Gateway](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/tutorials/rest-gateway) configured
+Have an instance of solace agent mesh running with the [REST Gateway](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/tutorials/rest-gateway) configured
 
 ## Usage
 
