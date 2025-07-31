@@ -10,9 +10,15 @@ This library simplifies task submission and result retrieval by abstracting the 
 pip install sam-rest-client
 ```
 
+## Prerequisite
+
+Hve an instance of solace agent mesh running with the [REST Gateway](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/tutorials/rest-gateway) configured
+
 ## Usage
 
 Here is a quick example of how to use the client to submit a task to an agent.
+
+### Script
 
 ```python
 import asyncio
@@ -22,14 +28,14 @@ async def main():
     # Initialize the client with the gateway's base URL and an auth token
     client = SAMRestClient(
         base_url="http://localhost:8080",
-        auth_token="your-bearer-token-here"
+        auth_token="your-bearer-token-here" # Optional if you have Authentication configured in your REST Gateway
     )
 
     try:
-        print("Submitting task to 'DataAnalyzer'...")
+        print("Submitting task to 'OrchestratorAgent'...")
         # Use the modern, asynchronous API (default)
         final_result = await client.invoke(
-            agent_name="DataAnalyzer",
+            agent_name="OrchestratorAgent",
             prompt="Summarize the attached sales data.",
             files=[("sales.csv", open("sales.csv", "rb"))],
             timeout_seconds=120
@@ -62,6 +68,19 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+```
+
+### Using the CLI
+
+When you install the sam-rest-client, you also have access to a cli command via `sam-rest-cli`. to learn more about it run the following
+
+```
+sam-rest-cli -h
+```
+
+For example
+```
+sam-rest-cli --url http://localhost:8080 --agent OrchestratorAgent --prompt "Give me a list of all the agents in the system"
 ```
 
 ### Legacy Synchronous Mode
