@@ -81,13 +81,10 @@ installer = "pip"
 dependencies = [
     "pytest_asyncio",
     "pytest>=8.0.0",
-    "pytest-mock>=3.0.0",
-    "pytest-cov>=4.0.0",
-    "pytest-xdist>=3.5.0",
-    "sam-test-infrastructure @ file:./sam-test-infrastructure"
 ]
 extra-dependencies = [
     "solace-agent-mesh[database,cli,gcs,vertex,employee_tools]",
+    "sam-test-infrastructure @ {root:uri}/sam-test-infrastructure"
 ]
 
 # Override to ensure integration tests are explicitly skipped in CI
