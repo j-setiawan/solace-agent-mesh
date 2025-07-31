@@ -133,7 +133,7 @@ By sending a request and observing the response, you can verify an agent's behav
 
 ## System Logs
 
-System logs provide detailed insights into the system's behavior. The logging is configured in the `configs/logging_config.ini` file, which controls both console (STDOUT) and file-based logging.
+System logs provide detailed insights into the system's behavior. The logging behavior is configured in the `configs/logging_config.ini` file, which controls both console (STDOUT) and file-based logging.
 
 By default, the system is configured to:
 - Output logs with a severity of `INFO` and higher to the console (STDOUT).
