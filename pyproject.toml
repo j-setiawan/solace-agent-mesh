@@ -88,6 +88,7 @@ dependencies = [
 ]
 extra-dependencies = [
     "solace-agent-mesh[database,cli,gcs,vertex,employee_tools]",
+    "sam-test-infrastructure @ {root:uri}/sam-test-infrastructure"
 ]
 
 # Override to ensure mermaid tests are explicitly skipped in CI (requires playwright)
@@ -153,5 +154,3 @@ path = ".github/helper_scripts/build_frontend.py"
 
 [tool.hatch.version]
 path = "cli/__init__.py"
-
-
