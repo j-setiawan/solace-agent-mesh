@@ -91,10 +91,6 @@ extra-dependencies = [
     "sam-test-infrastructure @ {root:uri}/sam-test-infrastructure"
 ]
 
-# Override to ensure mermaid tests are explicitly skipped in CI (requires playwright)
-[tool.hatch.envs.hatch-test.overrides]
-env.CI.env-vars = "PYTEST_ADDOPTS=--ignore=tests/integration/scenarios_declarative/test_data/general_agent_tools/mermaid_diagram_generator/ --tb=short --strict-markers --disable-warnings -p pytest_asyncio"
-
 [[tool.hatch.envs.hatch-test.matrix]]
 python = ["3.10", "3.13"]
 
