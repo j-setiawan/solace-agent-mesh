@@ -3,8 +3,8 @@ Programmatic integration tests for the BuiltinTool registry.
 """
 
 import pytest
-from src.solace_agent_mesh.agent.tools.registry import tool_registry
-from src.solace_agent_mesh.agent.tools.tool_definition import BuiltinTool
+from solace_agent_mesh.agent.tools.registry import tool_registry
+from solace_agent_mesh.agent.tools.tool_definition import BuiltinTool
 from google.genai import types as adk_types
 
 pytestmark = pytest.mark.asyncio

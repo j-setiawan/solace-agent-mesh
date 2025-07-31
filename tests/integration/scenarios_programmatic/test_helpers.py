@@ -5,13 +5,13 @@ Helper functions for programmatic integration tests to reduce boilerplate.
 import pytest
 from typing import List, Dict, Any, Optional
 
-from tests.integration.infrastructure.llm_server.server import (
+from sam_test_infrastructure.llm_server.server import (
     TestLLMServer,
 )
-from tests.integration.infrastructure.gateway_interface.component import (
+from sam_test_infrastructure.gateway_interface.component import (
     TestGatewayComponent,
 )
-from src.solace_agent_mesh.common.types import (
+from solace_agent_mesh.common.types import (
     TextPart,
     Task,
     TaskStatusUpdateEvent,
