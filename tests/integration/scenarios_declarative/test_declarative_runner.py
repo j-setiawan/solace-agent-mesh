@@ -960,9 +960,9 @@ SKIPPED_MERMAID_DIAGRAM_GENERATOR_SCENARIOS = [
 ]
 
 SKIPPED_FAILING_EMBED_TESTS = [
-    "test_embed_chain_malformed",
-    "test_embed_malformed_no_close_delimiter",
-    "test_ac_template_missing_template_file",
+    "embed_general_chain_malformed_001",
+    "embed_general_malformed_no_close_delimiter_001",
+    "embed_ac_template_missing_template_file_001",
 ]
 
 @pytest.mark.asyncio
