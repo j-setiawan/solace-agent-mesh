@@ -83,7 +83,8 @@ dependencies = [
     "pytest>=8.0.0",
     "pytest-mock>=3.0.0",
     "pytest-cov>=4.0.0",
-    "pytest-xdist>=3.5.0"
+    "pytest-xdist>=3.5.0",
+    "sam-test-infrastructure @ file:./sam-test-infrastructure"
 ]
 extra-dependencies = [
     "solace-agent-mesh[database,cli,gcs,vertex,employee_tools]",
@@ -152,5 +153,3 @@ path = ".github/helper_scripts/build_frontend.py"
 
 [tool.hatch.version]
 path = "cli/__init__.py"
-
-
