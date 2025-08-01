@@ -8,6 +8,7 @@ import { FlowChartPanel, processTaskForVisualization } from "@/lib/components/ac
 import type { VisualizedTask } from "@/lib/types";
 
 import { ArtifactPanel } from "./artifact/ArtifactPanel";
+import { FlowChartDetails } from "../activities/FlowChartDetails";
 
 interface ChatSidePanelProps {
     onCollapsedToggle: (isSidePanelCollapsed: boolean) => void;
@@ -102,7 +103,10 @@ export const ChatSidePanel: React.FC<ChatSidePanelProps> = ({ onCollapsedToggle,
                         <TabsContent value="workflow" className="m-0 h-full">
                             <div className="h-full">
                                 {visualizedTask ? (
-                                    <FlowChartPanel processedSteps={visualizedTask.steps || []} isRightPanelVisible={false} isSidePanelTransitioning={isSidePanelTransitioning} />
+                                    <div className="flex h-full flex-col">
+                                        <FlowChartDetails task={visualizedTask} />
+                                        <FlowChartPanel processedSteps={visualizedTask.steps || []} isRightPanelVisible={false} isSidePanelTransitioning={isSidePanelTransitioning} />
+                                    </div>
                                 ) : (
                                     <div className="flex h-full items-center justify-center p-4">
                                         <div className="text-muted-foreground text-center">
