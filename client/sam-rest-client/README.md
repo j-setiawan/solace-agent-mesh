@@ -28,7 +28,7 @@ async def main():
     # Initialize the client with the gateway's base URL and an auth token
     client = SAMRestClient(
         base_url="http://localhost:8080",
-        auth_token="your-bearer-token-here" # Optional if you have Authentication configured in your REST Gateway
+        auth_token="your-bearer-token-here" # Required if your REST Gateway requires authentication; omit if authentication is disabled
     )
 
     try:
