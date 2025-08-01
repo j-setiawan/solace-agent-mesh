@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
 ### Using the CLI
 
-When you install the sam-rest-client, you also have access to a cli command via `sam-rest-cli`. To learn more about it run the following
+When you install the sam-rest-client, you also have access to a CLI command via `sam-rest-cli`. To learn more about it run the following
 
 ```
 sam-rest-cli -h
