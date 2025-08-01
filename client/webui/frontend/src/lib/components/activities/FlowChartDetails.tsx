@@ -1,8 +1,11 @@
-import { Badge } from "@/lib/components/ui";
-import type { MessageFE, VisualizedTask } from "@/lib/types";
 import { useMemo, type JSX } from "react";
-import { LoadingMessageRow } from "../chat";
+
+import { Badge } from "@/lib/components/ui";
 import { useChatContext } from "@/lib/hooks";
+
+import type { MessageFE, VisualizedTask } from "@/lib/types";
+
+import { LoadingMessageRow } from "../chat";
 
 const getStatusBadge = (status: string, type: "info" | "error" | "success") => {
     return (
@@ -33,19 +36,18 @@ const getTaskStatus = (task: VisualizedTask, loadingMessage: MessageFE | undefin
 };
 
 export const FlowChartDetails: React.FC<{ task: VisualizedTask  }> = ({ task }) => {
+	console.count("FlowChartDetails rendered");
 	const { messages } = useChatContext();
-	const loadingMessage = useMemo(() => {
-		return messages.find(message => message.isStatusBubble);
-	}, [messages]);
-	
-    if (!task) {
-        return null;
-    }
+	const taskStatus = useMemo(() => {
+		const loadingMessage = messages.find(message => message.isStatusBubble);
+
+		return task ? getTaskStatus(task, loadingMessage) : null;
+	}, [messages, task]);
 
     return (
-        <div className="p-4 border-b grid grid-cols-[auto_1fr] grid-rows-[32px_32px] gap-x-8 leading-[32px]">
+        task ? <div className="p-4 border-b grid grid-cols-[auto_1fr] grid-rows-[32px_32px] gap-x-8 leading-[32px]">
 			<div className="text-muted-foreground">User</div><div className="truncate" title={task.initialRequestText}>{task.initialRequestText}</div>
-			<div className="text-muted-foreground">Status</div><div className="truncate">{getTaskStatus(task, loadingMessage)}</div>
-        </div>
+			<div className="text-muted-foreground">Status</div><div className="truncate">{taskStatus}</div>
+        </div> : null
     );
 };
