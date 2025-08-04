@@ -39,22 +39,21 @@ export const ChatSidePanel: React.FC<ChatSidePanelProps> = ({ onCollapsedToggle,
         onCollapsedToggle(newCollapsed);
     };
 
-    const handleIconClick = (tab: "files" | "workflow") => {
-        if (isSidePanelCollapsed) {
-            setIsSidePanelCollapsed(false);
-            setActiveSidePanelTab(tab);
-            onCollapsedToggle?.(false);
-        } else {
-            setActiveSidePanelTab(tab);
-        }
-    };
-
     const handleTabClick = (tab: "files" | "workflow") => {
         if (tab === "files") {
             setPreviewArtifact(null);
         }
 
         setActiveSidePanelTab(tab);
+    };
+
+    const handleIconClick = (tab: "files" | "workflow") => {
+        if (isSidePanelCollapsed) {
+            setIsSidePanelCollapsed(false);
+            onCollapsedToggle?.(false);
+        }
+
+        handleTabClick(tab);
     };
 
     // Collapsed state - narrow vertical panel with icons
