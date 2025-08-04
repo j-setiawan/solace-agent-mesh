@@ -18,7 +18,7 @@ interface ChatSidePanelProps {
 }
 
 export const ChatSidePanel: React.FC<ChatSidePanelProps> = ({ onCollapsedToggle, isSidePanelCollapsed, setIsSidePanelCollapsed, isSidePanelTransitioning }) => {
-    const { activeSidePanelTab, setActiveSidePanelTab, taskIdInSidePanel } = useChatContext();
+    const { activeSidePanelTab, setActiveSidePanelTab, setPreviewArtifact, taskIdInSidePanel } = useChatContext();
     const { monitoredTasks } = useTaskContext();
     const [visualizedTask, setVisualizedTask] = useState<VisualizedTask | null>(null);
 
@@ -49,6 +49,14 @@ export const ChatSidePanel: React.FC<ChatSidePanelProps> = ({ onCollapsedToggle,
         }
     };
 
+    const handleTabClick = (tab: "files" | "workflow") => {
+        if (tab === "files") {
+            setPreviewArtifact(null);
+        }
+
+        setActiveSidePanelTab(tab);
+    };
+
     // Collapsed state - narrow vertical panel with icons
     if (isSidePanelCollapsed) {
         return (
@@ -74,7 +82,7 @@ export const ChatSidePanel: React.FC<ChatSidePanelProps> = ({ onCollapsedToggle,
     return (
         <div className="bg-background flex h-full flex-col border-l">
             <div className="m-1 min-h-0 flex-1">
-                <Tabs value={activeSidePanelTab} onValueChange={value => setActiveSidePanelTab(value as "files" | "workflow")} className="flex h-full flex-col">
+                <Tabs value={activeSidePanelTab} onValueChange={value => handleTabClick(value as "files" | "workflow")} className="flex h-full flex-col">
                     <div className="flex gap-2 p-2">
                         <Button variant="ghost" onClick={toggleCollapsed} className="p-1" tooltip="Collapse Panel">
                             <PanelRightIcon className="size-5" />
