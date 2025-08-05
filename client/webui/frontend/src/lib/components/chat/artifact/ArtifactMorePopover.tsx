@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Trash } from "lucide-react";
+import { RefreshCcw, Trash } from "lucide-react";
 
 import { Menu, Popover, PopoverContent, PopoverTrigger, type MenuAction } from "@/lib/components";
 import { useChatContext } from "@/lib/hooks";
@@ -10,14 +10,21 @@ interface MorePopoverProps {
 }
 
 export const MorePopover: React.FC<MorePopoverProps> = ({ children }) => {
-	const { setIsBatchDeleteModalOpen } = useChatContext();
+	const { artifactsRefetch, setIsBatchDeleteModalOpen } = useChatContext();
 
     const menuActions: MenuAction[] = [{
+        id: "refreshAll",
+        label: "Refresh",
+        onClick: () => { artifactsRefetch(); },
+        icon: <RefreshCcw />,
+        iconPosition: "right",
+    },{
         id: "deleteAll",
         label: "Delete All",
         onClick: () => { setIsBatchDeleteModalOpen(true); },
         icon: <Trash />,
         iconPosition: "right",
+        divider: true,
     }];
 
     return (

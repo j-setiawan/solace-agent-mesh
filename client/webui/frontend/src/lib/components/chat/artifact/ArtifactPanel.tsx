@@ -21,12 +21,14 @@ const sortFunctions: Record<SortOptionType, (a1: ArtifactInfo, a2: ArtifactInfo)
 };
 
 export const ArtifactPanel: React.FC = () => {
-    const { artifacts, previewArtifact, setPreviewArtifact } = useChatContext();
+    const { artifacts, artifactsLoading, previewArtifact, setPreviewArtifact } = useChatContext();
 
     const [sortOption, setSortOption] = useState<SortOptionType>(SortOption.DateDesc);
     const sortedArtifacts = useMemo(() => {
+        if (artifactsLoading) return [];
+        
         return artifacts ? [...artifacts].sort(sortFunctions[sortOption]) : [];
-    }, [artifacts, sortOption]);
+    }, [artifacts, artifactsLoading, sortOption]);
 
     const header = useMemo(() => {
         if (previewArtifact) {
@@ -59,6 +61,7 @@ export const ArtifactPanel: React.FC = () => {
         );
     }, [previewArtifact, sortedArtifacts.length, sortOption, setPreviewArtifact]);
 
+    console.log("Loading", artifactsLoading, "Artifacts", sortedArtifacts.length);
     return (
         <div className="flex h-full flex-col">
             {header}
@@ -67,15 +70,15 @@ export const ArtifactPanel: React.FC = () => {
             <div className="flex min-h-0 flex-1">
                 {!previewArtifact && (
                     <div className="flex-1 overflow-y-auto">
-                        {sortedArtifacts.map(artifact => (
+                        {!artifactsLoading && sortedArtifacts.map(artifact => (
                             <ArtifactCard key={artifact.filename} artifact={artifact} />
                         ))}
-                        {artifacts.length === 0 && (
+                        {artifactsLoading || artifacts.length === 0 && (
                             <div className="flex h-full items-center justify-center p-4">
                                 <div className="text-muted-foreground text-center">
                                     <FileText className="mx-auto mb-4 h-12 w-12" />
                                     <div className="text-lg font-medium">Files</div>
-                                    <div className="mt-2 text-sm">No files available</div>
+                                    <div className="mt-2 text-sm">{artifactsLoading ? "Loading..." : "No files available"}</div>
                                 </div>
                             </div>
                         )}
