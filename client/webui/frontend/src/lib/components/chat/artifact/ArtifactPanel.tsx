@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 
-import { ArrowDown, ArrowLeft, Ellipsis, FileText } from "lucide-react";
+import { ArrowDown, ArrowLeft, Ellipsis, FileText, Loader2 } from "lucide-react";
 
 import { Button } from "@/lib/components";
 import { useChatContext } from "@/lib/hooks";
@@ -26,7 +26,7 @@ export const ArtifactPanel: React.FC = () => {
     const [sortOption, setSortOption] = useState<SortOptionType>(SortOption.DateDesc);
     const sortedArtifacts = useMemo(() => {
         if (artifactsLoading) return [];
-        
+
         return artifacts ? [...artifacts].sort(sortFunctions[sortOption]) : [];
     }, [artifacts, artifactsLoading, sortOption]);
 
@@ -61,24 +61,28 @@ export const ArtifactPanel: React.FC = () => {
         );
     }, [previewArtifact, sortedArtifacts.length, sortOption, setPreviewArtifact]);
 
-    console.log("Loading", artifactsLoading, "Artifacts", sortedArtifacts.length);
     return (
         <div className="flex h-full flex-col">
             {header}
-
-            {/* Panel Content */}
             <div className="flex min-h-0 flex-1">
                 {!previewArtifact && (
                     <div className="flex-1 overflow-y-auto">
-                        {!artifactsLoading && sortedArtifacts.map(artifact => (
+                        {sortedArtifacts.map(artifact => (
                             <ArtifactCard key={artifact.filename} artifact={artifact} />
                         ))}
-                        {artifactsLoading || artifacts.length === 0 && (
+                        {sortedArtifacts.length === 0 && (
                             <div className="flex h-full items-center justify-center p-4">
                                 <div className="text-muted-foreground text-center">
-                                    <FileText className="mx-auto mb-4 h-12 w-12" />
-                                    <div className="text-lg font-medium">Files</div>
-                                    <div className="mt-2 text-sm">{artifactsLoading ? "Loading..." : "No files available"}</div>
+                                    {artifactsLoading && (
+                                        <Loader2 className="size-6 animate-spin" />
+                                    )}
+                                    {!artifactsLoading && (
+                                        <>
+                                            <FileText className="mx-auto mb-4 h-12 w-12" />
+                                            <div className="text-lg font-medium">Files</div>
+                                            <div className="mt-2 text-sm">No files available</div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -93,8 +97,6 @@ export const ArtifactPanel: React.FC = () => {
                     </div>
                 )}
             </div>
-
-            {/* Delete Modals */}
             <ArtifactDeleteDialog />
             <ArtifactDeleteAllDialog />
         </div>
