@@ -89,7 +89,7 @@ dependencies = [
 ]
 extra-dependencies = [
     "solace-agent-mesh[database,cli,gcs,vertex,employee_tools]",
-    "sam-test-infrastructure @ {root:uri}/sam-test-infrastructure"
+    "sam-test-infrastructure @ {root:uri}/tests/sam-test-infrastructure"
 ]
 
 [tool.hatch.envs.hatch-test.scripts]
