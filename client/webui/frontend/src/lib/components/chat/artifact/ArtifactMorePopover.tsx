@@ -17,20 +17,20 @@ export const MorePopover: React.FC<MorePopoverProps> = ({ children }) => {
         label: "Refresh",
         onClick: () => { artifactsRefetch(); },
         icon: <RefreshCcw />,
-        iconPosition: "right",
+        iconPosition: "left",
     },{
         id: "deleteAll",
         label: "Delete All",
         onClick: () => { setIsBatchDeleteModalOpen(true); },
         icon: <Trash />,
-        iconPosition: "right",
+        iconPosition: "left",
         divider: true,
     }];
 
     return (
         <Popover>
             <PopoverTrigger asChild>{children}</PopoverTrigger>
-            <PopoverContent align="end" side="bottom" className="bg-background min-w-[200px] p-1" sideOffset={0}>
+            <PopoverContent align="end" side="bottom" className="bg-background px-0 py-1 w-auto" sideOffset={0}>
                 <Menu actions={menuActions} />
             </PopoverContent>
         </Popover>
