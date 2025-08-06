@@ -140,6 +140,7 @@ markers = [
     # Common Components
     # Markers for sub-components within the 'common' directory.
     "middleware: marks tests related to the middleware component",
+    "server: marks tests related to the server component",
     "services: marks tests related to the services",
 
     # Features
