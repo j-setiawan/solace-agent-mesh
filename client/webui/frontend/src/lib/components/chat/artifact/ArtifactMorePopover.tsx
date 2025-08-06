@@ -30,7 +30,7 @@ export const MorePopover: React.FC<MorePopoverProps> = ({ children }) => {
     return (
         <Popover>
             <PopoverTrigger asChild>{children}</PopoverTrigger>
-            <PopoverContent align="end" side="bottom" className="bg-background px-0 py-1 w-auto" sideOffset={0}>
+            <PopoverContent align="end" side="bottom" className="w-auto" sideOffset={0}>
                 <Menu actions={menuActions} />
             </PopoverContent>
         </Popover>
