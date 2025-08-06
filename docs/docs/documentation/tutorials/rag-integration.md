@@ -6,7 +6,7 @@ toc_max_heading_level: 4
 
 # RAG Integration
 
-This tutorial guides you through setting up and configuring the Solace Agent Mesh (SAM) Retrieval Augmented Generation (RAG) plugin. This powerful plugin allows your agents to answer questions by retrieving information from a knowledge base of your documents.
+This tutorial guides you through setting up and configuring the Solace Agent Mesh (SAM) Retrieval Augmented Generation (RAG) plugin. The RAG plugin enables your agents to answer questions by retrieving information from a knowledge base of your documents.
 
 ## What is SAM RAG?
 
@@ -24,7 +24,7 @@ This allows you to build agents that can answer questions about your own private
 Before you begin, ensure you have:
 - [Installed Solace Agent Mesh and the SAM CLI](../getting-started/installation.md).
 - [Created a new Solace Agent Mesh project](../getting-started/quick-start.md).
-- Access to a vector database (e.g., Qdrant, Chroma, Pinecone).
+- Access to a vector database (for example, Qdrant, Chroma, and Pinecone).
 - Access to an LLM for generation and an embedding model.
 - A directory with some documents for the agent to ingest.
 
@@ -36,13 +36,13 @@ To add the RAG plugin to your SAM project, run the following command:
 sam plugin add my-rag-agent --plugin sam-rag
 ```
 
-You can replace `my-rag-agent` with any name you prefer. This command will:
-- Install the `sam-rag` plugin.
-- Create a new agent configuration file at `configs/agents/my-rag-agent.yaml`.
+Replace `my-rag-agent` with your preferred agent name. This command:
+- Installs the `sam-rag` plugin.
+- Creates a new agent configuration file at `configs/agents/my-rag-agent.yaml`.
 
 ## Configuring the RAG Agent
 
-The RAG agent requires a detailed configuration. Open `configs/agents/my-rag-agent.yaml` and let's walk through the different sections.
+The RAG agent requires a detailed configuration. Open `configs/agents/my-rag-agent.yaml` to configure the following sections:.
 
 ### Shared Configuration
 
@@ -82,7 +82,7 @@ scanner:
   source:
     type: filesystem
     directories:
-      - "/path/to/your/documents" # IMPORTANT: Change this path
+      - "/path/to/your/documents" # Important: Replace with your actual document directory path
     filters:
       file_formats:
         - ".txt"
@@ -235,7 +235,7 @@ QDRANT_COLLECTION="my-rag-collection"
 QDRANT_EMBEDDING_DIMENSION=1536 # Depends on your embedding model
 
 # Scanner
-LOCAL_DOCUMENTS_PATH="./my_documents" # A folder with your files
+LOCAL_DOCUMENTS_PATH="./my_documents" # Relative path to your documents folder
 ```
 
 Create a directory named `my_documents` in your project root and place some text or markdown files inside it.
@@ -248,7 +248,7 @@ Once you have configured your agent and set the environment variables, you can r
 sam run configs/agents/my-rag-agent.yaml
 ```
 
-When the agent starts, it will begin scanning the documents in the configured source, processing them, and ingesting them into your vector database. This may take some time depending on the number and size of your documents.
+When the agent starts, it begins scanning the documents in the configured source, processing and ingesting them into your vector database. This process may take some time, depending on the number and size of your documents.
 
 ## Testing the RAG Agent
 
@@ -260,7 +260,7 @@ There are two primary ways to ingest documents into your RAG agent's knowledge b
 
 #### Option 1: Automatic Scanning (Batch Ingestion)
 
-This is the method we've prepared for by configuring the `scanner`. The agent automatically ingests documents from the directories specified in your configuration upon startup.
+This method uses the configured `scanner` component. The agent automatically ingests documents from the directories specified in your configuration upon startup.
 
 **Step 1: Create a Document**
 
@@ -298,7 +298,7 @@ You will see logs indicating that the file is being processed. Once the agent is
 
 #### Option 2: Manual Upload via Gateway
 
-You can also ingest documents on-the-fly by uploading them directly through a gateway, like the Web UI. This is useful for adding single documents without restarting the agent. The RAG agent exposes a tool for this purpose.
+You can also ingest documents dynamically by uploading them directly through a gateway, like the Web UI. This is useful for adding single documents without restarting the agent. The RAG agent exposes a tool for this purpose.
 
 **Step 1: Start the RAG Agent and Web UI**
 
@@ -306,7 +306,7 @@ Ensure both your RAG agent and the Web UI gateway are running.
 
 **Step 2: Upload a Document in the Web UI**
 
-1.  Open the Web UI (usually at http://localhost:8000) and start a chat with your RAG agent.
+1.  Open the Web UI (usually at http://localhost:8000, or check your gateway configuration for the correct URL) and start a chat with your RAG agent.
 2.  Use the file attachment button to select a document from your local machine.
 3.  Send a prompt along with the file, instructing the agent to ingest it. For example:
     > "Please ingest the attached document into your knowledge base."
@@ -327,7 +327,7 @@ You can interact with your RAG agent through any gateway, such as the Web UI gat
 3.  Start a conversation with `my-rag-agent`.
 4.  Ask a question related to the content of the documents you provided during the initial scan.
 
-For example, if you have a document about the features of a product, you could ask:
+For example, if you have a document about product features, you could ask:
 > "What are the key features of Product X?"
 
 The agent will search its knowledge base, find the relevant information, and generate an answer based on the content of your documents.
