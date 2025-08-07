@@ -29,7 +29,7 @@
 
 ---
 
-Solace Agent Mesh is a framework that supports building AI applications where multiple specialized AI agents work together to solve complex problems.
+Solace Agent Mesh is a framework that supports building AI applications where multiple specialized AI agents work together to solve complex problems and use [Solace Platform](https://solace.com)'s event messaging for true scalability and reliability.
 
 With Solace Agent Mesh (SAM), you can create teams of AI agents, each having distinct skills and access to specific tools. For example, you could have a Database Agent that can make SQL queries to fetch data or a MultiModal Agent that can help create images, audio files and reports.
 
@@ -48,14 +48,14 @@ The result? A fully asynchronous, event-driven and decoupled AI agent architectu
 ---
 
 ## 🔑 Key Features 
-- **[Multi-Agent Event-Driven Architecture](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/getting-started/component-overview)** – Agents communicate via Solace's enterprise event mesh for true scalability
-- **[Agent Orchestration](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/concepts/agents)** – Complex tasks are broken down and delegated automatically by the [Orchestrator](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/concepts/orchestrator) agent
-- **[Flexible Interfaces](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/concepts/gateways)** – REST API, web UI, [Slack](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/tutorials/slack-integration) integration, or build your own
+- **[Multi-Agent Event-Driven Architecture](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/getting-started/component-overview)** – Agents communicate via the Solace Event Mesh for true scalability
+- **[Agent Orchestration](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/concepts/agents)** – Complex tasks are automatically broken down and delegated by the [Orchestrator](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/concepts/orchestrator) agent
+- **[Flexible Interfaces](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/concepts/gateways)** – Integrate with REST API, web UI, [Slack](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/tutorials/slack-integration), or build your own integration
 - **[Extensible](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/concepts/plugins)** – Add your own agents, gateways, or services with minimal code
 - **[Agent-to-Agent Communication](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/concepts/architecture)** – Agents can discover and delegate tasks to each other seamlessly using the Agent2Agent (A2A) Protocol
-- **[Dynamic Embeds](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/user-guide/builtin-tools/embeds)** – Embed dynamic content like real-time data, calculations, and file contents in responses
+- **[Dynamic Embeds](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/user-guide/builtin-tools/embeds)** – Embed dynamic content like real-time data, calculations and file contents in responses
 
-📚 Want to know more? Check out the full Solace Agent Mesh [documentation](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/getting-started/introduction/).
+📚 **Want to know more?** Check out the full Solace Agent Mesh [documentation](https://solacelabs.github.io/solace-agent-mesh/docs/documentation/getting-started/introduction/).
 
 ---
 
@@ -82,7 +82,7 @@ mkdir my-agent-mesh && cd my-agent-mesh
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 ```
-#### 3. Install the Solace Agent Mesh (SAM)
+#### 3. Install Solace Agent Mesh (SAM)
 ```bash
 pip3 install solace-agent-mesh
 ```
@@ -162,5 +162,10 @@ View the full list of contributors here: [GitHub Contributors](https://github.co
 
 ## 📄 License
 
-This project is licensed under the **Apache 2.0 License**.  
-See the full license text in the [LICENSE](LICENSE) file.
+This project is licensed under the **Apache 2.0 License**. See the full license text in the [LICENSE](LICENSE) file.
+
+---
+
+<h3 align="center">
+  <img src="./docs/static/img/solace-logo-text.svg" alt="Solace Agent Mesh Logo" width="100"/>
+</h3>
