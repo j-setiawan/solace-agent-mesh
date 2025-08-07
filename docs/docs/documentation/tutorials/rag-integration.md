@@ -42,7 +42,7 @@ Replace `my-rag-agent` with your preferred agent name. This command:
 
 ## Configuring the RAG Agent
 
-The RAG agent requires a detailed configuration. Open `configs/agents/my-rag-agent.yaml` to configure the following sections:.
+The RAG agent requires a detailed configuration. Open `configs/agents/my-rag-agent.yaml` to configure the following sections:
 
 ### Shared Configuration
 
@@ -166,7 +166,7 @@ embedding:
 
 #### 5. Vector Database Configuration
 
-Configure the connection to your vector database where the embeddings will be stored.
+Configure the connection to your vector database where the embeddings are stored.
 
 **Qdrant Example:**
 ```yaml
@@ -191,7 +191,7 @@ vector_db:
 
 #### 6. LLM Configuration
 
-Configure the LLM that will be used to generate answers based on the retrieved context.
+Configure the LLM that is used to generate answers based on the retrieved context.
 ```yaml
 llm:
   load_balancer:
@@ -311,7 +311,7 @@ Ensure both your RAG agent and the Web UI gateway are running.
 3.  Send a prompt along with the file, instructing the agent to ingest it. For example:
     > "Please ingest the attached document into your knowledge base."
 
-The RAG agent will use its built-in `ingest_document` tool to process the file you uploaded. The file will go through the same preprocessing, splitting, and embedding pipeline as the documents from the automatic scan.
+The RAG agent uses its `built-in` ingest_document tool to process the file you uploaded. The file goes through the same preprocessing, splitting, and embedding pipeline as the documents from the automatic scan.
 
 **Step 3: Confirm Ingestion**
 
@@ -330,7 +330,7 @@ You can interact with your RAG agent through any gateway, such as the Web UI gat
 For example, if you have a document about product features, you could ask:
 > "What are the key features of Product X?"
 
-The agent will search its knowledge base, find the relevant information, and generate an answer based on the content of your documents.
+The agent searches its knowledge base, finds the relevant information, and generates an answer based on the content of your documents.
 
 ## Troubleshooting
 
