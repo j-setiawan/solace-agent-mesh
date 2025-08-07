@@ -25,7 +25,10 @@ from urllib.parse import urlparse
 
 from solace_ai_connector.common.log import log
 
-from ...common.utils.mime_helpers import is_text_based_mime_type
+from ...common.utils.mime_helpers import (
+    is_text_based_mime_type,
+    get_extension_for_mime_type,
+)
 
 
 class MCPContentType:
@@ -245,7 +248,7 @@ class MCPContentProcessor:
         data_key: str,
         mime_type_key: str,
         default_mime_type: str,
-        extension_getter: callable,
+        default_extension: str,
         size_metadata_key: str,
     ) -> Optional[MCPContentItem]:
         """Generic processor for binary content (images, audio) with base64 decoding."""
@@ -269,7 +272,7 @@ class MCPContentProcessor:
             return None
 
         # Generate filename with appropriate extension
-        extension = extension_getter(mime_type)
+        extension = get_extension_for_mime_type(mime_type, default_extension)
         filename = (
             f"{self.tool_name}_{content_type}_{index}_{uuid.uuid4().hex[:8]}{extension}"
         )
@@ -361,7 +364,7 @@ class MCPContentProcessor:
             data_key="data",
             mime_type_key="mimeType",
             default_mime_type="image/png",
-            extension_getter=self._get_image_extension,
+            default_extension=".png",
             size_metadata_key="image_size_bytes",
         )
 
@@ -376,7 +379,7 @@ class MCPContentProcessor:
             data_key="data",
             mime_type_key="mimeType",
             default_mime_type="audio/wav",
-            extension_getter=self._get_audio_extension,
+            default_extension=".wav",
             size_metadata_key="audio_size_bytes",
         )
 
@@ -593,38 +596,6 @@ class MCPContentProcessor:
 
         return summary
 
-    def _get_image_extension(self, mime_type: str) -> str:
-        """Get file extension for image MIME type."""
-
-        extension_mapping = {
-            "image/png": ".png",
-            "image/jpeg": ".jpg",
-            "image/jpg": ".jpg",
-            "image/gif": ".gif",
-            "image/bmp": ".bmp",
-            "image/webp": ".webp",
-            "image/svg+xml": ".svg",
-        }
-
-        return extension_mapping.get(mime_type.lower(), ".png")
-
-    def _get_audio_extension(self, mime_type: str) -> str:
-        """Get file extension for audio MIME type."""
-
-        extension_mapping = {
-            "audio/wav": ".wav",
-            "audio/mp3": ".mp3",
-            "audio/mpeg": ".mp3",
-            "audio/ogg": ".ogg",
-            "audio/flac": ".flac",
-            "audio/aac": ".aac",
-            "audio/m4a": ".m4a",
-        }
-
-        return extension_mapping.get(mime_type.lower(), ".wav")
-
-    def _extract_filename_from_uri(self, uri: str, mime_type: str, index: int) -> str:
-        """Extract filename from URI or generate one based on URI components."""
 
         try:
             parsed_uri = urlparse(uri)
@@ -637,56 +608,22 @@ class MCPContentProcessor:
                     # Clean filename and ensure it has an extension
                     clean_filename = re.sub(r'[<>:"/\\|?*]', "_", filename_part)
                     if "." not in clean_filename:
-                        extension = self._get_extension_for_mime_type(mime_type)
+                        extension = get_extension_for_mime_type(mime_type)
                         clean_filename += extension
                     return f"{self.tool_name}_resource_{index}_{clean_filename}"
 
             # Use hostname if available
             if parsed_uri.hostname:
                 hostname = re.sub(r'[<>:"/\\|?*.]', "_", parsed_uri.hostname)
-                extension = self._get_extension_for_mime_type(mime_type)
+                extension = get_extension_for_mime_type(mime_type)
                 return f"{self.tool_name}_resource_{index}_{hostname}{extension}"
 
         except Exception as e:
             log.debug("%s Error parsing URI %s: %s", self.log_identifier, uri, e)
 
         # Fallback to generic filename
-        extension = self._get_extension_for_mime_type(mime_type)
+        extension = get_extension_for_mime_type(mime_type)
         return f"{self.tool_name}_resource_{index}_{uuid.uuid4().hex[:8]}{extension}"
-
-    def _get_extension_for_mime_type(self, mime_type: str) -> str:
-        """Get file extension for any MIME type."""
-
-        # Common MIME type to extension mappings
-        extension_mapping = {
-            # Text formats
-            "text/plain": ".txt",
-            "text/html": ".html",
-            "text/css": ".css",
-            "text/javascript": ".js",
-            "text/csv": ".csv",
-            "text/markdown": ".md",
-            # Application formats
-            "application/json": ".json",
-            "application/xml": ".xml",
-            "application/pdf": ".pdf",
-            "application/zip": ".zip",
-            "application/x-yaml": ".yaml",
-            # Image formats
-            "image/png": ".png",
-            "image/jpeg": ".jpg",
-            "image/gif": ".gif",
-            "image/svg+xml": ".svg",
-            # Audio formats
-            "audio/wav": ".wav",
-            "audio/mp3": ".mp3",
-            "audio/ogg": ".ogg",
-            # Video formats
-            "video/mp4": ".mp4",
-            "video/webm": ".webm",
-        }
-
-        return extension_mapping.get(mime_type.lower(), ".dat")
 
 
 class MCPContentProcessorConfig:
