@@ -31,11 +31,13 @@ class ADKToolWrapper:
         original_func: Callable,
         tool_config: Optional[Dict],
         tool_name: str,
+        origin: str,
         raw_string_args: Optional[List[str]] = None,
     ):
         self._original_func = original_func
         self._tool_config = tool_config or {}
         self._tool_name = tool_name
+        self.origin = origin
         self._raw_string_args = set(raw_string_args) if raw_string_args else set()
         self._is_async = inspect.iscoroutinefunction(original_func)
 
