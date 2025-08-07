@@ -596,7 +596,8 @@ class MCPContentProcessor:
 
         return summary
 
-
+    def _extract_filename_from_uri(self, uri: str, mime_type: str, index: int) -> str:
+        """Extract filename from URI or generate one based on URI components."""
         try:
             parsed_uri = urlparse(uri)
 
