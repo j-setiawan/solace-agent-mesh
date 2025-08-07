@@ -22,6 +22,7 @@ from ...common.a2a_protocol import (
 from google.genai import types as adk_types
 from google.adk.tools.mcp_tool import MCPTool
 from solace_ai_connector.common.log import log
+from .intelligent_mcp_callbacks import save_mcp_response_as_artifact_intelligent
 
 from ...agent.utils.artifact_helpers import (
     METADATA_SUFFIX,
@@ -459,7 +460,13 @@ async def _save_mcp_response_as_artifact(
     original_tool_args: Dict[str, Any],
 ) -> Dict[str, Any]:
     """
-    Saves the full MCP tool response as a JSON artifact with associated metadata.
+    Intelligently processes and saves MCP tool response content as typed artifacts.
+
+    This function delegates to the intelligent MCP callback processor which:
+    - Detects and parses different content types (text, image, audio, resource)
+    - Creates appropriately typed artifacts with proper MIME types
+    - Generates enhanced metadata based on content analysis
+    - Falls back to raw JSON saving if intelligent processing fails
 
     Args:
         tool: The MCPTool instance that generated the response.
@@ -469,83 +476,46 @@ async def _save_mcp_response_as_artifact(
         original_tool_args: The original arguments passed to the MCP tool.
 
     Returns:
-        A dictionary containing details of the saved artifact (filename, version, etc.),
-        as returned by `save_artifact_with_metadata`.
+        A dictionary containing details of the saved artifacts, maintaining backward
+        compatibility with the original interface while supporting multiple artifacts.
     """
-    log_identifier = f"[CallbackHelper:{tool.name}]"
-    log.debug("%s Saving MCP response as artifact...", log_identifier)
+    # Delegate to the intelligent processor
+    result = await save_mcp_response_as_artifact_intelligent(
+        tool, tool_context, host_component, mcp_response_dict, original_tool_args
+    )
 
-    try:
-        a2a_context = tool_context.state.get("a2a_context", {})
-        logical_task_id = a2a_context.get("logical_task_id", "unknownTask")
-        task_id_suffix = logical_task_id[-6:]
-        random_suffix = uuid.uuid4().hex[:6]
-        filename = f"{task_id_suffix}_{tool.name}_{random_suffix}.json"
-        log.debug("%s Generated artifact filename: %s", log_identifier, filename)
-
-        content_bytes = json.dumps(mcp_response_dict, indent=2).encode("utf-8")
-        mime_type = "application/json"
-        artifact_timestamp = datetime.now(timezone.utc)
-
-        metadata_for_saving = {
-            "description": f"Full JSON response from MCP tool {tool.name}.",
-            "source_tool_name": tool.name,
-            "source_tool_args": original_tool_args,
+    # For backward compatibility, if multiple artifacts were saved, return the first one
+    # but include information about all saved artifacts in the result
+    if result.get("artifacts_saved"):
+        primary_artifact = result["artifacts_saved"][0]
+        # Add intelligent processing metadata to the primary result
+        primary_artifact["intelligent_processing"] = {
+            "total_artifacts_saved": len(result["artifacts_saved"]),
+            "processing_status": result["status"],
+            "has_fallback": result.get("fallback_artifact") is not None,
         }
-        log.debug("%s Prepared content and metadata for saving.", log_identifier)
-
-        artifact_service = host_component.artifact_service
-        if not artifact_service:
-            raise ValueError("ArtifactService is not available on host_component.")
-
-        app_name = host_component.agent_name
-        user_id = tool_context._invocation_context.user_id
-        session_id = get_original_session_id(tool_context._invocation_context)
-        schema_max_keys = host_component.get_config(
-            "schema_max_keys", DEFAULT_SCHEMA_MAX_KEYS
-        )
-
-        log.debug(
-            "%s Calling save_artifact_with_metadata with: app_name=%s, user_id=%s, session_id=%s, filename=%s, schema_max_keys=%d",
-            log_identifier,
-            app_name,
-            user_id,
-            session_id,
-            filename,
-            schema_max_keys,
-        )
-
-        save_result = await save_artifact_with_metadata(
-            artifact_service=artifact_service,
-            app_name=app_name,
-            user_id=user_id,
-            session_id=session_id,
-            filename=filename,
-            content_bytes=content_bytes,
-            mime_type=mime_type,
-            metadata_dict=metadata_for_saving,
-            timestamp=artifact_timestamp,
-            schema_max_keys=schema_max_keys,
-            tool_context=tool_context,
-        )
-
-        log.info(
-            "%s MCP response saved as artifact '%s' (version %s). Result: %s",
-            log_identifier,
-            save_result.get("data_filename", filename),
-            save_result.get("data_version", "N/A"),
-            save_result.get("status"),
-        )
-        return save_result
-
-    except Exception as e:
-        log.exception(
-            "%s Error in _save_mcp_response_as_artifact: %s", log_identifier, e
-        )
+        return primary_artifact
+    elif result.get("fallback_artifact"):
+        # Return the fallback artifact if no intelligent artifacts were saved
+        fallback = result["fallback_artifact"]
+        fallback["intelligent_processing"] = {
+            "total_artifacts_saved": 0,
+            "processing_status": result["status"],
+            "has_fallback": True,
+            "fallback_reason": result.get("message", "Intelligent processing failed"),
+        }
+        return fallback
+    else:
+        # Return error result
         return {
             "status": "error",
-            "data_filename": filename if "filename" in locals() else "unknown_filename",
-            "message": f"Failed to save MCP response as artifact: {e}",
+            "data_filename": "unknown_filename",
+            "message": result.get("message", "Failed to save MCP response as artifact"),
+            "intelligent_processing": {
+                "total_artifacts_saved": 0,
+                "processing_status": "error",
+                "has_fallback": False,
+            },
         }
 
 
@@ -785,6 +755,7 @@ It can span multiple lines.
 
 The system will automatically save the content and give you a confirmation in the next turn."""
 
+
 def _generate_artifact_creation_instruction() -> str:
     return """
     **Creating Text-Based Artifacts:**
@@ -805,6 +776,7 @@ def _generate_artifact_creation_instruction() -> str:
     - Temporary content only relevant to the immediate conversation
     - Basic explanations that don't require reference material
     """
+
 
 def _generate_embed_instruction(
     include_artifact_content: bool,
