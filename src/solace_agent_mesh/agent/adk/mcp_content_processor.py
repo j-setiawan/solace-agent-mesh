@@ -395,7 +395,7 @@ class MCPContentProcessor:
 
         uri = resource.get("uri", "")
         mime_type = resource.get("mimeType", "application/octet-stream")
-        text_content = resource.get("text", "")
+        content = resource.get("blob") or resource.get("text", "")
 
         if not uri:
             log.warning(
@@ -409,11 +409,11 @@ class MCPContentProcessor:
         # Determine if the resource is text-based or binary using MIME type detection
         is_text_based = is_text_based_mime_type(mime_type)
 
-        if text_content:
+        if content:
             # We have actual text content
             if is_text_based:
                 # Text-based resource with content - process normally
-                content_bytes = text_content.encode("utf-8")
+                content_bytes = content.encode("utf-8")
                 specific_metadata = {
                     "resource_uri": uri,
                     "has_text_content": True,
@@ -422,20 +422,20 @@ class MCPContentProcessor:
             else:
                 # Binary resource with text content - assume it's base64 encoded
                 try:
-                    content_bytes = base64.b64decode(text_content)
+                    content_bytes = base64.b64decode(content)
                     specific_metadata = {
                         "resource_uri": uri,
                         "has_text_content": True,
                         "is_text_based": False,
                         "decoded_from_base64": True,
-                        "original_size_bytes": len(text_content),
+                        "original_size_bytes": len(content),
                         "decoded_size_bytes": len(content_bytes),
                     }
                     log.debug(
                         "%s Resource content item %d: decoded base64 binary content, original=%d bytes, decoded=%d bytes",
                         self.log_identifier,
                         index,
-                        len(text_content),
+                        len(content),
                         len(content_bytes),
                     )
                 except Exception as e:
@@ -446,7 +446,7 @@ class MCPContentProcessor:
                         index,
                         str(e),
                     )
-                    content_bytes = text_content.encode("utf-8")
+                    content_bytes = content.encode("utf-8")
                     specific_metadata = {
                         "resource_uri": uri,
                         "has_text_content": True,
