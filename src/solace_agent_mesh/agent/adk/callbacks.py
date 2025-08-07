@@ -608,12 +608,6 @@ async def manage_large_mcp_tool_responses_callback(
         llm_max_bytes = 4096
 
     contains_non_text_content = _mcp_response_contains_non_text(mcp_response_dict)
-    if contains_non_text_content:
-        log.info(
-            "%s MCP response contains non-text content. It will be saved as an artifact.",
-            log_identifier,
-        )
-
     try:
         serialized_original_response_str = json.dumps(mcp_response_dict)
         original_response_bytes = len(serialized_original_response_str.encode("utf-8"))
