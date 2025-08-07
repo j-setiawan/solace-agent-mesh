@@ -452,6 +452,24 @@ def repair_history_callback(
     return None
 
 
+def _mcp_response_contains_non_text(mcp_response_dict: Dict[str, Any]) -> bool:
+    """
+    Checks if the 'content' list in an MCP response dictionary contains any
+    items that are not of type 'text'.
+    """
+    if not isinstance(mcp_response_dict, dict):
+        return False
+
+    content_list = mcp_response_dict.get("content")
+    if not isinstance(content_list, list):
+        return False
+
+    for item in content_list:
+        if isinstance(item, dict) and item.get("type") != "text":
+            return True
+    return False
+
+
 async def _save_mcp_response_as_artifact(
     tool: BaseTool,
     tool_context: ToolContext,
@@ -589,6 +607,13 @@ async def manage_large_mcp_tool_responses_callback(
         save_threshold = 2048
         llm_max_bytes = 4096
 
+    contains_non_text_content = _mcp_response_contains_non_text(mcp_response_dict)
+    if contains_non_text_content:
+        log.info(
+            "%s MCP response contains non-text content. It will be saved as an artifact.",
+            log_identifier,
+        )
+
     try:
         serialized_original_response_str = json.dumps(mcp_response_dict)
         original_response_bytes = len(serialized_original_response_str.encode("utf-8"))
@@ -607,12 +632,15 @@ async def manage_large_mcp_tool_responses_callback(
 
     needs_truncation_for_llm = original_response_bytes > llm_max_bytes
     needs_saving_as_artifact = (
-        original_response_bytes > save_threshold
-    ) or needs_truncation_for_llm
+        (original_response_bytes > save_threshold)
+        or needs_truncation_for_llm
+        or contains_non_text_content
+    )
     log.debug(
-        "%s Conditions: needs_truncation_for_llm=%s, needs_saving_as_artifact=%s",
+        "%s Conditions: needs_truncation_for_llm=%s, contains_non_text=%s, needs_saving_as_artifact=%s",
         log_identifier,
         needs_truncation_for_llm,
+        contains_non_text_content,
         needs_saving_as_artifact,
     )
 
