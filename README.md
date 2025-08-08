@@ -29,7 +29,7 @@
 
 ---
 
-Solace Agent Mesh is a framework that supports building AI applications where multiple specialized AI agents work together to solve complex problems and use [Solace Platform](https://solace.com)'s event messaging for true scalability and reliability.
+**Solace Agent Mesh** is a framework that supports building AI applications where multiple specialized AI agents work together to solve complex problems. It uses the event messaging of [Solace Platform](https://solace.com) for true scalability and reliability.
 
 With Solace Agent Mesh (SAM), you can create teams of AI agents, each having distinct skills and access to specific tools. For example, you could have a Database Agent that can make SQL queries to fetch data or a MultiModal Agent that can help create images, audio files and reports.
 
@@ -114,13 +114,17 @@ sam plugin add <your-component-name> --plugin <plugin-name>
 
 ## 🏗️ Architecture Overview
 
+<p align="center">
+  <img src="./docs/static/img/Solace_AI_Framework_README.png" alt="Solace Agent Mesh Architecture" width="100%"/>
+</p>
+
 Solace Agent Mesh provides a "Universal A2A Agent Host," a flexible and configurable runtime environment built by integrating Google's Agent Development Kit (ADK) with the Solace AI Connector (SAC) framework.
 
 The system allows you to:
 
 - Host AI agents developed with Google ADK within the SAC framework
 - Define agent capabilities (LLM model, instructions, tools) primarily through SAC YAML configuration
-- Utilize Solace PubSub+ as the transport for standard Agent-to-Agent (A2A) protocol communication
+- Use Solace Platform as the transport for standard Agent-to-Agent (A2A) protocol communication
 - Enable dynamic discovery of peer agents running within the same ecosystem
 - Allow agents to delegate tasks to discovered peers via the A2A protocol over Solace
 - Manage file artifacts using built-in tools with automatic metadata injection
