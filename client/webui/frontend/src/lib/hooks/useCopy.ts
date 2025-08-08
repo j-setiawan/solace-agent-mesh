@@ -8,7 +8,7 @@ interface UseCopyReturn<T extends HTMLElement> {
 }
 
 /**
- * A custom hook that provides a ref and keydown handler for selecting content for copying.
+ * A custom hook that provides a ref and keydown handler for selecting content to copy it.
  */
 export function useCopy<T extends HTMLElement>(): UseCopyReturn<T> {
   const ref = useRef<T>(null);
