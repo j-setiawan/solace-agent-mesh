@@ -114,10 +114,6 @@ sam plugin add <your-component-name> --plugin <plugin-name>
 
 ## 🏗️ Architecture Overview
 
-<p align="center">
-  <img src="./docs/static/img/Solace_AI_Framework_README.png" alt="Solace Agent Mesh Architecture" width="100%"/>
-</p>
-
 Solace Agent Mesh provides a "Universal A2A Agent Host," a flexible and configurable runtime environment built by integrating Google's Agent Development Kit (ADK) with the Solace AI Connector (SAC) framework.
 
 The system allows you to:
