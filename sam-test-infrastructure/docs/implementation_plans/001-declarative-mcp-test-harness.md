@@ -12,14 +12,14 @@
 ## Implementation Checklist
 
 ### Part 1: `TestMCPServer` Application
-- [ ] **Module**: Create `mcp_server/server.py`.
-- [ ] **Class**: Implement `TestMCPServer` class using `fastmcp`.
-- [ ] **Tool**: Add a generic `@mcp.tool def get_data(...)`.
-- [ ] **Parsing**: Implement directive parsing for `[test_case_id=...]` and `[mcp_responses_json=...]`.
-- [ ] **State**: Implement a stateful response cache keyed by `test_case_id`.
-- [ ] **Transform**: Implement `snake_case` to `camelCase` key transformation for responses.
-- [ ] **Health Check**: Add a `GET /health` endpoint for `http` mode.
-- [ ] **Runnable**: Make `server.py` runnable from the CLI with transport/port arguments.
+- [x] **Module**: Create `mcp_server/server.py`.
+- [x] **Class**: Implement `TestMCPServer` class using `fastmcp`.
+- [x] **Tool**: Add a generic `@mcp.tool def get_data(...)`.
+- [x] **Parsing**: Implement directive parsing for `[test_case_id=...]` and `[mcp_responses_json=...]`.
+- [x] **State**: Implement a stateful response cache keyed by `test_case_id`.
+- [x] **Transform**: Implement `snake_case` to `camelCase` key transformation for responses.
+- [x] **Health Check**: Add a `GET /health` endpoint for `http` mode.
+- [x] **Runnable**: Make `server.py` runnable from the CLI with transport/port arguments.
 
 ### Part 2: Pytest Fixture
 - [ ] **Module**: Create `mcp_server/fixture.py`.
