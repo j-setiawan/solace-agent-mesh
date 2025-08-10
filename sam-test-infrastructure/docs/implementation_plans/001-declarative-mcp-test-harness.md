@@ -9,6 +9,46 @@
 
 ---
 
+## Implementation Checklist
+
+### Part 1: `TestMCPServer` Application
+- [ ] **Module**: Create `mcp_server/server.py`.
+- [ ] **Class**: Implement `TestMCPServer` class using `fastmcp`.
+- [ ] **Tool**: Add a generic `@mcp.tool def get_data(...)`.
+- [ ] **Parsing**: Implement directive parsing for `[test_case_id=...]` and `[mcp_responses_json=...]`.
+- [ ] **State**: Implement a stateful response cache keyed by `test_case_id`.
+- [ ] **Transform**: Implement `snake_case` to `camelCase` key transformation for responses.
+- [ ] **Health Check**: Add a `GET /health` endpoint for `http` mode.
+- [ ] **Runnable**: Make `server.py` runnable from the CLI with transport/port arguments.
+
+### Part 2: Pytest Fixture
+- [ ] **Module**: Create `mcp_server/fixture.py`.
+- [ ] **Fixture**: Define the `mcp_server_harness` pytest fixture.
+- [ ] **Process Management**: Use `subprocess.Popen` to start the server process.
+- [ ] **Readiness Check**: Implement a readiness check (polling `/health` for http mode).
+- [ ] **Yield Config**: Yield `connection_params` for dynamic agent configuration.
+- [ ] **Teardown**: Ensure reliable server process termination.
+
+### Part 3: Test Runner Integration
+- [ ] **YAML Parsing**: Modify `TestDeclarativeAgent` to read the `mcp_interactions` key from YAML.
+- [ ] **Encoding**: Implement Base64 encoding for the `mcp_interactions` data.
+- [ ] **Directive Injection**: Inject the encoded data and `test_case_id` into the gateway input prompt.
+- [ ] **Dynamic Tool Config**: Inject the `connection_params` from the fixture into the agent's `mcp` tool configuration at runtime.
+
+### Part 4: Integration Tests
+- [ ] **Test Structure**: Create `test_mcp_processing.py` and a corresponding `test_data/mcp/` directory.
+- [ ] **Test Case 1 (Text)**: Add a test for basic text processing.
+- [ ] **Test Case 2 (Image)**: Add a test for base64 image processing.
+- [ ] **Test Case 3 (Intelligent Off)**: Add a test for `enable_intelligent_processing: false`.
+- [ ] **Test Case 4 (Fallback)**: Add a test for `fallback_to_raw_on_error: true` with malformed data.
+- [ ] **Test Case 5 (HTTP)**: Add a parameterized test to run a case using the `http` transport.
+
+### Part 5: Documentation
+- [ ] **Usage Guide**: Update the primary testing `README.md` to explain how to use `mcp_interactions`.
+- [ ] **Code Comments**: Add clear, concise comments to the new `TestMCPServer` and `mcp_server_harness` modules.
+
+---
+
 This document provides a step-by-step plan for implementing the Declarative MCP Test Harness feature.
 
 ### Part 1: Create the `TestMCPServer` Harness Application
