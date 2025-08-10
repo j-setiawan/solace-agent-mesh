@@ -22,12 +22,12 @@
 - [x] **Runnable**: Make `server.py` runnable from the CLI with transport/port arguments.
 
 ### Part 2: Pytest Fixture
-- [ ] **Module**: Create `mcp_server/fixture.py`.
-- [ ] **Fixture**: Define the `mcp_server_harness` pytest fixture.
-- [ ] **Process Management**: Use `subprocess.Popen` to start the server process.
-- [ ] **Readiness Check**: Implement a readiness check (polling `/health` for http mode).
-- [ ] **Yield Config**: Yield `connection_params` for dynamic agent configuration.
-- [ ] **Teardown**: Ensure reliable server process termination.
+- [x] **Module**: Create `mcp_server/fixture.py`.
+- [x] **Fixture**: Define the `mcp_server_harness` pytest fixture.
+- [x] **Process Management**: Use `subprocess.Popen` to start the server process.
+- [x] **Readiness Check**: Implement a readiness check (polling `/health` for http mode).
+- [x] **Yield Config**: Yield `connection_params` for dynamic agent configuration.
+- [x] **Teardown**: Ensure reliable server process termination.
 
 ### Part 3: Test Runner Integration
 - [ ] **YAML Parsing**: Modify `TestDeclarativeAgent` to read the `mcp_interactions` key from YAML.
