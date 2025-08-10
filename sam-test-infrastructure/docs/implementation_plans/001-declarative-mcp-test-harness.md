@@ -36,12 +36,12 @@
 - [ ] **Dynamic Tool Config**: Inject the `connection_params` from the fixture into the agent's `mcp` tool configuration at runtime.
 
 ### Part 4: Integration Tests
-- [ ] **Test Structure**: Create `test_mcp_processing.py` and a corresponding `test_data/mcp/` directory.
-- [ ] **Test Case 1 (Text)**: Add a test for basic text processing.
-- [ ] **Test Case 2 (Image)**: Add a test for base64 image processing.
-- [ ] **Test Case 3 (Intelligent Off)**: Add a test for `enable_intelligent_processing: false`.
-- [ ] **Test Case 4 (Fallback)**: Add a test for `fallback_to_raw_on_error: true` with malformed data.
-- [ ] **Test Case 5 (HTTP)**: Add a parameterized test to run a case using the `http` transport.
+- [x] **Test Structure**: Create `test_mcp_processing.py` and a corresponding `test_data/mcp/` directory.
+- [x] **Test Case 1 (Text)**: Add a test for basic text processing.
+- [x] **Test Case 2 (Image)**: Add a test for base64 image processing.
+- [x] **Test Case 3 (Intelligent Off)**: Add a test for `enable_intelligent_processing: false`.
+- [x] **Test Case 4 (Fallback)**: Add a test for `fallback_to_raw_on_error: true` with malformed data.
+- [x] **Test Case 5 (HTTP)**: Add a parameterized test to run a case using the `http` transport.
 
 ### Part 5: Documentation
 - [ ] **Usage Guide**: Update the primary testing `README.md` to explain how to use `mcp_interactions`.
