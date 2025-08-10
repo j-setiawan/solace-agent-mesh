@@ -252,12 +252,6 @@ def shared_solace_connector(
     test_agent_tools = [
         {
             "tool_type": "python",
-            "component_module": "solace_agent_mesh.agent.tools.test_tools",
-            "function_name": "time_delay",
-            "component_base_path": ".",
-        },
-        {
-            "tool_type": "python",
             "component_module": "tests.integration.test_support.tools",
             "function_name": "get_weather_tool",
             "component_base_path": ".",
