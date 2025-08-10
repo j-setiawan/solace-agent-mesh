@@ -12,14 +12,14 @@ This document proposes the creation of a new test harness, the `TestMCPServer`, 
 
 - To enable comprehensive and reliable integration testing of the agent's MCP response parsing and artifact creation logic (`MCPContentProcessor`).
 - To provide a consistent, intuitive, and low-friction testing experience for developers, reusing existing declarative testing patterns.
-- To ensure the agent's MCP handling is tested against both `stdio` and `http/sse` transport protocols.
+- To ensure the agent's MCP handling is tested against both `stdio` and `http` (Streamable HTTP/SSE) transport protocols.
 - To facilitate the simulation of a wide variety of MCP response types, including valid, complex, and malformed data, to ensure robustness.
 
 ## 3. Requirements
 
 - A new test harness, `TestMCPServer`, must be created. It will act as a configurable mock MCP server.
 - The `TestMCPServer` must be configurable via a new `mcp_interactions` section within the existing declarative YAML test files.
-- The test harness must be capable of running as a standalone process and communicating over both `stdio` and `http/sse` transports.
+- The test harness must be capable of running as a standalone process and communicating over both `stdio` and `http` (Streamable HTTP/SSE) transports.
 - The harness must be able to simulate various MCP content types, including text (with different formats like JSON, CSV), binary (image, audio), resource references, and mixed-content responses.
 - The syntax used within the `mcp_interactions` YAML block must be consistent with project standards (i.e., use `snake_case` for all keys).
 
