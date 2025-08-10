@@ -14,6 +14,7 @@ from sam_test_infrastructure.llm_server.server import TestLLMServer
 from sam_test_infrastructure.artifact_service.service import (
     TestInMemoryArtifactService,
 )
+from sam_test_infrastructure.mcp_server.fixture import mcp_server_harness
 
 from sam_test_infrastructure.a2a_validator.validator import A2AMessageValidator
 from solace_agent_mesh.common.client.card_resolver import A2ACardResolver
