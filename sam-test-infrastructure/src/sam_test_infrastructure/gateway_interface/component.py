@@ -5,6 +5,8 @@ and captures A2A responses from the agent under test.
 """
 
 import asyncio
+import base64
+import json
 import threading
 from collections import defaultdict
 from typing import Any, Dict, List, Union, Optional, Tuple
@@ -242,6 +244,7 @@ class TestGatewayComponent(BaseGatewayComponent):
             test_input_data: A dictionary representing the test input. Expected keys:
                              'target_agent_name', 'user_identity', 'a2a_parts' (list of dicts),
                              'external_context_override' (optional dict).
+                             May also contain 'mcp_interactions' and 'test_case_id' for injection.
 
         Returns:
             The task_id assigned to the submitted A2A task.
@@ -251,6 +254,49 @@ class TestGatewayComponent(BaseGatewayComponent):
             self.log_identifier,
             test_input_data,
         )
+
+        # Handle injection of MCP test directives
+        mcp_interactions = test_input_data.get("mcp_interactions")
+        test_case_id = test_input_data.get("test_case_id")
+
+        if mcp_interactions and test_case_id:
+            log.debug(
+                "%s Found mcp_interactions for test case %s. Injecting directives.",
+                self.log_identifier,
+                test_case_id,
+            )
+            try:
+                json_str = json.dumps(mcp_interactions)
+                b64_str = base64.b64encode(json_str.encode("utf-8")).decode("utf-8")
+                mcp_directive = f"[mcp_responses_json={b64_str}]"
+                case_id_directive = f"[test_case_id={test_case_id}]"
+
+                # Find the first text part and append to it
+                found_text_part = False
+                if "a2a_parts" in test_input_data and isinstance(
+                    test_input_data["a2a_parts"], list
+                ):
+                    for part in test_input_data["a2a_parts"]:
+                        if part.get("type") == "text" and "text" in part:
+                            part["text"] = (
+                                f"{part['text']} {case_id_directive}{mcp_directive}"
+                            ).strip()
+                            found_text_part = True
+                            break
+
+                if not found_text_part:
+                    log.warning(
+                        "%s 'mcp_interactions' provided, but no text part found in 'a2a_parts' to inject directives into.",
+                        self.log_identifier,
+                    )
+
+            except Exception as e:
+                log.error(
+                    "%s Failed to encode and inject MCP directives: %s",
+                    self.log_identifier,
+                    e,
+                )
+
         user_identity = await self.authenticate_and_enrich_user(test_input_data)
         if user_identity is None:
             raise PermissionError("Test user authentication failed.")
