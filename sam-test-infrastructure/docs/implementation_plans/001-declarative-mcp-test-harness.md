@@ -33,7 +33,7 @@
 - [x] **YAML Parsing**: Modify `TestDeclarativeAgent` to read the `mcp_interactions` key from YAML.
 - [x] **Encoding**: Implement Base64 encoding for the `mcp_interactions` data.
 - [x] **Directive Injection**: Inject the encoded data and `test_case_id` into the gateway input prompt.
-- [ ] **Dynamic Tool Config**: Inject the `connection_params` from the fixture into the agent's `mcp` tool configuration at runtime.
+- [x] **Dynamic Tool Config**: Inject the `connection_params` from the fixture into the agent's `mcp` tool configuration at runtime.
 
 ### Part 4: Integration Tests
 - [x] **Test Structure**: Create `test_mcp_processing.py` and a corresponding `test_data/mcp/` directory.

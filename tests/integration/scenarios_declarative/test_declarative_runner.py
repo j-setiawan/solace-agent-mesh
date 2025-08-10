@@ -973,14 +973,31 @@ async def test_declarative_scenario(
     test_artifact_service_instance: TestInMemoryArtifactService,
     a2a_message_validator: A2AMessageValidator,
     mock_gemini_client: None,
-    sam_app_under_test: SamAgentApp,  # Added to get component for patching
-    monkeypatch: pytest.MonkeyPatch,  # Added monkeypatch fixture
+    sam_app_under_test: SamAgentApp,
+    monkeypatch: pytest.MonkeyPatch,
+    mcp_server_harness,
 ):
     """
     Executes a single declarative test scenario discovered by pytest_generate_tests.
     """
     scenario_id = declarative_scenario.get("test_case_id", "N/A")
     scenario_description = declarative_scenario.get("description", "No description")
+
+    # --- Phase 0: Dynamic Test Configuration Injection ---
+    if "mcp_interactions" in declarative_scenario:
+        if "agent_config" not in declarative_scenario or "tools" not in declarative_scenario.get("agent_config", {}):
+            pytest.fail(f"Scenario {scenario_id} has 'mcp_interactions' but is missing 'agent_config.tools' section.")
+
+        found_mcp_tool = False
+        for tool_config in declarative_scenario["agent_config"]["tools"]:
+            if tool_config.get("tool_type") == "mcp":
+                tool_config["connection_params"] = mcp_server_harness
+                found_mcp_tool = True
+                print(f"Scenario {scenario_id}: Dynamically injected connection_params into MCP tool config.")
+                break
+        
+        if not found_mcp_tool:
+            pytest.fail(f"Scenario {scenario_id} has 'mcp_interactions' but no tool with 'tool_type: mcp' was found in agent_config.")
 
     if scenario_id in SKIPPED_FAILING_EMBED_TESTS:
         pytest.skip(f"Skipping failing embed test '{scenario_id}' until fixed.")
@@ -1047,6 +1064,11 @@ async def test_declarative_scenario(
     gateway_input_data = declarative_scenario.get("gateway_input")
     if not gateway_input_data:
         pytest.fail(f"Scenario {scenario_id}: 'gateway_input' is missing.")
+
+    # Augment gateway_input with mcp_interactions if present for directive injection
+    if "mcp_interactions" in declarative_scenario:
+        gateway_input_data["mcp_interactions"] = declarative_scenario["mcp_interactions"]
+        gateway_input_data["test_case_id"] = scenario_id
 
     overall_timeout = declarative_scenario.get(
         "expected_completion_timeout_seconds", 10.0
