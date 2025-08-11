@@ -70,7 +70,7 @@ This section tests the system's resilience and ensures it handles failures grace
 
 | Test ID | Description | Status | Test File |
 | :--- | :--- | :--- | :--- |
-| 4.1 | Verifies that if intelligent processing is disabled in the configuration, the system correctly falls back to saving the entire raw MCP response as a single `.json` artifact. | | |
+| 4.1 | Verifies that if intelligent processing is disabled in the configuration, the system correctly falls back to saving the entire raw MCP response as a single `.json` artifact. | Implemented | `test_mcp_fallback_intelligent_disabled.yaml` |
 | 4.2 | Verifies that if the `content` field in the MCP response is not a list, the system falls back to saving the raw response as a single `.json` artifact. | | |
 | 4.3 | Verifies that if one item in a multi-item response is malformed (e.g., invalid base64), it is skipped, others are processed, and the final status is `partial_success`. | | |
 | 4.4 | Verifies that if `fallback_to_raw_on_error` is `false`, a processing error results in no artifact being saved and an error message being returned to the LLM. | | |
