@@ -107,7 +107,7 @@ def main():
     parser.add_argument(
         "--transport",
         type=str,
-        choices=["stdio", "http"],
+        choices=["stdio", "http", "sse"],
         default="stdio",
         help="The transport protocol to use.",
     )

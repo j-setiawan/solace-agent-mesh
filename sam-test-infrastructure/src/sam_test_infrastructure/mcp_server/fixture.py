@@ -55,7 +55,7 @@ def mcp_server_harness() -> Generator[Dict[str, Any], None, None]:
             sys.executable,
             SERVER_PATH,
             "--transport",
-            "http",
+            "sse",
             "--port",
             str(port),
         ]
