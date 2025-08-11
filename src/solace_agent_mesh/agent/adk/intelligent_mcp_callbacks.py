@@ -140,6 +140,11 @@ async def save_mcp_response_as_artifact_intelligent(
                     failed_artifacts.append(artifact_result)
 
             except Exception as e:
+                if not processor_config.fallback_to_raw_on_error:
+                    # If we're not falling back, this is a hard failure.
+                    # Re-raise to be caught by the main try/except block.
+                    raise e
+
                 log.exception("%s Error saving content item: %s", log_identifier, e)
                 overall_status = "partial_success"
                 failed_artifacts.append({"status": "error", "message": str(e)})
