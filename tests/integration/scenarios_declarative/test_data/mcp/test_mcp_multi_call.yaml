@@ -30,7 +30,7 @@ llm_interactions:
                 type: "function"
                 function:
                   name: "get_data_stdio"
-                  arguments: '{"task_description": "Get user profile for user123. {{mcp_directives[0]}}"}'
+                  arguments: '{"task_description": "Get user profile for user123. {{mcp_directives}}"}'
 
   # Second LLM turn: receives the profile, then decides to get activity.
   - expected_request:
@@ -50,7 +50,7 @@ llm_interactions:
                 type: "function"
                 function:
                   name: "get_data_stdio"
-                  arguments: '{"task_description": "Now get recent activity for user123. {{mcp_directives[1]}}"}'
+                  arguments: '{"task_description": "Now get recent activity for user123. {{mcp_directives}}"}'
 
   # Third LLM turn: receives activity, generates final response.
   - expected_request:

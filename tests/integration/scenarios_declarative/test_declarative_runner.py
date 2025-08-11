@@ -970,8 +970,8 @@ SKIPPED_FAILING_EMBED_TESTS = [
 def _preprocess_mcp_interactions(scenario: Dict[str, Any]) -> None:
     """
     Pre-processes the scenario to inject MCP directives into LLM tool call arguments.
-    Finds markers like '{{mcp_directives}}' or '{{mcp_directives[0]}}' and replaces
-    them with the base64-encoded mcp_interactions payload.
+    Finds markers like '{{mcp_directives}}' and replaces them with the
+    base64-encoded mcp_interactions payload.
     """
     if "mcp_interactions" not in scenario:
         return
@@ -988,47 +988,27 @@ def _preprocess_mcp_interactions(scenario: Dict[str, Any]) -> None:
             f"Scenario {test_case_id}: 'mcp_interactions' must be a list, but got {type(mcp_interactions_list)}."
         )
 
-    # 1. Pre-compute all directive strings
-    directive_strings = []
-    for interaction_payload in mcp_interactions_list:
-        try:
-            json_str = json.dumps(interaction_payload)
-            b64_str = base64.b64encode(json_str.encode("utf-8")).decode("utf-8")
-            # Note: The leading space is important for some prompts.
-            directive_string = (
-                f" [test_case_id={test_case_id}][mcp_responses_json={b64_str}]"
-            )
-            directive_strings.append(directive_string)
-        except Exception as e:
-            pytest.fail(
-                f"Scenario {test_case_id}: Failed to encode mcp_interaction item: {e}\nItem: {interaction_payload}"
-            )
+    # 1. Pre-compute the single directive string for the whole list
+    try:
+        json_str = json.dumps(mcp_interactions_list)
+        b64_str = base64.b64encode(json_str.encode("utf-8")).decode("utf-8")
+        # Note: The leading space is important for some prompts.
+        directive_string = (
+            f" [test_case_id={test_case_id}][mcp_responses_json={b64_str}]"
+        )
+    except Exception as e:
+        pytest.fail(
+            f"Scenario {test_case_id}: Failed to encode mcp_interactions list: {e}\nList: {mcp_interactions_list}"
+        )
 
     # 2. Define the replacer function for re.sub
     def replacer(match):
         index_str = match.group(1)
-        if index_str:  # Indexed marker like [0]
-            try:
-                index = int(index_str)
-                if not 0 <= index < len(directive_strings):
-                    pytest.fail(
-                        f"Scenario {test_case_id}: Marker index {index} is out of bounds for mcp_interactions list (size: {len(directive_strings)})."
-                    )
-                return directive_strings[index]
-            except (ValueError, IndexError):
-                pytest.fail(
-                    f"Scenario {test_case_id}: Invalid index '{index_str}' in mcp_directives marker."
-                )
-        else:  # Non-indexed marker
-            if len(directive_strings) > 1:
-                pytest.fail(
-                    f"Scenario {test_case_id}: Non-indexed '{{{{mcp_directives}}}}' marker used, but there are multiple ({len(directive_strings)}) mcp_interactions. Please use an indexed marker like '{{{{mcp_directives[0]}}}}'."
-                )
-            if not directive_strings:
-                pytest.fail(
-                    f"Scenario {test_case_id}: '{{{{mcp_directives}}}}' marker used, but 'mcp_interactions' is empty."
-                )
-            return directive_strings[0]
+        if index_str:
+            pytest.fail(
+                f"Scenario {test_case_id}: Indexed mcp_directives marker '[[{index_str}]]' is no longer supported. The entire mcp_interactions list is now injected."
+            )
+        return directive_string
 
     # 3. Iterate and replace markers
     llm_interactions = scenario.get("llm_interactions", [])
