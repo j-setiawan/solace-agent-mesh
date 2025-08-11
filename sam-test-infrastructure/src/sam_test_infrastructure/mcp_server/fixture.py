@@ -23,80 +23,71 @@ def find_free_port() -> int:
         return s.getsockname()[1]
 
 
-@pytest.fixture(scope="function", params=["stdio", "http"])
-def mcp_server_harness(request) -> Generator[Dict[str, Any], None, None]:
+@pytest.fixture(scope="session")
+def mcp_server_harness() -> Generator[Dict[str, Any], None, None]:
     """
     Pytest fixture to manage the lifecycle of the TestMCPServer.
 
-    It starts the server in a separate process and provides connection details
-    to the test function. The fixture is parameterized to run tests against
-    both 'stdio' and 'http' transports.
+    It starts the server in a separate process for HTTP and provides connection details
+    for both 'stdio' and 'http' transports.
 
     Yields:
-        A dictionary containing the `connection_params` for the agent's tool config.
+        A dictionary containing the `connection_params` for both stdio and http.
     """
-    transport_mode = request.param
     process = None
-    connection_params = {}
     port = 0
 
     try:
-        if transport_mode == "stdio":
-            # For stdio mode, DON'T start external process - let ADK manage it
-            # Just provide the command/args for ADK to start its own process
-            connection_params = {
-                "type": "stdio",
-                "command": sys.executable,
-                "args": [SERVER_PATH, "--transport", "stdio"],
-            }
-            print(
-                f"\nConfigured TestMCPServer for stdio mode (ADK will start process)."
+        # Prepare stdio config
+        stdio_params = {
+            "type": "stdio",
+            "command": sys.executable,
+            "args": [SERVER_PATH, "--transport", "stdio"],
+        }
+        print("\nConfigured TestMCPServer for stdio mode (ADK will start process).")
+
+        # Start HTTP server
+        port = find_free_port()
+        url = f"http://127.0.0.1:{port}"
+        health_url = f"{url}/health"
+        command = [
+            sys.executable,
+            SERVER_PATH,
+            "--transport",
+            "http",
+            "--port",
+            str(port),
+        ]
+        process = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+        print(f"\nStarted TestMCPServer in http mode (PID: {process.pid})...")
+
+        # Readiness check by polling the /health endpoint
+        max_wait_seconds = 10
+        start_time = time.time()
+        is_ready = False
+        while time.time() - start_time < max_wait_seconds:
+            try:
+                response = httpx.get(health_url, timeout=1)
+                if response.status_code == 200:
+                    print(f"TestMCPServer is ready on {url}.")
+                    is_ready = True
+                    break
+            except httpx.RequestError:
+                time.sleep(0.1)
+
+        if not is_ready:
+            pytest.fail(
+                f"Test MCP Server (http) failed to start on port {port} within {max_wait_seconds} seconds."
             )
 
-        elif transport_mode == "http":
-            port = find_free_port()
-            url = f"http://127.0.0.1:{port}"
-            health_url = f"{url}/health"
-            command = [
-                sys.executable,
-                SERVER_PATH,
-                "--transport",
-                "http",
-                "--port",
-                str(port),
-            ]
-            process = subprocess.Popen(
-                command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-            )
-            print(f"\nStarted TestMCPServer in http mode (PID: {process.pid})...")
+        http_params = {
+            "type": "sse",  # 'sse' is the type used by the ADK's MCPToolset for http
+            "url": url,
+        }
 
-            # Readiness check by polling the /health endpoint
-            max_wait_seconds = 10
-            start_time = time.time()
-            is_ready = False
-            while time.time() - start_time < max_wait_seconds:
-                try:
-                    response = httpx.get(health_url, timeout=1)
-                    if response.status_code == 200:
-                        print(f"TestMCPServer is ready on {url}.")
-                        is_ready = True
-                        break
-                except httpx.RequestError:
-                    time.sleep(0.1)
-
-            if not is_ready:
-                pytest.fail(
-                    f"Test MCP Server (http) failed to start on port {port} within {max_wait_seconds} seconds."
-                )
-
-            connection_params = {
-                "type": "sse",  # 'sse' is the type used by the ADK's MCPToolset for http
-                "url": url,
-            }
-        else:
-            raise ValueError(
-                f"Unsupported transport mode for mcp_server_harness: {transport_mode}"
-            )
+        connection_params = {"stdio": stdio_params, "http": http_params}
 
         yield connection_params
 
@@ -120,7 +111,7 @@ def mcp_server_harness(request) -> Generator[Dict[str, Any], None, None]:
                     "\nTestMCPServer process did not terminate gracefully, had to be killed."
                 )
             print("TestMCPServer terminated.")
-        elif request.param == "stdio":
-            print(
-                "\nNo external TestMCPServer process to terminate (stdio mode - ADK manages process)."
-            )
+
+        print(
+            "\nNo external TestMCPServer process to terminate for stdio mode (ADK manages process)."
+        )
