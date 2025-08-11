@@ -44,8 +44,6 @@ class TestMCPServer:
             name="TestMCPServer",
             instructions="A mock server for testing MCP tool integrations.",
         )
-        self.responses_cache: Dict[str, List[Any]] = {}
-        self.cache_lock = threading.Lock()
 
         # Register the generic tool under two different names for stdio and http
         self.mcp.tool(self.get_data, name="get_data_stdio")
@@ -56,48 +54,17 @@ class TestMCPServer:
         """Simple health check endpoint for HTTP mode."""
         return JSONResponse({"status": "ok"})
 
-    async def get_data(self, task_description: str, ctx: Context) -> Dict[str, Any]:
+    async def get_data(
+        self, response_to_return: Dict[str, Any], ctx: Context
+    ) -> Dict[str, Any]:
         """
-        A generic tool that returns a pre-configured response based on
-        directives found in the task_description.
+        A generic tool that returns the provided dictionary as its response.
+        This allows tests to directly inject the desired MCP response.
+        The tool's single argument 'response_to_return' is expected to be a
+        dictionary containing the desired MCP response structure (e.g., a 'content' list).
         """
-        case_id_match = re.search(r"\[test_case_id=([\w.-]+)\]", task_description)
-        if not case_id_match:
-            return {
-                "error": "Directive [test_case_id=...] not found in task_description."
-            }
-        case_id = case_id_match.group(1)
-
-        with self.cache_lock:
-            if case_id not in self.responses_cache:
-                responses_match = re.search(
-                    r"\[mcp_responses_json=([\w=+/]+)\]", task_description
-                )
-                if not responses_match:
-                    return {
-                        "error": "Directive [mcp_responses_json=...] not found for new test case."
-                    }
-
-                b64_str = responses_match.group(1)
-                try:
-                    json_str = base64.b64decode(b64_str).decode("utf-8")
-                    self.responses_cache[case_id] = json.loads(json_str)
-                except (
-                    base64.binascii.Error,
-                    json.JSONDecodeError,
-                    UnicodeDecodeError,
-                ) as e:
-                    return {"error": f"Failed to decode mcp_responses_json: {e}"}
-
-            if not self.responses_cache.get(case_id):
-                return {
-                    "error": f"No more responses available for test case '{case_id}'."
-                }
-
-            response_to_serve = self.responses_cache[case_id].pop(0)
-
-        # Transform keys to camelCase before returning
-        transformed_response = _convert_keys_to_camel_case(response_to_serve)
+        # Transform keys to camelCase to mimic a real MCP server response.
+        transformed_response = _convert_keys_to_camel_case(response_to_return)
         return transformed_response
 
 
