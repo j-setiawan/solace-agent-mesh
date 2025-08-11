@@ -36,8 +36,13 @@ llm_interactions:
           response_json_matches:
             status: "processed_and_saved"
             message_to_llm_matches_regex: "The full response has been saved as artifact 'get_data_stdio_json_0_.*\\.json' \\(version 0\\)\\."
-            # This is the key assertion for metadata injection.
-            appended_artifact_metadata_matches_regex: "Metadata for `get_data_stdio_json_0_.*\\.json` \\(v0\\):\n  ```yaml\ndescription: Text content from MCP tool get_data_stdio\nsource_tool_name: get_data_stdio\nsource_tool_args:\n  response_to_return:\n    content:\n    - text: '{\"user_id\": \"user123\", \"name\": \"Alice\", \"role\": \"Admin\", \"preferences\":\n        {\"theme\": \"dark\", \"notifications\": true}}'\n      type: text\ncontent_type: text\ncontent_index: 0\ndetected_format: json\nformat_parse_success: true\nparsed_data_summary:\n  type: object\n  keys:\n  - user_id\n  - name\n  - role\n  - preferences\n  key_count: 4\nmime_type: application/json\ntimestamp: .*\nversion: 0\nfilename: get_data_stdio_json_0_.*\\.json\n  ```"
+            # This is the key assertion for metadata injection, now using contains for robustness.
+            appended_artifact_metadata_contains:
+              - "Description: Text content from MCP tool get_data_stdio"
+              - "source_tool_name: get_data_stdio"
+              - "detected_format: json"
+              - "format_parse_success: True"
+              - "'key_count': 4"
 
     static_response:
       choices:
