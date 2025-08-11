@@ -32,8 +32,8 @@ llm_interactions:
         - tool_name: "get_data_stdio"
           response_json_matches:
             status: "processed_and_saved"
-            # The message only mentions the first artifact saved.
-            message_to_llm_matches_regex: "The full response has been saved as artifact 'get_data_stdio_text_0_.*\\.txt' \\(version 0\\)\\."
+            # The message should now indicate that multiple artifacts were saved.
+            message_to_llm_matches_regex: "The full response has been saved as 2 artifacts, starting with 'get_data_stdio_text_0_.*\\.txt' \\(version 0\\)\\."
             mcp_tool_output:
               content:
                 - type: "text"

@@ -713,9 +713,21 @@ async def manage_large_mcp_tool_responses_callback(
                 "data_filename", "unknown_artifact.json"
             )
             version = saved_artifact_details.get("data_version", "N/A")
-            message_parts_for_llm.append(
-                f"The full response has been saved as artifact '{filename}' (version {version})."
+            intelligent_processing_details = saved_artifact_details.get(
+                "intelligent_processing", {}
             )
+            total_artifacts = intelligent_processing_details.get(
+                "total_artifacts_saved", 1
+            )
+
+            if total_artifacts > 1:
+                message_parts_for_llm.append(
+                    f"The full response has been saved as {total_artifacts} artifacts, starting with '{filename}' (version {version})."
+                )
+            else:
+                message_parts_for_llm.append(
+                    f"The full response has been saved as artifact '{filename}' (version {version})."
+                )
             log.debug(
                 "%s Added saved artifact details to LLM response.", log_identifier
             )
