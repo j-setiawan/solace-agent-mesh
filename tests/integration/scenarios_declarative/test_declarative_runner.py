@@ -967,82 +967,6 @@ SKIPPED_FAILING_EMBED_TESTS = [
 ]
 
 
-@pytest.fixture
-def mcp_configured_sam_app(
-    declarative_scenario: Dict[str, Any],
-    sam_app_under_test: SamAgentApp,
-    mcp_server_harness,
-    monkeypatch: pytest.MonkeyPatch,
-) -> SamAgentApp:
-    """
-    Applies MCP tool configuration to the sam_app_under_test if the scenario requires it.
-    This fixture runs after sam_app_under_test but before the test execution.
-    """
-    scenario_id = declarative_scenario.get("test_case_id", "N/A")
-
-    # Check if this scenario needs MCP configuration
-    if "mcp_interactions" in declarative_scenario:
-        if (
-            "agent_config" not in declarative_scenario
-            or "tools" not in declarative_scenario.get("agent_config", {})
-        ):
-            pytest.fail(
-                f"Scenario {scenario_id} has 'mcp_interactions' but is missing 'agent_config.tools' section."
-            )
-
-        # Inject connection_params into MCP tool config
-        found_mcp_tool = False
-        for tool_config in declarative_scenario["agent_config"]["tools"]:
-            if tool_config.get("tool_type") == "mcp":
-                tool_config["connection_params"] = mcp_server_harness
-                found_mcp_tool = True
-                print(
-                    f"Scenario {scenario_id}: Dynamically injected connection_params into MCP tool config."
-                )
-                break
-
-        if not found_mcp_tool:
-            pytest.fail(
-                f"Scenario {scenario_id} has 'mcp_interactions' but no tool with 'tool_type: mcp' was found in agent_config."
-            )
-
-        # Apply MCP tool configuration override IMMEDIATELY
-        sam_agent_component = None
-        if sam_app_under_test.flows and sam_app_under_test.flows[0].component_groups:
-            for group in sam_app_under_test.flows[0].component_groups:
-                for comp_wrapper in group:
-                    actual_comp = getattr(comp_wrapper, "component", comp_wrapper)
-                    if isinstance(actual_comp, SamAgentComponent):
-                        sam_agent_component = actual_comp
-                        break
-                if sam_agent_component:
-                    break
-
-        if not sam_agent_component:
-            pytest.fail(
-                f"Scenario {scenario_id}: Could not find SamAgentComponent to apply MCP tool config."
-            )
-
-        # Apply the MCP tool configuration override immediately
-        original_get_config = sam_agent_component.get_config
-
-        def _patched_get_config_for_mcp(key: str, default: Any = None) -> Any:
-            if key == "tools":
-                mcp_tools_config = declarative_scenario["agent_config"]["tools"]
-                print(
-                    f"Scenario {scenario_id}: MCP FIXTURE OVERRIDE for config key 'tools'. Returning {len(mcp_tools_config)} tools including MCP."
-                )
-                return mcp_tools_config
-            return original_get_config(key, default)
-
-        monkeypatch.setattr(
-            sam_agent_component, "get_config", _patched_get_config_for_mcp
-        )
-        print(f"Scenario {scenario_id}: Applied MCP tool configuration via fixture.")
-
-    return sam_app_under_test
-
-
 @pytest.mark.asyncio
 async def test_declarative_scenario(
     declarative_scenario: Dict[str, Any],
@@ -1051,7 +975,7 @@ async def test_declarative_scenario(
     test_artifact_service_instance: TestInMemoryArtifactService,
     a2a_message_validator: A2AMessageValidator,
     mock_gemini_client: None,
-    mcp_configured_sam_app: SamAgentApp,
+    sam_app_under_test: SamAgentApp,
     monkeypatch: pytest.MonkeyPatch,
     mcp_server_harness,
     request: pytest.FixtureRequest,
