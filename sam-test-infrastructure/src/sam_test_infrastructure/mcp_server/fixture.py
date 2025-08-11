@@ -48,8 +48,9 @@ def mcp_server_harness() -> Generator[Dict[str, Any], None, None]:
 
         # Start HTTP server
         port = find_free_port()
-        url = f"http://127.0.0.1:{port}"
-        health_url = f"{url}/health"
+        base_url = f"http://127.0.0.1:{port}"
+        health_url = f"{base_url}/health"
+        sse_url = f"{base_url}/sse"  # The default path for fastmcp sse transport
         command = [
             sys.executable,
             SERVER_PATH,
@@ -71,7 +72,7 @@ def mcp_server_harness() -> Generator[Dict[str, Any], None, None]:
             try:
                 response = httpx.get(health_url, timeout=1)
                 if response.status_code == 200:
-                    print(f"TestMCPServer is ready on {url}.")
+                    print(f"TestMCPServer is ready on {base_url}.")
                     is_ready = True
                     break
             except httpx.RequestError:
@@ -84,7 +85,7 @@ def mcp_server_harness() -> Generator[Dict[str, Any], None, None]:
 
         http_params = {
             "type": "sse",  # 'sse' is the type used by the ADK's MCPToolset for http
-            "url": url,
+            "url": sse_url,
         }
 
         connection_params = {"stdio": stdio_params, "http": http_params}
