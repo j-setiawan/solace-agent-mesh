@@ -1143,12 +1143,6 @@ async def test_declarative_scenario(
     if not gateway_input_data:
         pytest.fail(f"Scenario {scenario_id}: 'gateway_input' is missing.")
 
-    # Augment gateway_input with mcp_interactions if present for directive injection
-    if "mcp_interactions" in declarative_scenario:
-        gateway_input_data["mcp_interactions"] = declarative_scenario[
-            "mcp_interactions"
-        ]
-        gateway_input_data["test_case_id"] = scenario_id
 
     overall_timeout = declarative_scenario.get(
         "expected_completion_timeout_seconds", 10.0
