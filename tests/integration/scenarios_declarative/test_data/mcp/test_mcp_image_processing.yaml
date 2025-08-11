@@ -21,7 +21,7 @@ llm_interactions:
                 type: "function"
                 function:
                   name: "get_data_stdio"
-                  arguments: '{"response_to_return": {"content": [{"type": "image", "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "mime_type": "image/png"}]}}'
+                  arguments: '{"response_to_return": {"content": [{"type": "image", "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "mimeType": "image/png"}]}}'
   - expected_request:
       expected_tool_responses_in_llm_messages:
         - tool_name: "get_data_stdio"
@@ -45,4 +45,4 @@ expected_gateway_output:
         expected_metadata_contains:
           source_tool_name: "get_data_stdio"
           content_type: "image"
-          mime_type: "image/png"
+          original_mime_type: "image/png"

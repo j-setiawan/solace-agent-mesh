@@ -27,7 +27,7 @@ llm_interactions:
                   name: "get_data_stdio"
                   # This is a tiny 1x1 pixel PNG, well below the default 2KB save threshold.
                   # It should be saved because it's non-text content.
-                  arguments: '{"response_to_return": {"content": [{"type": "image", "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "mime_type": "image/png"}]}}'
+                  arguments: '{"response_to_return": {"content": [{"type": "image", "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "mimeType": "image/png"}]}}'
 
   # 2. LLM gets the tool response and generates the final answer
   - expected_request:
@@ -41,7 +41,7 @@ llm_interactions:
               content:
                 - type: "image"
                   data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-                  mime_type: "image/png"
+                  mimeType: "image/png"
     static_response:
       choices:
         - message:
