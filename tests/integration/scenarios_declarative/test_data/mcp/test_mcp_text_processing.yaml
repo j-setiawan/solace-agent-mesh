@@ -21,26 +21,22 @@ llm_interactions:
                 type: "function"
                 function:
                   name: "get_data_stdio"
-                  arguments: '{"task_description": "Get text data from the test server. {{mcp_directives}}"}'
+                  arguments: '{"response_to_return": {"content": [{"type": "text", "text": "This is a simple text response."}]}}'
   - expected_request:
       expected_tool_responses_in_llm_messages:
         - tool_name: "get_data_stdio"
           response_json_matches:
             status: "processed"
             mcp_tool_output:
-              content:
-                - type: "text"
-                  text: "This is a simple text response."
+              responseToReturn:
+                content:
+                  - type: "text"
+                    text: "This is a simple text response."
     static_response:
       choices:
         - message:
             role: "assistant"
             content: "I have retrieved the text data and saved it as an artifact."
-
-mcp_interactions:
-  - content:
-      - type: "text"
-        text: "This is a simple text response."
 
 expected_gateway_output:
   - type: "artifact_created"

@@ -22,6 +22,7 @@ llm_interactions:
                 type: "function"
                 function:
                   name: "get_data_stdio"
+                  arguments: '{"response_to_return": {"content": [{"type": "image", "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "mime_type": "image/png"}]}}'
   - expected_request:
       expected_tool_responses_in_llm_messages:
         - tool_name: "get_data_stdio"
@@ -33,12 +34,6 @@ llm_interactions:
         - message:
             role: "assistant"
             content: "I have retrieved the data and saved it as a raw artifact."
-
-mcp_interactions:
-  - content:
-      - type: "image"
-        data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-        mime_type: "image/png"
 
 expected_gateway_output:
   - type: "artifact_created"

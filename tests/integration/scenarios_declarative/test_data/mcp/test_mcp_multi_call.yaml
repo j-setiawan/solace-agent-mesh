@@ -7,16 +7,6 @@ gateway_input:
     - type: "text"
       text: "Get the user profile for 'user123' and then get their recent activity."
 
-# The list of payloads the MCP server can return.
-mcp_interactions:
-  # Index 0: The user profile
-  - content:
-      - type: "text"
-        text: '{"user_id": "user123", "name": "Alice", "role": "Admin"}'
-  # Index 1: The user's activity
-  - content:
-      - type: "text"
-        text: '{"activity": ["logged_in", "viewed_dashboard", "ran_report"]}'
 
 # The sequence of mock LLM behaviors.
 llm_interactions:
@@ -30,7 +20,7 @@ llm_interactions:
                 type: "function"
                 function:
                   name: "get_data_stdio"
-                  arguments: '{"task_description": "Get user profile for user123. {{mcp_directives}}"}'
+                  arguments: '{"response_to_return": {"content": [{"type": "text", "text": "{\\"user_id\\": \\"user123\\", \\"name\\": \\"Alice\\", \\"role\\": \\"Admin\\"}"}]}}'
 
   # Second LLM turn: receives the profile, then decides to get activity.
   - expected_request:
@@ -38,9 +28,10 @@ llm_interactions:
         - tool_name: "get_data_stdio"
           response_json_matches:
             mcp_tool_output:
-              content:
-                - type: "text"
-                  text: '{"user_id": "user123", "name": "Alice", "role": "Admin"}'
+              responseToReturn:
+                content:
+                  - type: "text"
+                    text: '{"user_id": "user123", "name": "Alice", "role": "Admin"}'
     static_response:
       choices:
         - message:
@@ -50,7 +41,7 @@ llm_interactions:
                 type: "function"
                 function:
                   name: "get_data_stdio"
-                  arguments: '{"task_description": "Now get recent activity for user123. {{mcp_directives}}"}'
+                  arguments: '{"response_to_return": {"content": [{"type": "text", "text": "{\\"activity\\": [\\"logged_in\\", \\"viewed_dashboard\\", \\"ran_report\\"]}"}]}}'
 
   # Third LLM turn: receives activity, generates final response.
   - expected_request:
@@ -58,9 +49,10 @@ llm_interactions:
         - tool_name: "get_data_stdio"
           response_json_matches:
             mcp_tool_output:
-              content:
-                - type: "text"
-                  text: '{"activity": ["logged_in", "viewed_dashboard", "ran_report"]}'
+              responseToReturn:
+                content:
+                  - type: "text"
+                    text: '{"activity": ["logged_in", "viewed_dashboard", "ran_report"]}'
     static_response:
       choices:
         - message:

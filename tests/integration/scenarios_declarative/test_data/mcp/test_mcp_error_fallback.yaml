@@ -23,6 +23,7 @@ llm_interactions:
                 type: "function"
                 function:
                   name: "get_data_stdio"
+                  arguments: '{"response_to_return": {"content": [{"type": "image", "data": "this-is-not-valid-base64", "mime_type": "image/png"}]}}'
   - expected_request:
       expected_tool_responses_in_llm_messages:
         - tool_name: "get_data_stdio"
@@ -34,12 +35,6 @@ llm_interactions:
         - message:
             role: "assistant"
             content: "I have retrieved the data and saved it as a raw artifact due to a processing error."
-
-mcp_interactions:
-  - content:
-      - type: "image"
-        data: "this-is-not-valid-base64" # Malformed data
-        mime_type: "image/png"
 
 expected_gateway_output:
   - type: "artifact_created"
