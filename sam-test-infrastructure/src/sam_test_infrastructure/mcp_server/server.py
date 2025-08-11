@@ -45,9 +45,10 @@ class TestMCPServer:
         self.responses_cache: Dict[str, List[Any]] = {}
         self.cache_lock = threading.Lock()
 
-        # Register the generic tool and health check endpoint
+        # Register the generic tool
         self.mcp.tool(self.get_data)
-        self.mcp.add_api_route("/health", self.health_check, methods=["GET"])
+        # TODO: Re-enable health check endpoint when FastMCP API is updated
+        # self.mcp.add_api_route("/health", self.health_check, methods=["GET"])
 
     async def health_check(self):
         """Simple health check endpoint for HTTP mode."""
@@ -117,7 +118,10 @@ def main():
     args = parser.parse_args()
 
     server_instance = TestMCPServer()
-    server_instance.mcp.run(transport=args.transport, port=args.port)
+    if args.transport == "stdio":
+        server_instance.mcp.run(transport=args.transport)
+    else:
+        server_instance.mcp.run(transport=args.transport, port=args.port)
 
 
 if __name__ == "__main__":
