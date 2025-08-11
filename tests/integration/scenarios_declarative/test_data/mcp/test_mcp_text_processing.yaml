@@ -1,6 +1,10 @@
 test_case_id: "mcp_text_processing_001"
 description: "Tests that a simple text response from an MCP tool is saved as a .txt artifact."
 
+test_runner_config_overrides:
+  agent_config:
+    mcp_tool_response_save_threshold_bytes: 10 # Force saving for small responses
+
 gateway_input:
   target_agent_name: "TestAgent"
   parts:
@@ -26,8 +30,8 @@ llm_interactions:
       expected_tool_responses_in_llm_messages:
         - tool_name: "get_data_stdio"
           response_json_matches:
-            status: "processed"
-            message_to_llm: "Response from tool 'get_data_stdio' processed."
+            status: "processed_and_saved"
+            message_to_llm_matches_regex: "The full response has been saved as artifact 'get_data_stdio_text_0_.*\\.txt' \\(version 0\\)\\."
             mcp_tool_output:
               content:
                 - type: "text"
