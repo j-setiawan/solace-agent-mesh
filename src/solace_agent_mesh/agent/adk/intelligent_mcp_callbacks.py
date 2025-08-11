@@ -70,13 +70,19 @@ async def save_mcp_response_as_artifact_intelligent(
                 "%s Intelligent processing disabled, using raw JSON fallback",
                 log_identifier,
             )
-            return await _save_raw_mcp_response_fallback(
+            fallback_artifact = await _save_raw_mcp_response_fallback(
                 tool,
                 tool_context,
                 host_component,
                 mcp_response_dict,
                 original_tool_args,
             )
+            return {
+                "status": fallback_artifact.get("status", "error"),
+                "artifacts_saved": [],
+                "fallback_artifact": fallback_artifact,
+                "message": "Intelligent processing disabled, saved raw JSON as fallback",
+            }
 
         # Initialize content processor
         processor = MCPContentProcessor(tool.name, original_tool_args)
