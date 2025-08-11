@@ -1,14 +1,6 @@
 test_case_id: "mcp_image_processing_001"
 description: "Tests that a base64 image response is correctly saved as a .png artifact."
 
-agent_config:
-  agent_name: "TestAgent"
-  tools:
-    - tool_type: mcp
-      tool_name: "get_data"
-  mcp_intelligent_processing:
-    enable_intelligent_processing: true
-
 gateway_input:
   target_agent_name: "TestAgent"
   parts:
@@ -24,7 +16,7 @@ llm_interactions:
               - id: "call_mcp_tool_456"
                 type: "function"
                 function:
-                  name: "get_data"
+                  name: "get_data_stdio"
                   arguments: '{"task_description": "Get image data."}'
 
 mcp_interactions:
@@ -38,6 +30,6 @@ expected_gateway_output:
     filename_contains: ".png"
     mime_type: "image/png"
     metadata_contains:
-      source_tool_name: "get_data"
+      source_tool_name: "get_data_stdio"
       content_type: "image"
       original_mime_type: "image/png"

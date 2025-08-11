@@ -1,14 +1,11 @@
 test_case_id: "mcp_error_fallback_001"
 description: "Tests that with fallback enabled, a malformed response is saved as raw JSON."
 
-agent_config:
-  agent_name: "TestAgent"
-  tools:
-    - tool_type: mcp
-      tool_name: "get_data"
-  mcp_intelligent_processing:
-    enable_intelligent_processing: true
-    fallback_to_raw_on_error: true # The key setting for this test
+test_runner_config_overrides:
+  agent_config:
+    mcp_intelligent_processing:
+      enable_intelligent_processing: true
+      fallback_to_raw_on_error: true # The key setting for this test
 
 gateway_input:
   target_agent_name: "TestAgent"
@@ -25,7 +22,7 @@ llm_interactions:
               - id: "call_mcp_tool_abc"
                 type: "function"
                 function:
-                  name: "get_data"
+                  name: "get_data_stdio"
                   arguments: '{"task_description": "Get malformed data."}'
 
 mcp_interactions:
@@ -39,5 +36,5 @@ expected_gateway_output:
     filename_contains: "_raw.json" # Should be a raw JSON fallback
     mime_type: "application/json"
     metadata_contains:
-      source_tool_name: "get_data"
+      source_tool_name: "get_data_stdio"
       processing_type: "raw_fallback"

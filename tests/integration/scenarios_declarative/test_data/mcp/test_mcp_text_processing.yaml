@@ -1,15 +1,6 @@
 test_case_id: "mcp_text_processing_001"
 description: "Tests that a simple text response from an MCP tool is saved as a .txt artifact."
 
-agent_config:
-  agent_name: "TestAgent"
-  tools:
-    - tool_type: mcp
-      # connection_params will be injected by the test runner
-      # Note: tool_name is not needed for MCP tools - they are discovered dynamically
-  mcp_intelligent_processing:
-    enable_intelligent_processing: true
-
 gateway_input:
   target_agent_name: "TestAgent"
   parts:
@@ -29,7 +20,7 @@ llm_interactions:
               - id: "call_mcp_tool_123"
                 type: "function"
                 function:
-                  name: "get_data"
+                  name: "get_data_stdio"
                   arguments: '{"task_description": "Get text data from the test server."}'
 
 mcp_interactions:
@@ -42,6 +33,6 @@ expected_gateway_output:
     filename_contains: ".txt"
     mime_type: "text/plain"
     metadata_contains:
-      source_tool_name: "get_data"
+      source_tool_name: "get_data_stdio"
       content_type: "text"
       detected_format: "plain"
