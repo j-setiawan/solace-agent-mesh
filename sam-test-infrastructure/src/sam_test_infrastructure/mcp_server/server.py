@@ -77,6 +77,14 @@ class TestMCPServer:
         if not isinstance(content_list, list):
             return [f"Error: Expected 'content' to be a list, got {type(content_list)}"]
 
+        # Special handling for returning a raw ToolResult to bypass fastmcp's serialization
+        if len(content_list) == 1 and content_list[0].get("type") == "tool_result":
+            tool_result_data = content_list[0]
+            return ToolResult(
+                content=tool_result_data.get("content"),
+                structured_content=tool_result_data.get("structured_content"),
+            )
+
         # Special handling for resource links to bypass fastmcp's serialization
         if len(content_list) == 1 and content_list[0].get("type") == "resource":
             resource_data = content_list[0].get("resource", {})
