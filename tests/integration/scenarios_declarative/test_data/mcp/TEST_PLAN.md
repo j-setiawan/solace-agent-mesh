@@ -9,7 +9,7 @@ This section tests the fundamental decision-making process of the callback, ensu
 | Test ID | Description | Status | Test File |
 | :--- | :--- | :--- | :--- |
 | 1.1 | Verifies that a small text response, whose size is below both the save and LLM return thresholds, is **not** saved as an artifact and is returned to the LLM in full. | Implemented | `test_mcp_trigger_below_thresholds.yaml` |
-| 1.2 | Verifies that a text response larger than the `mcp_tool_response_save_threshold_bytes` but smaller than the LLM return limit **is** saved as an artifact, and the full response is still returned to the LLM. | | |
+| 1.2 | Verifies that a text response larger than the `mcp_tool_response_save_threshold_bytes` but smaller than the LLM return limit **is** saved as an artifact, and the full response is still returned to the LLM. | Implemented | `test_mcp_trigger_above_save_threshold.yaml` |
 | 1.3 | Verifies that a text response larger than both the save and LLM return thresholds **is** saved as an artifact, and a **truncated** response is returned to the LLM. | | |
 | 1.4 | Verifies that a response containing non-text content (e.g., a small image) is **always** saved as an artifact, even if its total size is below all configured size thresholds. | | |
 
