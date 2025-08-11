@@ -967,72 +967,6 @@ SKIPPED_FAILING_EMBED_TESTS = [
 ]
 
 
-def _preprocess_mcp_interactions(scenario: Dict[str, Any]) -> None:
-    """
-    Pre-processes the scenario to inject MCP directives into LLM tool call arguments.
-    Finds markers like '{{mcp_directives}}' and replaces them with the
-    base64-encoded mcp_interactions payload.
-    """
-    if "mcp_interactions" not in scenario:
-        return
-
-    test_case_id = scenario.get("test_case_id")
-    if not test_case_id:
-        pytest.fail(
-            "Scenario has 'mcp_interactions' but is missing 'test_case_id' for directive injection."
-        )
-
-    mcp_interactions_list = scenario["mcp_interactions"]
-    if not isinstance(mcp_interactions_list, list):
-        pytest.fail(
-            f"Scenario {test_case_id}: 'mcp_interactions' must be a list, but got {type(mcp_interactions_list)}."
-        )
-
-    # 1. Pre-compute the single directive string for the whole list
-    try:
-        json_str = json.dumps(mcp_interactions_list)
-        b64_str = base64.b64encode(json_str.encode("utf-8")).decode("utf-8")
-        # Note: The leading space is important for some prompts.
-        directive_string = (
-            f" [test_case_id={test_case_id}][mcp_responses_json={b64_str}]"
-        )
-    except Exception as e:
-        pytest.fail(
-            f"Scenario {test_case_id}: Failed to encode mcp_interactions list: {e}\nList: {mcp_interactions_list}"
-        )
-
-    # 2. Define the replacer function for re.sub
-    def replacer(match):
-        index_str = match.group(1)
-        if index_str:
-            pytest.fail(
-                f"Scenario {test_case_id}: Indexed mcp_directives marker '[[{index_str}]]' is no longer supported. The entire mcp_interactions list is now injected."
-            )
-        return directive_string
-
-    # 3. Iterate and replace markers
-    llm_interactions = scenario.get("llm_interactions", [])
-    for llm_interaction in llm_interactions:
-        static_response = llm_interaction.get("static_response", {})
-        choices = static_response.get("choices", [])
-        if not choices:
-            continue
-        message = choices[0].get("message", {})
-        tool_calls = message.get("tool_calls", [])
-        if not tool_calls:
-            continue
-
-        for tool_call in tool_calls:
-            function = tool_call.get("function", {})
-            arguments_str = function.get("arguments")
-            if isinstance(arguments_str, str):
-                # Regex to find {{mcp_directives}} or {{mcp_directives[<index>]}}
-                new_arguments_str = re.sub(
-                    r"\{\{mcp_directives(?:\[(\d+)\])?\}\}", replacer, arguments_str
-                )
-                if new_arguments_str != arguments_str:
-                    function["arguments"] = new_arguments_str
-
 
 @pytest.mark.asyncio
 async def test_declarative_scenario(
@@ -1052,8 +986,6 @@ async def test_declarative_scenario(
     """
     scenario_id = declarative_scenario.get("test_case_id", "N/A")
     scenario_description = declarative_scenario.get("description", "No description")
-
-    _preprocess_mcp_interactions(declarative_scenario)
 
     # --- Phase 0: MCP Configuration now handled by mcp_configured_sam_app fixture ---
 
