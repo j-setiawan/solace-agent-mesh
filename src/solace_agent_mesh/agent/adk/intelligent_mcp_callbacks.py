@@ -8,7 +8,7 @@ content processing to save MCP tool responses as appropriately typed artifacts.
 import json
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any, Dict, TYPE_CHECKING
 
 from google.adk.tools import ToolContext, BaseTool
 from solace_ai_connector.common.log import log
@@ -19,6 +19,10 @@ from ...agent.utils.artifact_helpers import (
     DEFAULT_SCHEMA_MAX_KEYS,
 )
 from ...agent.utils.context_helpers import get_original_session_id
+
+
+if TYPE_CHECKING:
+    from ...agent.sac.component import SamAgentComponent
 
 
 async def save_mcp_response_as_artifact_intelligent(
