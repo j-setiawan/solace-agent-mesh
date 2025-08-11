@@ -11,7 +11,7 @@ import re
 import threading
 from typing import Any, Dict, List
 
-from fastmcp import Context, FastMCP
+from fastmcp import Context, FastMCP, ToolResult
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 

@@ -28,10 +28,9 @@ llm_interactions:
         - tool_name: "get_data_stdio"
           response_json_matches:
             mcp_tool_output:
-              responseToReturn:
-                content:
-                  - type: "text"
-                    text: '{"user_id": "user123", "name": "Alice", "role": "Admin"}'
+              content:
+                - type: "text"
+                  text: '{"user_id": "user123", "name": "Alice", "role": "Admin"}'
     static_response:
       choices:
         - message:
@@ -49,10 +48,9 @@ llm_interactions:
         - tool_name: "get_data_stdio"
           response_json_matches:
             mcp_tool_output:
-              responseToReturn:
-                content:
-                  - type: "text"
-                    text: '{"activity": ["logged_in", "viewed_dashboard", "ran_report"]}'
+              content:
+                - type: "text"
+                  text: '{"activity": ["logged_in", "viewed_dashboard", "ran_report"]}'
     static_response:
       choices:
         - message:
