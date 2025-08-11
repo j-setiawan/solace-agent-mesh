@@ -202,6 +202,7 @@ def shared_solace_connector(
     test_artifact_service_instance: TestInMemoryArtifactService,
     session_monkeypatch,
     request,
+    mcp_server_harness,
 ) -> SolaceAiConnector:
     """
     Creates and manages a single SolaceAiConnector instance with multiple agents
@@ -297,6 +298,16 @@ def shared_solace_connector(
                 "model": "gemini-2.0-flash-preview-image-generation",
                 "gemini_api_key": "fake-gemini-api-key",
             },
+        },
+        {
+            "tool_type": "mcp",
+            "tool_name": "get_data_stdio",
+            "connection_params": mcp_server_harness["stdio"],
+        },
+        {
+            "tool_type": "mcp",
+            "tool_name": "get_data_http",
+            "connection_params": mcp_server_harness["http"],
         },
     ]
     sam_agent_app_config = create_agent_config(
