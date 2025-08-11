@@ -27,6 +27,7 @@ llm_interactions:
         - tool_name: "get_data_stdio"
           response_json_matches:
             status: "processed"
+            message_to_llm: "Response from tool 'get_data_stdio' processed."
             mcp_tool_output:
               content:
                 - type: "text"

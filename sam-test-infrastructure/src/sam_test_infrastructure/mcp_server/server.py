@@ -56,16 +56,21 @@ class TestMCPServer:
 
     async def get_data(
         self, response_to_return: Dict[str, Any], ctx: Context
-    ) -> Dict[str, Any]:
+    ) -> ToolResult:
         """
-        A generic tool that returns the provided dictionary as its response.
-        This allows tests to directly inject the desired MCP response.
+        A generic tool that returns a fully formed ToolResult.
+        This allows tests to directly inject the desired MCP response structure,
+        giving full control over the 'content' and 'structuredContent' fields.
         The tool's single argument 'response_to_return' is expected to be a
         dictionary containing the desired MCP response structure (e.g., a 'content' list).
         """
-        # Transform keys to camelCase to mimic a real MCP server response.
-        transformed_response = _convert_keys_to_camel_case(response_to_return)
-        return transformed_response
+        # By returning a ToolResult, we tell fastmcp to use this structure
+        # directly, bypassing any default serialization. This gives us precise
+        # control for testing.
+        return ToolResult(
+            content=response_to_return.get("content"),
+            structured_content=response_to_return.get("structuredContent"),
+        )
 
 
 def main():
