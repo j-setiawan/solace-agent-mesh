@@ -17,7 +17,6 @@ llm_interactions:
                 type: "function"
                 function:
                   name: "get_data_stdio"
-                  arguments: '{"task_description": "Get image data."}'
   - expected_request:
       expected_tool_responses_in_llm_messages:
         - tool_name: "get_data_stdio"

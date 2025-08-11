@@ -21,13 +21,15 @@ llm_interactions:
                 type: "function"
                 function:
                   name: "get_data_stdio"
-                  arguments: '{"task_description": "Get text data from the test server."}'
   - expected_request:
       expected_tool_responses_in_llm_messages:
         - tool_name: "get_data_stdio"
           response_json_matches:
             status: "processed"
-            message_to_llm_matches_regex: "This is a simple text response."
+            mcp_tool_output:
+              content:
+                - type: "text"
+                  text: "This is a simple text response."
     static_response:
       choices:
         - message:
