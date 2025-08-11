@@ -989,6 +989,26 @@ async def test_declarative_scenario(
 
     # --- Phase 0: MCP Configuration now handled by mcp_configured_sam_app fixture ---
 
+    if "monkeypatch_spec" in declarative_scenario:
+        for patch_spec in declarative_scenario["monkeypatch_spec"]:
+            target_str = patch_spec["target"]
+            side_effect_type = patch_spec.get("side_effect")
+
+            if side_effect_type == "exception":
+                exception_type_str = patch_spec.get("exception_type", "Exception")
+                exception_message = patch_spec.get(
+                    "exception_message", "Simulated failure"
+                )
+                exception_class = getattr(__builtins__, exception_type_str, Exception)
+
+                async def mock_save_fail(*args, **kwargs):
+                    raise exception_class(exception_message)
+
+                monkeypatch.setattr(target_str, mock_save_fail)
+                print(
+                    f"Scenario {scenario_id}: MONKEYPATCH APPLIED to '{target_str}' to raise {exception_type_str}."
+                )
+
     if scenario_id in SKIPPED_FAILING_EMBED_TESTS:
         pytest.skip(f"Skipping failing embed test '{scenario_id}' until fixed.")
 

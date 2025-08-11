@@ -60,7 +60,7 @@ This section focuses on edge cases for LLM response formatting and error handlin
 | Test ID | Description | Status | Test File |
 | :--- | :--- | :--- | :--- |
 | 3.1 | Verifies that a response is saved as an artifact when it exceeds the LLM return limit, even if it's below the save threshold. | Implemented | `test_mcp_save_forced_by_truncation.yaml` |
-| 3.2 | Verifies that if artifact saving fails, the LLM receives the original (or truncated) response along with a clear message that the save operation failed. | | |
+| 3.2 | Verifies that if artifact saving fails, the LLM receives the original (or truncated) response along with a clear message that the save operation failed. | Implemented | `test_mcp_llm_response_save_failed.yaml` |
 
 ---
 
