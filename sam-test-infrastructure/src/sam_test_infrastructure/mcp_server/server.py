@@ -13,7 +13,10 @@ import logging
 from typing import Any, Dict, List
 
 from fastmcp import Context, FastMCP
-from fastmcp.utilities.types import Audio, Image, File
+from fastmcp.tools.tool import ToolResult
+from fastmcp.utilities.types import Audio, Image
+from mcp.types import EmbeddedResource, TextResourceContents
+from pydantic import AnyUrl
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
@@ -74,6 +77,19 @@ class TestMCPServer:
         if not isinstance(content_list, list):
             return [f"Error: Expected 'content' to be a list, got {type(content_list)}"]
 
+        # Special handling for resource links to bypass fastmcp's serialization
+        if len(content_list) == 1 and content_list[0].get("type") == "resource":
+            resource_data = content_list[0].get("resource", {})
+            uri = resource_data.get("uri")
+            if uri:
+                # The agent expects a resource block with NO text/blob to create a placeholder.
+                # An empty text string should work, as `if content:` will be false.
+                resource_contents = TextResourceContents(uri=AnyUrl(uri), text="")
+                embedded_resource = EmbeddedResource(
+                    type="resource", resource=resource_contents
+                )
+                return ToolResult(content=[embedded_resource])
+
         result_objects = []
         for item in content_list:
             item_type = item.get("type")
@@ -101,15 +117,6 @@ class TestMCPServer:
                     result_objects.append(Audio(data=audio_bytes, format=format_type))
                 except (ValueError, TypeError) as e:
                     result_objects.append(f"Error decoding audio data: {e}")
-            elif item_type == "resource":
-                resource_data = item.get("resource", {})
-                uri = resource_data.get("uri")
-                if uri:
-                    # fastmcp converts a File object with a URI into an EmbeddedResource,
-                    # which is the correct structure for a resource link.
-                    result_objects.append(File(uri=uri))
-                else:
-                    result_objects.append("Error: resource item missing uri")
             else:
                 # For unknown types, return the raw dictionary as structured content
                 result_objects.append(item)
