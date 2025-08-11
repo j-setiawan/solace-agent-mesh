@@ -609,6 +609,7 @@ async def manage_large_mcp_tool_responses_callback(
 
     # Clean any Pydantic-specific types before serialization
     mcp_response_dict = _recursively_clean_pydantic_types(mcp_response_dict)
+    cleaned_args = _recursively_clean_pydantic_types(args)
 
     try:
         save_threshold = host_component.get_config(
@@ -658,7 +659,7 @@ async def manage_large_mcp_tool_responses_callback(
     saved_artifact_details = None
     if needs_saving_as_artifact:
         saved_artifact_details = await _save_mcp_response_as_artifact(
-            tool, tool_context, host_component, mcp_response_dict, args
+            tool, tool_context, host_component, mcp_response_dict, cleaned_args
         )
         if not (
             saved_artifact_details.get("status") == "success"
