@@ -40,8 +40,8 @@ This section ensures the `MCPContentProcessor` correctly handles each content ty
 
 | Test ID | Description | Status | Test File |
 | :--- | :--- | :--- | :--- |
-| 2.3.1 | Tests that a base64-encoded MP3 audio stream is correctly decoded and saved as an `.mp3` file with an `audio/mpeg` MIME type. | | |
-| 2.3.2 | Tests that a base64-encoded WAV audio stream is correctly decoded and saved as a `.wav` file with an `audio/wav` MIME type. | | |
+| 2.3.1 | Tests that a base64-encoded MP3 audio stream is correctly decoded and saved as an `.mp3` file with an `audio/mpeg` MIME type. | Implemented | `test_mcp_audio_processing_mp3.yaml` |
+| 2.3.2 | Tests that a base64-encoded WAV audio stream is correctly decoded and saved as a `.wav` file with an `audio/wav` MIME type. | Implemented | `test_mcp_audio_processing_wav.yaml` |
 
 ### 2.4 Resource Content Processing
 
