@@ -22,6 +22,17 @@ llm_interactions:
                 function:
                   name: "get_data_stdio"
                   arguments: '{"task_description": "Get text data from the test server."}'
+  - expected_request:
+      expected_tool_responses_in_llm_messages:
+        - tool_name: "get_data_stdio"
+          response_json_matches:
+            status: "processed_and_saved"
+            message_to_llm_matches_regex: "The full response has been saved as artifact 'get_data_stdio_text_0_.*\\.txt' \\(version 0\\)\\."
+    static_response:
+      choices:
+        - message:
+            role: "assistant"
+            content: "I have retrieved the text data and saved it as an artifact."
 
 mcp_interactions:
   - content:
