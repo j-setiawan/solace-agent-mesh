@@ -110,6 +110,9 @@ async def save_mcp_response_as_artifact_intelligent(
         # Save each content item as a separate artifact
         for content_item in content_items:
             try:
+                # Convert AnyUrl to string
+                if hasattr(content_item, "uri"):
+                    content_item.uri = str(content_item.uri)
                 artifact_result = await _save_content_item_as_artifact(
                     content_item, tool_context, host_component
                 )
