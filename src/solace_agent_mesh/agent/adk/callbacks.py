@@ -1218,6 +1218,7 @@ async def after_tool_callback_inject_metadata(
                         metadata_part.inline_data.data.decode("utf-8")
                     )
                     metadata_dict["version"] = version
+                    metadata_dict["filename"] = filename
                     formatted_text = format_metadata_for_llm(metadata_dict)
                     metadata_texts.append(formatted_text)
                     log.info(
