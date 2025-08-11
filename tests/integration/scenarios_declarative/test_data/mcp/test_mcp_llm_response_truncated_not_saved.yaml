@@ -1,0 +1,57 @@
+test_case_id: "mcp_llm_response_truncated_not_saved_001"
+description: "Verifies a response larger than the LLM return limit but smaller than the save threshold is truncated but not saved."
+skip_intermediate_events: true
+
+test_runner_config_overrides:
+  agent_config:
+    # Set a large save threshold so the response doesn't trigger it.
+    mcp_tool_response_save_threshold_bytes: 5000
+    # Set a small LLM return limit to trigger truncation.
+    mcp_tool_llm_return_max_bytes: 100
+
+gateway_input:
+  target_agent_name: "TestAgent"
+  user_identity: "mcp_llm_formatter@example.com"
+  parts:
+    - type: "text"
+      text: "Get a response that should be truncated but not saved."
+  external_context:
+    a2a_session_id: "session_mcp_llm_response_truncated_not_saved_001"
+
+llm_interactions:
+  # 1. LLM calls the MCP tool
+  - static_response:
+      choices:
+        - message:
+            role: "assistant"
+            tool_calls:
+              - id: "call_mcp_tool_123"
+                type: "function"
+                function:
+                  name: "get_data_stdio"
+                  # This response is > 100 bytes but < 5000 bytes.
+                  arguments: '{"response_to_return": {"content": [{"type": "text", "text": "This is a moderately long text response that is specifically designed to be larger than the LLM return limit but smaller than the artifact save threshold."}]}}'
+
+  # 2. LLM gets the truncated tool response and generates the final answer
+  - expected_request:
+      expected_tool_responses_in_llm_messages:
+        - tool_name: "get_data_stdio"
+          response_json_matches:
+            status: "processed_truncated"
+            message_to_llm_matches_regex: "The response from tool 'get_data_stdio' was too large .* for direct display and has been truncated."
+            # The output should be a truncated string preview
+            mcp_tool_output:
+              type: "truncated_json_string"
+              content: '{"content": [{"type": "text", "text": "This is a moderate... [Response truncated due to size limit.]'
+    static_response:
+      choices:
+        - message:
+            role: "assistant"
+            content: "I have retrieved the data, but it was too long to display fully. No artifact was saved."
+
+expected_gateway_output:
+  - type: "final_response"
+    content_parts:
+      - type: "text"
+        text_exact: "I have retrieved the data, but it was too long to display fully. No artifact was saved."
+    # No assert_artifact_state, as no artifact should be created.

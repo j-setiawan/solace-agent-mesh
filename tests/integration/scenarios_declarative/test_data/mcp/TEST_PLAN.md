@@ -53,16 +53,14 @@ This section ensures the `MCPContentProcessor` correctly handles each content ty
 
 ---
 
-## 3. LLM Response Formatting and Truncation
+## 3. LLM Response Formatting and Error Handling
 
-This section focuses on verifying that the final dictionary returned to the LLM is correctly formatted, informative, and truncated when necessary.
+This section focuses on edge cases for LLM response formatting and error handling during artifact saving.
 
 | Test ID | Description | Status | Test File |
 | :--- | :--- | :--- | :--- |
-| 3.1 | Verifies that when an artifact is saved but not truncated, the LLM receives the full original response along with a message confirming the save. | | |
-| 3.2 | Verifies that when a large response is saved, the LLM receives a **truncated** string preview and a message indicating both saving and truncation occurred. | | |
-| 3.3 | Verifies the edge case where a response is too large for the LLM but smaller than the save threshold. The LLM should receive a truncated response and a message about truncation only. | | |
-| 3.4 | Verifies that if artifact saving fails, the LLM receives the original (or truncated) response along with a clear message that the save operation failed. | | |
+| 3.1 | Verifies the edge case where a response is too large for the LLM but smaller than the save threshold. The LLM should receive a truncated response and a message about truncation only. | Implemented | `test_mcp_llm_response_truncated_not_saved.yaml` |
+| 3.2 | Verifies that if artifact saving fails, the LLM receives the original (or truncated) response along with a clear message that the save operation failed. | | |
 
 ---
 
