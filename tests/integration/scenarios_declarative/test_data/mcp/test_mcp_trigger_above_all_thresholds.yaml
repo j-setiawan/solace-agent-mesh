@@ -6,8 +6,9 @@ test_runner_config_overrides:
   agent_config:
     # Force saving for any response larger than 10 bytes.
     mcp_tool_response_save_threshold_bytes: 10
-    # Force truncation for any response larger than 30 bytes.
-    mcp_tool_llm_return_max_bytes: 30
+    # Force truncation for any response larger than 100 bytes. This must be
+    # larger than the truncation suffix itself (~42 bytes).
+    mcp_tool_llm_return_max_bytes: 100
 
 gateway_input:
   target_agent_name: "TestAgent"
@@ -42,7 +43,7 @@ llm_interactions:
             # The output should be a truncated string preview
             mcp_tool_output:
               type: "truncated_json_string"
-              content: '{"content":[{"type":"text", ... [Response truncated due to size limit.]'
+              content: '{"content": [{"type": "text", "text": "This is a very long ... [Response truncated due to size limit.]'
     static_response:
       choices:
         - message:
