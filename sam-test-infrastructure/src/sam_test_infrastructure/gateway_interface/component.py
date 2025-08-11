@@ -244,7 +244,6 @@ class TestGatewayComponent(BaseGatewayComponent):
             test_input_data: A dictionary representing the test input. Expected keys:
                              'target_agent_name', 'user_identity', 'a2a_parts' (list of dicts),
                              'external_context_override' (optional dict).
-                             May also contain 'mcp_interactions' and 'test_case_id' for injection.
 
         Returns:
             The task_id assigned to the submitted A2A task.
