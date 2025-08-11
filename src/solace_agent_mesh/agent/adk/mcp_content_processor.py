@@ -400,11 +400,8 @@ class MCPContentProcessor:
         mime_type = resource.get("mimeType", "application/octet-stream")
         content = resource.get("blob") or resource.get("text", "")
 
-        if not uri:
-            log.warning(
-                "%s Resource content item %d missing URI", self.log_identifier, index
-            )
-            return None
+        if uri:
+            uri = str(uri)
 
         # Extract filename from URI
         filename = self._extract_filename_from_uri(uri, mime_type, index)
