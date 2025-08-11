@@ -331,8 +331,14 @@ class MCPContentProcessor:
                 parsed_data, detected_format
             )
 
+        # If CSV was detected, use the version with unescaped newlines for saving.
+        if detected_format == TextFormat.CSV:
+            content_to_save = text_content.replace("\\n", "\n")
+        else:
+            content_to_save = text_content
+
         # Convert to bytes
-        content_bytes = text_content.encode("utf-8")
+        content_bytes = content_to_save.encode("utf-8")
 
         log.debug(
             "%s Processed text content item %d: format=%s, parse_success=%s, size=%d bytes",
@@ -510,9 +516,11 @@ class MCPContentProcessor:
 
         # Try CSV
         try:
+            # Unescape newlines for robust CSV detection and parsing
+            processed_text_for_csv = text_content.replace("\\n", "\n")
             # Check if it looks like CSV (has commas and multiple lines)
-            if "," in text_content and "\n" in text_content:
-                csv_reader = csv.reader(StringIO(text_content))
+            if "," in processed_text_for_csv and "\n" in processed_text_for_csv:
+                csv_reader = csv.reader(StringIO(processed_text_for_csv))
                 rows = list(csv_reader)
                 if len(rows) > 1 and len(rows[0]) > 1:  # At least 2 rows and 2 columns
                     return TextFormat.CSV, True, rows
