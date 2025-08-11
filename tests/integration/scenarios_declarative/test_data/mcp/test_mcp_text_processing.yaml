@@ -1,5 +1,6 @@
 test_case_id: "mcp_text_processing_001"
 description: "Tests that a simple text response from an MCP tool is saved as a .txt artifact."
+skip_intermediate_events: true
 
 test_runner_config_overrides:
   agent_config:
@@ -43,10 +44,14 @@ llm_interactions:
             content: "I have retrieved the text data and saved it as an artifact."
 
 expected_gateway_output:
-  - type: "artifact_created"
-    filename_contains: ".txt"
-    mime_type: "text/plain"
-    metadata_contains:
-      source_tool_name: "get_data_stdio"
-      content_type: "text"
-      detected_format: "plain"
+  - type: "final_response"
+    content_parts:
+      - type: "text"
+        text_exact: "I have retrieved the text data and saved it as an artifact."
+    assert_artifact_state:
+      - filename_matches_regex: "get_data_stdio_text_0_.*\\.txt"
+        version: 0
+        expected_metadata_contains:
+          source_tool_name: "get_data_stdio"
+          content_type: "text"
+          detected_format: "plain"
