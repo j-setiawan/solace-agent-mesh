@@ -496,8 +496,10 @@ class MCPContentProcessor:
 
         # Try JSON first
         try:
+            # Only consider it JSON if it's a structured type (dict or list)
             parsed_data = json.loads(text_content)
-            return TextFormat.JSON, True, parsed_data
+            if isinstance(parsed_data, (dict, list)):
+                return TextFormat.JSON, True, parsed_data
         except (json.JSONDecodeError, ValueError):
             pass
 
