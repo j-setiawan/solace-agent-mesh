@@ -59,7 +59,7 @@ This section focuses on edge cases for LLM response formatting and error handlin
 
 | Test ID | Description | Status | Test File |
 | :--- | :--- | :--- | :--- |
-| 3.1 | Verifies the edge case where a response is too large for the LLM but smaller than the save threshold. The LLM should receive a truncated response and a message about truncation only. | Implemented | `test_mcp_llm_response_truncated_not_saved.yaml` |
+| 3.1 | Verifies that a response is saved as an artifact when it exceeds the LLM return limit, even if it's below the save threshold. | Implemented | `test_mcp_save_forced_by_truncation.yaml` |
 | 3.2 | Verifies that if artifact saving fails, the LLM receives the original (or truncated) response along with a clear message that the save operation failed. | | |
 
 ---
