@@ -11,7 +11,8 @@ import re
 import threading
 from typing import Any, Dict, List
 
-from fastmcp import Context, FastMCP, ToolResult
+from fastmcp import Context, FastMCP
+from fastmcp.utilities.types import Audio, Image
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
@@ -56,21 +57,43 @@ class TestMCPServer:
 
     async def get_data(
         self, response_to_return: Dict[str, Any], ctx: Context
-    ) -> ToolResult:
+    ) -> List[Any]:
         """
-        A generic tool that returns a fully formed ToolResult.
-        This allows tests to directly inject the desired MCP response structure,
-        giving full control over the 'content' and 'structuredContent' fields.
-        The tool's single argument 'response_to_return' is expected to be a
-        dictionary containing the desired MCP response structure (e.g., a 'content' list).
+        A generic tool that constructs a list of typed Python objects based on
+        the 'content' list provided in its arguments. This allows tests to
+        leverage fastmcp's automatic type-to-ContentBlock conversion, giving
+        full control over the mocked MCP response.
         """
-        # By returning a ToolResult, we tell fastmcp to use this structure
-        # directly, bypassing any default serialization. This gives us precise
-        # control for testing.
-        return ToolResult(
-            content=response_to_return.get("content"),
-            structured_content=response_to_return.get("structuredContent"),
-        )
+        content_list = response_to_return.get("content", [])
+        if not isinstance(content_list, list):
+            return [f"Error: Expected 'content' to be a list, got {type(content_list)}"]
+
+        result_objects = []
+        for item in content_list:
+            item_type = item.get("type")
+            if item_type == "text":
+                result_objects.append(item.get("text", ""))
+            elif item_type == "image":
+                try:
+                    image_bytes = base64.b64decode(item.get("data", ""))
+                    result_objects.append(
+                        Image(data=image_bytes, mime_type=item.get("mimeType"))
+                    )
+                except (ValueError, TypeError) as e:
+                    result_objects.append(f"Error decoding image data: {e}")
+            elif item_type == "audio":
+                try:
+                    audio_bytes = base64.b64decode(item.get("data", ""))
+                    result_objects.append(
+                        Audio(data=audio_bytes, mime_type=item.get("mimeType"))
+                    )
+                except (ValueError, TypeError) as e:
+                    result_objects.append(f"Error decoding audio data: {e}")
+            else:
+                # For unknown types, return the raw dictionary as structured content
+                result_objects.append(item)
+
+        return result_objects
 
 
 def main():
