@@ -59,6 +59,7 @@ async def save_mcp_response_as_artifact_intelligent(
     processor_config = MCPContentProcessorConfig.from_dict(processor_config_dict)
 
     saved_artifacts = []
+    failed_artifacts = []
     fallback_artifact = None
     overall_status = "success"
 
@@ -126,16 +127,25 @@ async def save_mcp_response_as_artifact_intelligent(
                         artifact_result.get("message", "Unknown error"),
                     )
                     overall_status = "partial_success"
+                    failed_artifacts.append(artifact_result)
 
             except Exception as e:
                 log.exception("%s Error saving content item: %s", log_identifier, e)
                 overall_status = "partial_success"
+                failed_artifacts.append({"status": "error", "message": str(e)})
                 continue
 
-        # If no artifacts were saved successfully, fall back to raw JSON
+        # If no artifacts were saved successfully, check for failures before falling back
         if not saved_artifacts:
+            if failed_artifacts:
+                log.warning(
+                    "%s No content items saved successfully due to errors. Reporting first error.",
+                    log_identifier,
+                )
+                return failed_artifacts[0]
+
             log.warning(
-                "%s No content items saved successfully, using raw JSON fallback",
+                "%s No content items found or processed, falling back to raw JSON",
                 log_identifier,
             )
             fallback_artifact = await _save_raw_mcp_response_fallback(
