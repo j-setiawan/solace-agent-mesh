@@ -452,6 +452,24 @@ def repair_history_callback(
     return None
 
 
+def _recursively_clean_pydantic_types(data: Any) -> Any:
+    """
+    Recursively traverses a data structure (dicts, lists) and converts
+    Pydantic-specific types like AnyUrl to their primitive string representation
+    to ensure JSON serializability.
+    """
+    if isinstance(data, dict):
+        return {
+            key: _recursively_clean_pydantic_types(value) for key, value in data.items()
+        }
+    elif isinstance(data, list):
+        return [_recursively_clean_pydantic_types(item) for item in data]
+    # Check for Pydantic's AnyUrl without a direct import to avoid dependency issues.
+    elif type(data).__name__ == "AnyUrl" and hasattr(data, "__str__"):
+        return str(data)
+    return data
+
+
 def _mcp_response_contains_non_text(mcp_response_dict: Dict[str, Any]) -> bool:
     """
     Checks if the 'content' list in an MCP response dictionary contains any
@@ -588,6 +606,9 @@ async def manage_large_mcp_tool_responses_callback(
             type(tool_response),
         )
         mcp_response_dict = tool_response
+
+    # Clean any Pydantic-specific types before serialization
+    mcp_response_dict = _recursively_clean_pydantic_types(mcp_response_dict)
 
     try:
         save_threshold = host_component.get_config(
