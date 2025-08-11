@@ -42,22 +42,16 @@ def mcp_server_harness(request) -> Generator[Dict[str, Any], None, None]:
 
     try:
         if transport_mode == "stdio":
-            command = [sys.executable, SERVER_PATH, "--transport", "stdio"]
-            process = subprocess.Popen(
-                command,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            # For stdio, readiness is assumed once the process starts.
-            # A small delay for safety, allowing the process to initialize.
-            time.sleep(0.5)
+            # For stdio mode, DON'T start external process - let ADK manage it
+            # Just provide the command/args for ADK to start its own process
             connection_params = {
                 "type": "stdio",
                 "command": sys.executable,
                 "args": [SERVER_PATH, "--transport", "stdio"],
             }
-            print(f"\nStarted TestMCPServer in stdio mode (PID: {process.pid}).")
+            print(
+                f"\nConfigured TestMCPServer for stdio mode (ADK will start process)."
+            )
 
         elif transport_mode == "http":
             port = find_free_port()
@@ -126,3 +120,7 @@ def mcp_server_harness(request) -> Generator[Dict[str, Any], None, None]:
                     "\nTestMCPServer process did not terminate gracefully, had to be killed."
                 )
             print("TestMCPServer terminated.")
+        elif request.param == "stdio":
+            print(
+                "\nNo external TestMCPServer process to terminate (stdio mode - ADK manages process)."
+            )
