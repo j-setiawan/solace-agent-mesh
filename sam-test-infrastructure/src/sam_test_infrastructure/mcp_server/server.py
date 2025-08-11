@@ -15,7 +15,12 @@ from typing import Any, Dict, List
 from fastmcp import Context, FastMCP
 from fastmcp.tools.tool import ToolResult
 from fastmcp.utilities.types import Audio, Image
-from mcp.types import EmbeddedResource, TextResourceContents, BlobResourceContents
+from mcp.types import (
+    BlobResourceContents,
+    EmbeddedResource,
+    TextContent,
+    TextResourceContents,
+)
 from pydantic import AnyUrl
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
@@ -77,14 +82,6 @@ class TestMCPServer:
         if not isinstance(content_list, list):
             return [f"Error: Expected 'content' to be a list, got {type(content_list)}"]
 
-        # Special handling for returning a raw ToolResult to bypass fastmcp's serialization
-        if len(content_list) == 1 and content_list[0].get("type") == "tool_result":
-            tool_result_data = content_list[0]
-            return ToolResult(
-                content=tool_result_data.get("content"),
-                structured_content=tool_result_data.get("structured_content"),
-            )
-
         # Special handling for resource links to bypass fastmcp's serialization
         if len(content_list) == 1 and content_list[0].get("type") == "resource":
             resource_data = content_list[0].get("resource", {})
@@ -117,7 +114,9 @@ class TestMCPServer:
         for item in content_list:
             item_type = item.get("type")
             if item_type == "text":
-                result_objects.append(item.get("text", ""))
+                result_objects.append(
+                    TextContent(type="text", text=item.get("text", ""))
+                )
             elif item_type == "image":
                 try:
                     image_bytes = base64.b64decode(item.get("data", ""))

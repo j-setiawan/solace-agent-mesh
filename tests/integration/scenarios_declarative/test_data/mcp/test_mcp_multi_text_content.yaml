@@ -25,12 +25,12 @@ llm_interactions:
                 type: "function"
                 function:
                   name: "get_data_stdio"
-                  # Use the new 'tool_result' type to send back a list of content blocks
+                  # The MCP test server will now correctly handle a list of content blocks
                   arguments: >
-                    {"response_to_return": {"content": [{"type": "tool_result", "content": [
+                    {"response_to_return": {"content": [
                       {"type": "text", "text": "{\"user_id\": \"user123\", \"name\": \"Alice\"}"},
                       {"type": "text", "text": "id,product\\n1,widget\\n2,gadget"}
-                    ]}]}}
+                    ]}}
 
   - expected_request:
       expected_tool_responses_in_llm_messages:
