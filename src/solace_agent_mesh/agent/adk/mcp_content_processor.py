@@ -404,7 +404,8 @@ class MCPContentProcessor:
 
         uri = resource.get("uri", "")
         mime_type = resource.get("mimeType", "application/octet-stream")
-        content = resource.get("blob") or resource.get("text", "")
+        text_content = resource.get("text")
+        blob_content = resource.get("blob")
 
         if uri:
             uri = str(uri)
@@ -415,60 +416,52 @@ class MCPContentProcessor:
         # Determine if the resource is text-based or binary using MIME type detection
         is_text_based = is_text_based_mime_type(mime_type)
 
-        if content:
-            # We have actual text content
-            if is_text_based:
-                # Text-based resource with content - process normally
-                content_bytes = content.encode("utf-8")
+        if blob_content:
+            # Handle binary blob content
+            try:
+                content_bytes = base64.b64decode(blob_content)
                 specific_metadata = {
                     "resource_uri": uri,
-                    "has_text_content": True,
-                    "is_text_based": True,
+                    "has_text_content": False,
+                    "has_blob_content": True,
+                    "is_text_based": False,
+                    "decoded_from_base64": True,
+                    "original_size_bytes": len(blob_content),
+                    "decoded_size_bytes": len(content_bytes),
                     "is_placeholder": False,
                 }
-            else:
-                # Binary resource with text content - assume it's base64 encoded
-                try:
-                    content_bytes = base64.b64decode(content)
-                    specific_metadata = {
-                        "resource_uri": uri,
-                        "has_text_content": True,
-                        "is_text_based": False,
-                        "decoded_from_base64": True,
-                        "original_size_bytes": len(content),
-                        "decoded_size_bytes": len(content_bytes),
-                        "is_placeholder": False,
-                    }
-                    log.debug(
-                        "%s Resource content item %d: decoded base64 binary content, original=%d bytes, decoded=%d bytes",
-                        self.log_identifier,
-                        index,
-                        len(content),
-                        len(content_bytes),
-                    )
-                except Exception as e:
-                    # Base64 decoding failed, treat as text
-                    log.warning(
-                        "%s Resource content item %d: failed to decode as base64, treating as text: %s",
-                        self.log_identifier,
-                        index,
-                        str(e),
-                    )
-                    content_bytes = content.encode("utf-8")
-                    specific_metadata = {
-                        "resource_uri": uri,
-                        "has_text_content": True,
-                        "is_text_based": False,
-                        "base64_decode_failed": True,
-                        "decode_error": str(e),
-                        "is_placeholder": False,
-                    }
+                log.debug(
+                    "%s Resource content item %d: decoded base64 blob content, original=%d bytes, decoded=%d bytes",
+                    self.log_identifier,
+                    index,
+                    len(blob_content),
+                    len(content_bytes),
+                )
+            except Exception as e:
+                log.error(
+                    "%s Resource content item %d: failed to decode blob as base64: %s",
+                    self.log_identifier,
+                    index,
+                    str(e),
+                )
+                return None  # Fail processing for this item
+        elif text_content:
+            # Handle text content
+            content_bytes = text_content.encode("utf-8")
+            specific_metadata = {
+                "resource_uri": uri,
+                "has_text_content": True,
+                "has_blob_content": False,
+                "is_text_based": True,
+                "is_placeholder": False,
+            }
         else:
-            # No text content - create placeholder
+            # No content - create placeholder
             content_bytes = f"Resource reference: {uri}".encode("utf-8")
             specific_metadata = {
                 "resource_uri": uri,
                 "has_text_content": False,
+                "has_blob_content": False,
                 "is_text_based": is_text_based,
                 "is_placeholder": True,
             }

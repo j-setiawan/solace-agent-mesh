@@ -49,7 +49,7 @@ This section ensures the `MCPContentProcessor` correctly handles each content ty
 | :--- | :--- | :--- | :--- |
 | 2.4.1 | Tests that a resource link with only a URI creates a placeholder artifact containing the URI text, with a filename derived from the URI. | Implemented | `test_mcp_resource_processing_uri_only.yaml` |
 | 2.4.2 | Tests that a resource with embedded text content creates an artifact containing that text, using the filename from the URI and the specified MIME type. | Implemented | `test_mcp_resource_processing_with_text.yaml` |
-| 2.4.3 | Tests that a resource with base64-encoded binary content creates an artifact with the correctly decoded binary data. | | |
+| 2.4.3 | Tests that a resource with base64-encoded binary content creates an artifact with the correctly decoded binary data. | Implemented | `test_mcp_resource_processing_with_binary.yaml` |
 
 ---
 

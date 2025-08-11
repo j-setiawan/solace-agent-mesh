@@ -15,7 +15,7 @@ from typing import Any, Dict, List
 from fastmcp import Context, FastMCP
 from fastmcp.tools.tool import ToolResult
 from fastmcp.utilities.types import Audio, Image
-from mcp.types import EmbeddedResource, TextResourceContents
+from mcp.types import EmbeddedResource, TextResourceContents, BlobResourceContents
 from pydantic import AnyUrl
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
@@ -83,11 +83,23 @@ class TestMCPServer:
             uri = resource_data.get("uri")
             if uri:
                 text_content = resource_data.get("text")
-                # The agent expects a resource block with NO text/blob to create a placeholder.
-                # An empty text string should work, as `if content:` will be false.
-                resource_contents = TextResourceContents(
-                    uri=AnyUrl(uri), text=text_content or ""
-                )
+                blob_content_b64 = resource_data.get("blob")
+
+                if blob_content_b64:
+                    resource_contents = BlobResourceContents(
+                        uri=AnyUrl(uri),
+                        blob=blob_content_b64,
+                        mimeType=resource_data.get(
+                            "mimeType", "application/octet-stream"
+                        ),
+                    )
+                else:
+                    # The agent expects a resource block with NO text/blob to create a placeholder.
+                    # An empty text string should work, as `if content:` will be false.
+                    resource_contents = TextResourceContents(
+                        uri=AnyUrl(uri), text=text_content or ""
+                    )
+
                 embedded_resource = EmbeddedResource(
                     type="resource", resource=resource_contents
                 )
