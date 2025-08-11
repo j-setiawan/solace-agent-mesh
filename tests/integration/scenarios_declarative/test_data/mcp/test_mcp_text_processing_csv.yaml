@@ -26,7 +26,7 @@ llm_interactions:
                 function:
                   name: "get_data_stdio"
                   # The CSV string with newlines must be escaped within the arguments string.
-                  arguments: '{"response_to_return": {"content": [{"type": "text", "text": "id,name,value\\n1,Alice,100\\n2,Bob,200"}]}}'
+                  arguments: '{"response_to_return": {"content": [{"type": "text", "text": "id,name,value\n1,Alice,100\n2,Bob,200"}]}}'
   - expected_request:
       expected_tool_responses_in_llm_messages:
         - tool_name: "get_data_stdio"
