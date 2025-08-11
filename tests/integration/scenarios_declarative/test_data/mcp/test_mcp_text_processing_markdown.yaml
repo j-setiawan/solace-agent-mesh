@@ -26,7 +26,7 @@ llm_interactions:
                 function:
                   name: "get_data_stdio"
                   # The Markdown string with newlines must be escaped within the arguments string.
-                  arguments: '{"response_to_return": {"content": [{"type": "text", "text": "# Report Title\n\nThis is a test report with a list:\n\n- Item 1\n- Item 2"}]}}'
+                  arguments: '{"response_to_return": {"content": [{"type": "text", "text": "# Report Title\n\nThis is a test report with a list\n\n- Item 1\n- Item 2"}]}}'
   - expected_request:
       expected_tool_responses_in_llm_messages:
         - tool_name: "get_data_stdio"
@@ -36,7 +36,7 @@ llm_interactions:
             mcp_tool_output:
               content:
                 - type: "text"
-                  text: "# Report Title\n\nThis is a test report with a list:\n\n- Item 1\n- Item 2"
+                  text: "# Report Title\n\nThis is a test report with a list\n\n- Item 1\n- Item 2"
     static_response:
       choices:
         - message:
@@ -51,7 +51,7 @@ expected_gateway_output:
     assert_artifact_state:
       - filename_matches_regex: "get_data_stdio_markdown_0_.*\\.md$"
         version: 0
-        expected_content_text: "# Report Title\n\nThis is a test report with a list:\n\n- Item 1\n- Item 2"
+        expected_content_text: "# Report Title\n\nThis is a test report with a list\n\n- Item 1\n- Item 2"
         expected_metadata_contains:
           source_tool_name: "get_data_stdio"
           content_type: "text"
