@@ -12,6 +12,8 @@ import threading
 from typing import Any, Dict, List
 
 from fastmcp import Context, FastMCP
+from starlette.requests import Request
+from starlette.responses import JSONResponse, Response
 
 
 def _to_camel_case(snake_str: str) -> str:
@@ -45,14 +47,14 @@ class TestMCPServer:
         self.responses_cache: Dict[str, List[Any]] = {}
         self.cache_lock = threading.Lock()
 
-        # Register the generic tool
-        self.mcp.tool(self.get_data)
-        # TODO: Re-enable health check endpoint when FastMCP API is updated
-        # self.mcp.add_api_route("/health", self.health_check, methods=["GET"])
+        # Register the generic tool under two different names for stdio and http
+        self.mcp.tool(self.get_data, name="get_data_stdio")
+        self.mcp.tool(self.get_data, name="get_data_http")
+        self.mcp.custom_route("/health", methods=["GET"])(self.health_check)
 
-    async def health_check(self):
+    async def health_check(self, request: Request) -> Response:
         """Simple health check endpoint for HTTP mode."""
-        return {"status": "ok"}
+        return JSONResponse({"status": "ok"})
 
     async def get_data(self, task_description: str, ctx: Context) -> Dict[str, Any]:
         """
