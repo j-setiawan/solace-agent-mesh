@@ -33,8 +33,8 @@ This section ensures the `MCPContentProcessor` correctly handles each content ty
 
 | Test ID | Description | Status | Test File |
 | :--- | :--- | :--- | :--- |
-| 2.2.1 | Tests that a base64-encoded PNG image is correctly decoded and saved as a `.png` file with an `image/png` MIME type. | | |
-| 2.2.2 | Tests that a base64-encoded JPEG image is correctly decoded and saved as a `.jpg` file with an `image/jpeg` MIME type. | | |
+| 2.2.1 | Tests that a base64-encoded PNG image is correctly decoded and saved as a `.png` file with an `image/png` MIME type. | Implemented | `test_mcp_image_processing_png.yaml` |
+| 2.2.2 | Tests that a base64-encoded JPEG image is correctly decoded and saved as a `.jpg` file with an `image/jpeg` MIME type. | Implemented | `test_mcp_image_processing_jpeg.yaml` |
 
 ### 2.3 Audio Content Processing
 

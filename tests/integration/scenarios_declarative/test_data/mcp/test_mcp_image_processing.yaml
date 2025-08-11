@@ -1,15 +1,15 @@
-test_case_id: "mcp_image_processing_001"
-description: "Tests that a base64 image response is correctly saved as a .png artifact."
+test_case_id: "mcp_image_processing_png_001"
+description: "Tests that a base64 PNG image response is correctly saved as a .png artifact."
 skip_intermediate_events: true
 
 gateway_input:
   target_agent_name: "TestAgent"
-  user_identity: "mcp_text_tester@example.com"
+  user_identity: "mcp_image_tester@example.com"
   parts:
     - type: "text"
-      text: "Get image data."
+      text: "Get PNG image data."
   external_context:
-    a2a_session_id: "session_mcp_text_processing_001"
+    a2a_session_id: "session_mcp_image_processing_png_001"
 
 llm_interactions:
   - static_response:
@@ -17,7 +17,7 @@ llm_interactions:
         - message:
             role: "assistant"
             tool_calls:
-              - id: "call_mcp_tool_456"
+              - id: "call_mcp_tool_png"
                 type: "function"
                 function:
                   name: "get_data_stdio"
@@ -32,17 +32,19 @@ llm_interactions:
       choices:
         - message:
             role: "assistant"
-            content: "I have retrieved the image and saved it as an artifact."
+            content: "I have retrieved the PNG image and saved it as an artifact."
 
 expected_gateway_output:
   - type: "final_response"
     content_parts:
       - type: "text"
-        text_exact: "I have retrieved the image and saved it as an artifact."
+        text_exact: "I have retrieved the PNG image and saved it as an artifact."
     assert_artifact_state:
       - filename_matches_regex: "get_data_stdio_image_0_.*\\.png$"
         version: 0
+        expected_content_bytes_base64: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
         expected_metadata_contains:
           source_tool_name: "get_data_stdio"
           content_type: "image"
           original_mime_type: "image/png"
+          image_size_bytes: 68
