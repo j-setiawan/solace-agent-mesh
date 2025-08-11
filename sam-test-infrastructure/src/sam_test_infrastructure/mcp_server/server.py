@@ -82,9 +82,12 @@ class TestMCPServer:
             resource_data = content_list[0].get("resource", {})
             uri = resource_data.get("uri")
             if uri:
+                text_content = resource_data.get("text")
                 # The agent expects a resource block with NO text/blob to create a placeholder.
                 # An empty text string should work, as `if content:` will be false.
-                resource_contents = TextResourceContents(uri=AnyUrl(uri), text="")
+                resource_contents = TextResourceContents(
+                    uri=AnyUrl(uri), text=text_content or ""
+                )
                 embedded_resource = EmbeddedResource(
                     type="resource", resource=resource_contents
                 )

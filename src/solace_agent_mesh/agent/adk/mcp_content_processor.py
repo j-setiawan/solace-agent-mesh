@@ -424,6 +424,7 @@ class MCPContentProcessor:
                     "resource_uri": uri,
                     "has_text_content": True,
                     "is_text_based": True,
+                    "is_placeholder": False,
                 }
             else:
                 # Binary resource with text content - assume it's base64 encoded
@@ -436,6 +437,7 @@ class MCPContentProcessor:
                         "decoded_from_base64": True,
                         "original_size_bytes": len(content),
                         "decoded_size_bytes": len(content_bytes),
+                        "is_placeholder": False,
                     }
                     log.debug(
                         "%s Resource content item %d: decoded base64 binary content, original=%d bytes, decoded=%d bytes",
@@ -459,6 +461,7 @@ class MCPContentProcessor:
                         "is_text_based": False,
                         "base64_decode_failed": True,
                         "decode_error": str(e),
+                        "is_placeholder": False,
                     }
         else:
             # No text content - create placeholder
