@@ -608,45 +608,34 @@ async def manage_large_mcp_tool_responses_callback(
         llm_max_bytes = 4096
 
     contains_non_text_content = _mcp_response_contains_non_text(mcp_response_dict)
-    try:
-        serialized_original_response_str = json.dumps(mcp_response_dict)
-        original_response_bytes = len(serialized_original_response_str.encode("utf-8"))
-        log.debug(
-            "%s Original response size: %d bytes.",
-            log_identifier,
-            original_response_bytes,
-        )
-    except TypeError as e:
-        log.error(
-            "%s Failed to serialize original MCP tool response dictionary: %s. Returning original response object.",
-            log_identifier,
-            e,
-        )
-        return tool_response
-
-    needs_truncation_for_llm = original_response_bytes > llm_max_bytes
-    needs_saving_as_artifact = (
-        (original_response_bytes > save_threshold)
-        or needs_truncation_for_llm
-        or contains_non_text_content
-    )
-    log.debug(
-        "%s Conditions: needs_truncation_for_llm=%s, contains_non_text=%s, needs_saving_as_artifact=%s",
-        log_identifier,
-        needs_truncation_for_llm,
-        contains_non_text_content,
-        needs_saving_as_artifact,
-    )
+    if not contains_non_text_content:
+        try:
+            serialized_original_response_str = json.dumps(mcp_response_dict)
+            original_response_bytes = len(
+                serialized_original_response_str.encode("utf-8")
+            )
+            log.debug(
+                "%s Original response size: %d bytes.",
+                log_identifier,
+                original_response_bytes,
+            )
+        except TypeError as e:
+            log.error(
+                "%s Failed to serialize original MCP tool response dictionary: %s. Returning original response object.",
+                log_identifier,
+                e,
+            )
+            return tool_response
+        needs_truncation_for_llm = original_response_bytes > llm_max_bytes
+        needs_saving_as_artifact = (
+            original_response_bytes > save_threshold
+        ) or needs_truncation_for_llm
+    else:
+        needs_truncation_for_llm = False
+        needs_saving_as_artifact = True
 
     saved_artifact_details = None
     if needs_saving_as_artifact:
-        log.info(
-            "%s Original response (%d bytes) requires saving (save_threshold=%d, llm_max_bytes=%d). Saving as artifact.",
-            log_identifier,
-            original_response_bytes,
-            save_threshold,
-            llm_max_bytes,
-        )
         saved_artifact_details = await _save_mcp_response_as_artifact(
             tool, tool_context, host_component, mcp_response_dict, args
         )
