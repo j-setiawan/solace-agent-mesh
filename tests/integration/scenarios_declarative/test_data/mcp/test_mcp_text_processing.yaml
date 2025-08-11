@@ -5,8 +5,8 @@ agent_config:
   agent_name: "TestAgent"
   tools:
     - tool_type: mcp
-      tool_name: "get_data" # This must match the generic tool in TestMCPServer
       # connection_params will be injected by the test runner
+      # Note: tool_name is not needed for MCP tools - they are discovered dynamically
   mcp_intelligent_processing:
     enable_intelligent_processing: true
 
