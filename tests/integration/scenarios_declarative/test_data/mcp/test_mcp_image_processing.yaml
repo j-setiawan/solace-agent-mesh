@@ -1,11 +1,15 @@
 test_case_id: "mcp_image_processing_001"
 description: "Tests that a base64 image response is correctly saved as a .png artifact."
+skip_intermediate_events: true
 
 gateway_input:
   target_agent_name: "TestAgent"
+  user_identity: "mcp_text_tester@example.com"
   parts:
     - type: "text"
       text: "Get image data."
+  external_context:
+    a2a_session_id: "session_mcp_text_processing_001"
 
 llm_interactions:
   - static_response:
@@ -31,10 +35,14 @@ llm_interactions:
             content: "I have retrieved the image and saved it as an artifact."
 
 expected_gateway_output:
-  - type: "artifact_created"
-    filename_contains: ".png"
-    mime_type: "image/png"
-    metadata_contains:
-      source_tool_name: "get_data_stdio"
-      content_type: "image"
-      original_mime_type: "image/png"
+  - type: "final_response"
+    content_parts:
+      - type: "text"
+        text_exact: "I have retrieved the image and saved it as an artifact."
+    assert_artifact_state:
+      - filename_matches_regex: "get_data_stdio_image_0_.*\\.png$"
+        version: 0
+        expected_metadata_contains:
+          source_tool_name: "get_data_stdio"
+          content_type: "image"
+          mime_type: "image/png"
