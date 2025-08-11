@@ -13,7 +13,7 @@ import logging
 from typing import Any, Dict, List
 
 from fastmcp import Context, FastMCP
-from fastmcp.utilities.types import Audio, Image
+from fastmcp.utilities.types import Audio, Image, File
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
@@ -101,6 +101,15 @@ class TestMCPServer:
                     result_objects.append(Audio(data=audio_bytes, format=format_type))
                 except (ValueError, TypeError) as e:
                     result_objects.append(f"Error decoding audio data: {e}")
+            elif item_type == "resource":
+                resource_data = item.get("resource", {})
+                uri = resource_data.get("uri")
+                if uri:
+                    # fastmcp converts a File object with a URI into an EmbeddedResource,
+                    # which is the correct structure for a resource link.
+                    result_objects.append(File(uri=uri))
+                else:
+                    result_objects.append("Error: resource item missing uri")
             else:
                 # For unknown types, return the raw dictionary as structured content
                 result_objects.append(item)
