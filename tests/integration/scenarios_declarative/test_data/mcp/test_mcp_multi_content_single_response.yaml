@@ -43,8 +43,12 @@ llm_interactions:
                   data: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
                   mimeType: "image/png"
             saved_mcp_response_artifact_details:
-              intelligent_processing:
-                total_artifacts_saved: 2
+              status: "success"
+              artifacts_saved:
+                - data_filename_matches_regex: "get_data_stdio_audio_0_.*\\.wav"
+                  status: "success"
+                - data_filename_matches_regex: "get_data_stdio_image_1_.*\\.png"
+                  status: "success"
 
     static_response:
       choices:

@@ -513,47 +513,13 @@ async def _save_mcp_response_as_artifact(
         original_tool_args: The original arguments passed to the MCP tool.
 
     Returns:
-        A dictionary containing details of the saved artifacts, maintaining backward
-        compatibility with the original interface while supporting multiple artifacts.
+        A dictionary containing the full, structured result of the processing,
+        including lists of successfully saved artifacts and any fallback artifact.
     """
-    # Delegate to the intelligent processor
-    result = await save_mcp_response_as_artifact_intelligent(
+    # Delegate to the intelligent processor and return the full result.
+    return await save_mcp_response_as_artifact_intelligent(
         tool, tool_context, host_component, mcp_response_dict, original_tool_args
     )
-
-    # For backward compatibility, if multiple artifacts were saved, return the first one
-    # but include information about all saved artifacts in the result
-    if result.get("artifacts_saved"):
-        primary_artifact = result["artifacts_saved"][0]
-        # Add intelligent processing metadata to the primary result
-        primary_artifact["intelligent_processing"] = {
-            "total_artifacts_saved": len(result["artifacts_saved"]),
-            "processing_status": result["status"],
-            "has_fallback": result.get("fallback_artifact") is not None,
-        }
-        return primary_artifact
-    elif result.get("fallback_artifact"):
-        # Return the fallback artifact if no intelligent artifacts were saved
-        fallback = result["fallback_artifact"]
-        fallback["intelligent_processing"] = {
-            "total_artifacts_saved": 0,
-            "processing_status": result["status"],
-            "has_fallback": True,
-            "fallback_reason": result.get("message", "Intelligent processing failed"),
-        }
-        return fallback
-    else:
-        # Return error result
-        return {
-            "status": "error",
-            "data_filename": "unknown_filename",
-            "message": result.get("message", "Failed to save MCP response as artifact"),
-            "intelligent_processing": {
-                "total_artifacts_saved": 0,
-                "processing_status": "error",
-                "has_fallback": False,
-            },
-        }
 
 
 async def manage_large_mcp_tool_responses_callback(
@@ -703,32 +669,39 @@ async def manage_large_mcp_tool_responses_callback(
         )
 
     if needs_saving_as_artifact:
-        if saved_artifact_details and (
-            saved_artifact_details.get("status") == "success"
-            or saved_artifact_details.get("status") == "partial_success"
-        ):
+        if saved_artifact_details and saved_artifact_details.get("status") in [
+            "success",
+            "partial_success",
+        ]:
             final_llm_response_dict["saved_mcp_response_artifact_details"] = (
                 saved_artifact_details
             )
-            filename = saved_artifact_details.get(
-                "data_filename", "unknown_artifact.json"
-            )
-            version = saved_artifact_details.get("data_version", "N/A")
-            intelligent_processing_details = saved_artifact_details.get(
-                "intelligent_processing", {}
-            )
-            total_artifacts = intelligent_processing_details.get(
-                "total_artifacts_saved", 1
-            )
 
-            if total_artifacts > 1:
-                message_parts_for_llm.append(
-                    f"The full response has been saved as {total_artifacts} artifacts, starting with '{filename}' (version {version})."
+            artifacts_saved = saved_artifact_details.get("artifacts_saved", [])
+            fallback_artifact = saved_artifact_details.get("fallback_artifact")
+            total_artifacts = len(artifacts_saved)
+
+            if total_artifacts > 0:
+                first_artifact = artifacts_saved[0]
+                filename = first_artifact.get("data_filename", "unknown_artifact")
+                version = first_artifact.get("data_version", "N/A")
+                if total_artifacts > 1:
+                    message_parts_for_llm.append(
+                        f"The full response has been saved as {total_artifacts} artifacts, starting with '{filename}' (version {version})."
+                    )
+                else:
+                    message_parts_for_llm.append(
+                        f"The full response has been saved as artifact '{filename}' (version {version})."
+                    )
+            elif fallback_artifact:
+                filename = fallback_artifact.get(
+                    "data_filename", "unknown_artifact.json"
                 )
-            else:
+                version = fallback_artifact.get("data_version", "N/A")
                 message_parts_for_llm.append(
                     f"The full response has been saved as artifact '{filename}' (version {version})."
                 )
+
             log.debug(
                 "%s Added saved artifact details to LLM response.", log_identifier
             )
@@ -736,21 +709,18 @@ async def manage_large_mcp_tool_responses_callback(
             message_parts_for_llm.append(
                 "Saving the full response as an artifact failed."
             )
-            final_llm_response_dict["saved_mcp_response_artifact_details"] = {
-                "status": "error",
-                "message": saved_artifact_details.get(
-                    "message", "Artifact saving failed."
-                ),
-                "filename": saved_artifact_details.get("data_filename", "unknown"),
-            }
+            # Pass the whole error structure through
+            final_llm_response_dict["saved_mcp_response_artifact_details"] = (
+                saved_artifact_details
+            )
             log.warning(
                 "%s Artifact save failed, error details included in LLM response.",
                 log_identifier,
             )
 
     if needs_saving_as_artifact and (
-        saved_artifact_details.get("status") == "success"
-        or saved_artifact_details.get("status") == "partial_success"
+        saved_artifact_details
+        and saved_artifact_details.get("status") in ["success", "partial_success"]
     ):
         if needs_truncation_for_llm:
             final_llm_response_dict["status"] = "processed_saved_and_truncated"
