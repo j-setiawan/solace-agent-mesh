@@ -43,7 +43,7 @@ llm_interactions:
                 - type: "text"
                   text: '{"user_id": "user123", "name": "Alice"}'
                 - type: "text"
-                  text: "id,product\n1,widget\n2,gadget"
+                  text: "id,product\\n1,widget\\n2,gadget"
             saved_mcp_response_artifact_details:
               intelligent_processing:
                 total_artifacts_saved: 2
