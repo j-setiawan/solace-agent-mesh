@@ -18,7 +18,10 @@ from google.adk.agents.callback_context import CallbackContext
 from google.adk.models.llm_request import LlmRequest
 from google.adk.models.llm_response import LlmResponse
 from google.adk.tools.mcp_tool import MCPToolset
-from google.adk.tools.mcp_tool.mcp_session_manager import SseServerParams, StdioConnectionParams
+from google.adk.tools.mcp_tool.mcp_session_manager import (
+    SseServerParams,
+    StdioConnectionParams,
+)
 
 from mcp import StdioServerParameters
 
@@ -70,12 +73,24 @@ async def load_adk_tools(
             "%s No explicit tools configured in 'tools' list.", component.log_identifier
         )
     else:
+        log.error(
+            "%s [DEBUG] Processing %d tool configurations: %s",
+            component.log_identifier,
+            len(tools_config),
+            [tc.get("tool_type") for tc in tools_config],
+        )
         log.info(
             "%s Loading tools from 'tools' list configuration...",
             component.log_identifier,
         )
         for tool_config in tools_config:
             tool_type = tool_config.get("tool_type", "").lower()
+            log.error(
+                "%s [DEBUG] Processing tool_type: %s, config: %s",
+                component.log_identifier,
+                tool_type,
+                tool_config,
+            )
 
             try:
                 if tool_type == "python":
@@ -112,7 +127,9 @@ async def load_adk_tools(
                     if tool_description:
                         tool_callable.__doc__ = tool_description
 
-                    _check_and_register_tool_name(function_name, f"python:{module_name}")
+                    _check_and_register_tool_name(
+                        function_name, f"python:{module_name}"
+                    )
                     loaded_tools.append(tool_callable)
                     log.info(
                         "%s Loaded Python tool: %s from %s.",
@@ -212,9 +229,9 @@ async def load_adk_tools(
                         _check_and_register_tool_name(
                             tool_def.name, f"builtin-group:{group_name}"
                         )
-                        specific_tool_config = tool_config.get(
-                            "tool_configs", {}
-                        ).get(tool_def.name)
+                        specific_tool_config = tool_config.get("tool_configs", {}).get(
+                            tool_def.name
+                        )
                         tool_callable = ADKToolWrapper(
                             tool_def.implementation,
                             specific_tool_config,
@@ -232,6 +249,11 @@ async def load_adk_tools(
                     )
 
                 elif tool_type == "mcp":
+                    log.error(
+                        "%s [DEBUG] Found MCP tool config! Processing MCP tool: %s",
+                        component.log_identifier,
+                        tool_config,
+                    )
                     tool_name = tool_config.get("tool_name")
                     if not tool_name:
                         log.info(
@@ -248,7 +270,6 @@ async def load_adk_tools(
                         k: v for k, v in connection_params_config.items() if k != "type"
                     }
                     connection_args["timeout"] = connection_args.get("timeout", 30)
-
 
                     environment_variables = tool_config.get("environment_variables")
                     env_param = {}
@@ -292,9 +313,9 @@ async def load_adk_tools(
                                 **final_connection_args,
                                 env=env_param if env_param else None,
                             ),
-                            timeout=connection_args.get("timeout")
+                            timeout=connection_args.get("timeout"),
                         )
-                        
+
                     elif connection_type == "sse":
                         connection_params = SseServerParams(**connection_args)
                     else:
@@ -317,9 +338,32 @@ async def load_adk_tools(
                     mcp_toolset_instance.origin = "mcp"
 
                     # Check for duplicates from the MCP server
-                    mcp_tools = await mcp_toolset_instance.get_tools()
-                    for mcp_tool in mcp_tools:
-                        _check_and_register_tool_name(mcp_tool.name, "mcp")
+                    log.error(
+                        "%s [DEBUG] Attempting to discover tools from MCP server...",
+                        component.log_identifier,
+                    )
+                    try:
+                        mcp_tools = await mcp_toolset_instance.get_tools()
+                        log.error(
+                            "%s [DEBUG] Successfully discovered %d tools from MCP server: %s",
+                            component.log_identifier,
+                            len(mcp_tools),
+                            [tool.name for tool in mcp_tools],
+                        )
+                        for mcp_tool in mcp_tools:
+                            log.error(
+                                "%s [DEBUG] Registering MCP tool: %s",
+                                component.log_identifier,
+                                mcp_tool.name,
+                            )
+                            _check_and_register_tool_name(mcp_tool.name, "mcp")
+                    except Exception as e:
+                        log.error(
+                            "%s Failed to discover tools from MCP server: %s",
+                            component.log_identifier,
+                            str(e),
+                        )
+                        raise
 
                     loaded_tools.append(mcp_toolset_instance)
                     log.info(
