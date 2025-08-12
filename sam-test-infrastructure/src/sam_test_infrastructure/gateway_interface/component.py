@@ -5,8 +5,6 @@ and captures A2A responses from the agent under test.
 """
 
 import asyncio
-import base64
-import json
 import threading
 from collections import defaultdict
 from typing import Any, Dict, List, Union, Optional, Tuple
@@ -284,7 +282,10 @@ class TestGatewayComponent(BaseGatewayComponent):
         Constructs and sends a task cancellation request.
         """
         log.info(
-            f"{self.log_identifier} TestGatewayComponent: Cancelling task {task_id} for agent {agent_name}."
+            "%s TestGatewayComponent: Cancelling task %s for agent %s.",
+            self.log_identifier,
+            task_id,
+            agent_name,
         )
         self.captured_cancel_calls.append(task_id)
 
@@ -299,7 +300,9 @@ class TestGatewayComponent(BaseGatewayComponent):
             topic=target_topic, payload=payload, user_properties=user_properties
         )
         log.info(
-            f"{self.log_identifier} TestGatewayComponent: Cancellation message for task {task_id} sent."
+            "%s TestGatewayComponent: Cancellation message for task %s sent.",
+            self.log_identifier,
+            task_id,
         )
 
     async def get_next_captured_output(
