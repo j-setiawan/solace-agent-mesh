@@ -43,7 +43,7 @@ llm_interactions:
             # The output should be a truncated string preview
             mcp_tool_output:
               type: "truncated_json_string"
-              content: '{"content": [{"type": "text", "text": "This is a very long ... [Response truncated due to size limit.]'
+              content: '{"content": [{"type": "text", "text": "This is a very lon... [Response truncated due to size limit.]'
     static_response:
       choices:
         - message:

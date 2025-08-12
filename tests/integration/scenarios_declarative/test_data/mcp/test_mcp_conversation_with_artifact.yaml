@@ -38,7 +38,7 @@ llm_interactions:
             message_to_llm_matches_regex: "The full response has been saved as artifact 'get_data_stdio_json_0_.*\\.json' \\(version 0\\)\\."
             # This is the key assertion for metadata injection, now using contains for robustness.
             appended_artifact_metadata_contains:
-              - "Description: Text content from MCP tool get_data_stdio"
+              - "**Description:** Text content from MCP tool get_data_stdio"
               - "source_tool_name: get_data_stdio"
               - "detected_format: json"
               - "format_parse_success: True"
@@ -56,7 +56,7 @@ expected_gateway_output:
       - type: "text"
         text_exact: "I have created the user data for 'user123'. The user is Alice, an Admin, who prefers a dark theme."
     assert_artifact_state:
-      - filename_matches_regex: "get_data_stdio_json_0_.*\\.json$"
+      - filename_matches_regex: "get_data_stdio_json_0_.*[^a]\\.json$"
         version: 0
         expected_content_text: '{"user_id": "user123", "name": "Alice", "role": "Admin", "preferences": {"theme": "dark", "notifications": true}}'
         expected_metadata_contains:

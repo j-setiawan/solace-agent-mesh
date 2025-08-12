@@ -85,12 +85,6 @@ async def load_adk_tools(
         )
         for tool_config in tools_config:
             tool_type = tool_config.get("tool_type", "").lower()
-            log.debug(
-                "%s Processing tool_type: %s, config: %s",
-                component.log_identifier,
-                tool_type,
-                tool_config,
-            )
 
             try:
                 if tool_type == "python":
@@ -249,11 +243,6 @@ async def load_adk_tools(
                     )
 
                 elif tool_type == "mcp":
-                    log.debug(
-                        "%s Found MCP tool config! Processing MCP tool: %s",
-                        component.log_identifier,
-                        tool_config,
-                    )
                     tool_name = tool_config.get("tool_name")
                     if not tool_name:
                         log.info(
@@ -338,10 +327,6 @@ async def load_adk_tools(
                     mcp_toolset_instance.origin = "mcp"
 
                     # Check for duplicates from the MCP server
-                    log.debug(
-                        "%s Attempting to discover tools from MCP server...",
-                        component.log_identifier,
-                    )
                     try:
                         mcp_tools = await mcp_toolset_instance.get_tools()
                         log.debug(

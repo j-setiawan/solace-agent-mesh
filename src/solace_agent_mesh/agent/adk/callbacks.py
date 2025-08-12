@@ -213,6 +213,7 @@ async def process_artifact_blocks_callback(
                             original_func=_internal_create_artifact,
                             tool_config=None,  # No specific config for this internal tool
                             tool_name="_internal_create_artifact",
+                            origin="internal",
                         )
                         save_result = await wrapped_creator(**kwargs_for_call)
 

@@ -52,7 +52,7 @@ expected_gateway_output:
       - type: "text"
         text_exact: "I have retrieved the text data and saved it as an artifact."
     assert_artifact_state:
-      - filename_matches_regex: "get_data_stdio_text_0_.*\\.txt"
+      - filename_matches_regex: "get_data_stdio_text_0_.*\\.txt$"
         version: 0
         expected_metadata_contains:
           source_tool_name: "get_data_stdio"
