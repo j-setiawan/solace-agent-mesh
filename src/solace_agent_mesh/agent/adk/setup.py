@@ -73,8 +73,8 @@ async def load_adk_tools(
             "%s No explicit tools configured in 'tools' list.", component.log_identifier
         )
     else:
-        log.error(
-            "%s [DEBUG] Processing %d tool configurations: %s",
+        log.debug(
+            "%s Processing %d tool configurations: %s",
             component.log_identifier,
             len(tools_config),
             [tc.get("tool_type") for tc in tools_config],
@@ -85,8 +85,8 @@ async def load_adk_tools(
         )
         for tool_config in tools_config:
             tool_type = tool_config.get("tool_type", "").lower()
-            log.error(
-                "%s [DEBUG] Processing tool_type: %s, config: %s",
+            log.debug(
+                "%s Processing tool_type: %s, config: %s",
                 component.log_identifier,
                 tool_type,
                 tool_config,
@@ -249,8 +249,8 @@ async def load_adk_tools(
                     )
 
                 elif tool_type == "mcp":
-                    log.error(
-                        "%s [DEBUG] Found MCP tool config! Processing MCP tool: %s",
+                    log.debug(
+                        "%s Found MCP tool config! Processing MCP tool: %s",
                         component.log_identifier,
                         tool_config,
                     )
@@ -338,21 +338,21 @@ async def load_adk_tools(
                     mcp_toolset_instance.origin = "mcp"
 
                     # Check for duplicates from the MCP server
-                    log.error(
-                        "%s [DEBUG] Attempting to discover tools from MCP server...",
+                    log.debug(
+                        "%s Attempting to discover tools from MCP server...",
                         component.log_identifier,
                     )
                     try:
                         mcp_tools = await mcp_toolset_instance.get_tools()
-                        log.error(
-                            "%s [DEBUG] Successfully discovered %d tools from MCP server: %s",
+                        log.debug(
+                            "%s Successfully discovered %d tools from MCP server: %s",
                             component.log_identifier,
                             len(mcp_tools),
                             [tool.name for tool in mcp_tools],
                         )
                         for mcp_tool in mcp_tools:
-                            log.error(
-                                "%s [DEBUG] Registering MCP tool: %s",
+                            log.debug(
+                                "%s Registering MCP tool: %s",
                                 component.log_identifier,
                                 mcp_tool.name,
                             )
