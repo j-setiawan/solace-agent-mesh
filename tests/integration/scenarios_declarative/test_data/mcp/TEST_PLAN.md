@@ -86,3 +86,13 @@ This section tests more advanced use cases involving multiple content items and 
 | 5.1 | Tests that a single MCP response containing multiple items (e.g., text and an image) results in the creation of two separate, correctly typed artifacts. | Implemented | `test_mcp_multi_content_single_response.yaml` |
 | 5.2 | Tests a two-turn conversation where the first turn creates an artifact and the second turn successfully uses that artifact, confirming metadata is correctly injected and used by the LLM. | Implemented | `test_mcp_conversation_with_artifact.yaml` |
 | 5.3 | Tests that a single response containing multiple text items of different formats (e.g., one JSON and one CSV) results in two distinct, correctly typed text artifacts. | Implemented | `test_mcp_multi_text_content.yaml` |
+
+---
+
+## 6. Transport-Specific Scenarios
+
+This section tests MCP tool functionality over different transport mechanisms.
+
+| Test ID | Description | Status | Test File |
+| :--- | :--- | :--- | :--- |
+| 6.1 | Verifies that a simple tool call over the HTTP (SSE) transport works correctly and saves an artifact. | Implemented | `test_mcp_http_transport.yaml` |
