@@ -34,6 +34,7 @@ from solace_agent_mesh.agent.sac.component import SamAgentComponent
 from google.genai import types as adk_types  # Add this import
 import re
 import json
+import builtins
 from asteval import Interpreter
 import math
 from ..scenarios_programmatic.test_helpers import (
@@ -967,7 +968,6 @@ SKIPPED_FAILING_EMBED_TESTS = [
 ]
 
 
-
 @pytest.mark.asyncio
 async def test_declarative_scenario(
     declarative_scenario: Dict[str, Any],
@@ -999,7 +999,7 @@ async def test_declarative_scenario(
                 exception_message = patch_spec.get(
                     "exception_message", "Simulated failure"
                 )
-                exception_class = getattr(__builtins__, exception_type_str, Exception)
+                exception_class = getattr(builtins, exception_type_str, Exception)
 
                 async def mock_save_fail(*args, **kwargs):
                     raise exception_class(exception_message)
@@ -1074,7 +1074,6 @@ async def test_declarative_scenario(
     gateway_input_data = declarative_scenario.get("gateway_input")
     if not gateway_input_data:
         pytest.fail(f"Scenario {scenario_id}: 'gateway_input' is missing.")
-
 
     overall_timeout = declarative_scenario.get(
         "expected_completion_timeout_seconds", 10.0
@@ -1464,14 +1463,13 @@ def _assert_dict_subset(
         is_regex_match = False
         regex_suffix = "_matches_regex"
 
+        is_contains_match = False
         if expected_key_in_yaml.endswith(regex_suffix):
             actual_key_to_check = expected_key_in_yaml[: -len(regex_suffix)]
             is_regex_match = True
         elif expected_key_in_yaml.endswith("_contains"):
             actual_key_to_check = expected_key_in_yaml[: -len("_contains")]
             is_contains_match = True
-        else:
-            is_contains_match = False
 
         current_path = f"{context_path}.{actual_key_to_check}"
 

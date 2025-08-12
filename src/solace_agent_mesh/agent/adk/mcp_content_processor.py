@@ -193,12 +193,11 @@ class MCPContentProcessor:
             )
             return None
 
-    def _log_empty_content(self, content_type: str, index: int) -> None:
+    def _log_empty_content(self, content_type: str, index: int):
         """Log warning for empty content and return None."""
         log.warning(
             "%s %s content item %d is empty", self.log_identifier, content_type, index
         )
-        return None
 
     def _create_content_item(
         self,
