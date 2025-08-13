@@ -10,6 +10,7 @@ from solace_ai_connector.common.utils import import_module
 
 from .app_llm_agent import AppLlmAgent
 from .tool_wrapper import ADKToolWrapper
+from .embed_resolving_mcp_toolset import EmbedResolvingMCPToolset
 from google.adk.runners import Runner
 from google.adk.models import BaseLlm
 from google.adk.tools import BaseTool, ToolContext
@@ -320,9 +321,10 @@ async def load_adk_tools(
                             tool_name,
                         )
 
-                    mcp_toolset_instance = MCPToolset(
+                    mcp_toolset_instance = EmbedResolvingMCPToolset(
                         connection_params=connection_params,
                         tool_filter=tool_filter_list,
+                        tool_config=tool_config,
                     )
                     mcp_toolset_instance.origin = "mcp"
 
