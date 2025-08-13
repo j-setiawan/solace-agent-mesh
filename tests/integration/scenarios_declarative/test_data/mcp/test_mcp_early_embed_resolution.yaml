@@ -43,12 +43,12 @@ llm_interactions:
         - tool_name: "get_data_stdio"
           response_json_matches:
             status: "processed_and_saved"
-            # Verify that early embeds were resolved in the tool parameters
-            mcp_tool_output:
-              content:
-                - type: "text"
-                  # Should contain "15" instead of "«math:5*3»" and actual timestamp instead of "«datetime:iso»"
-                  text_contains: "Math result: 15"
+            message_to_llm_matches_regex: "The full response has been saved as artifact 'get_data_stdio_text_0_.*\\.txt' \\(version 0\\)\\."
+            saved_mcp_response_artifact_details:
+              status: "success"
+              artifacts_saved:
+                - data_filename_matches_regex: "get_data_stdio_text_0_.*\\.txt"
+                  status: "success"
 
     static_response:
       choices:
@@ -61,3 +61,7 @@ expected_gateway_output:
     content_parts:
       - type: "text"
         text_exact: "Successfully called MCP tool with resolved early embed parameters."
+    assert_artifact_state:
+      - filename_matches_regex: "get_data_stdio_text_0_.*\\.txt$"
+        version: 0
+        expected_content_text_matches_regex: "Math result: 15 calculated at \\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*"

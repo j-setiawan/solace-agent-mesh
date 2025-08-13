@@ -50,14 +50,12 @@ llm_interactions:
         - tool_name: "get_data_stdio"
           response_json_matches:
             status: "processed_and_saved"
-            # Verify that embeds were resolved in the tool parameters before sending to MCP server
-            # The response should contain the resolved values, not the embed syntax
-            mcp_tool_output:
-              content:
-                - type: "text"
-                  # This should contain resolved values: "5" instead of "«math:2+3»",
-                  # ISO timestamp instead of "«datetime:iso»", and JSON content instead of "«artifact_content:test_data.json»"
-                  text_matches_regex: "Calculation result: 5 at \\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*Z with data: .*Hello from artifact.*"
+            message_to_llm_matches_regex: "The full response has been saved as artifact 'get_data_stdio_text_0_.*\\.txt' \\(version 0\\)\\."
+            saved_mcp_response_artifact_details:
+              status: "success"
+              artifacts_saved:
+                - data_filename_matches_regex: "get_data_stdio_text_0_.*\\.txt"
+                  status: "success"
 
     static_response:
       choices:
@@ -70,3 +68,7 @@ expected_gateway_output:
     content_parts:
       - type: "text"
         text_exact: "Successfully called MCP tool with resolved embed parameters."
+    assert_artifact_state:
+      - filename_matches_regex: "get_data_stdio_text_0_.*\\.txt$"
+        version: 0
+        expected_content_text_matches_regex: 'Calculation result: 5 at \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.* with data: {"message": "Hello from artifact", "timestamp": "2024-01-01T00:00:00Z"}'
