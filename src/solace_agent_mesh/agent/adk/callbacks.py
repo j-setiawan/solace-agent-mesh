@@ -500,9 +500,24 @@ async def manage_large_mcp_tool_responses_callback(
     host_component: "SamAgentComponent",
 ) -> Optional[Dict[str, Any]]:
     """
-    Manages large responses from MCP tools by conditionally saving them as artifacts
-    and/or truncating them before returning to the LLM.
-    The 'tool_response' is the direct output from the tool's run_async method.
+    Manages large or non-textual responses from MCP tools.
+
+    This callback intercepts the response from an MCPTool. Based on the response's
+    size and content type, it performs one or more of the following actions:
+    1.  **Saves as Artifact:** If the response size exceeds a configured threshold,
+        or if it contains non-textual content (like images), it calls the
+        `save_mcp_response_as_artifact_intelligent` function to save the
+        response as one or more typed artifacts.
+    2.  **Truncates for LLM:** If the response size exceeds a configured limit for
+        the LLM, it truncates the content to a preview string.
+    3.  **Constructs Final Response:** It builds a new dictionary to be returned
+        to the LLM, which includes:
+        - A `message_to_llm` summarizing what was done (e.g., saved, truncated).
+        - `saved_mcp_response_artifact_details` with the result of the save operation.
+        - `mcp_tool_output` containing either the original response or the truncated preview.
+        - A `status` field indicating the outcome (e.g., 'processed_and_saved').
+
+    The `tool_response` is the direct output from the tool's `run_async` method.
     """
     log_identifier = f"[Callback:ManageLargeMCPResponse:{tool.name}]"
     log.info(
