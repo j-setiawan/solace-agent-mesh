@@ -8,7 +8,9 @@ content processing to save MCP tool responses as appropriately typed artifacts.
 import json
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict, TYPE_CHECKING
+from typing import Any, Dict, TYPE_CHECKING, List, Optional
+from enum import Enum
+from pydantic import BaseModel
 
 from google.adk.tools import ToolContext, BaseTool
 from solace_ai_connector.common.log import log
@@ -23,6 +25,39 @@ from ...agent.utils.context_helpers import get_original_session_id
 
 if TYPE_CHECKING:
     from ...agent.sac.component import SamAgentComponent
+
+
+class McpSaveStatus(str, Enum):
+    """Enumeration for the status of an MCP save operation."""
+
+    SUCCESS = "success"
+    PARTIAL_SUCCESS = "partial_success"
+    ERROR = "error"
+
+
+class SavedArtifactInfo(BaseModel):
+    """
+    A Pydantic model to hold the details of a successfully saved artifact.
+    This mirrors the dictionary structure returned by save_artifact_with_metadata.
+    """
+
+    status: str
+    data_filename: str
+    data_version: int
+    metadata_filename: str
+    metadata_version: int
+    message: str
+
+
+class McpSaveResult(BaseModel):
+    """
+    The definitive, type-safe result of an MCP response save operation.
+    """
+
+    status: McpSaveStatus
+    message: str
+    artifacts_saved: List[SavedArtifactInfo] = []
+    fallback_artifact: Optional[SavedArtifactInfo] = None
 
 
 async def save_mcp_response_as_artifact_intelligent(
