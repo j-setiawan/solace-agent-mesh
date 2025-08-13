@@ -52,6 +52,13 @@ class SavedArtifactInfo(BaseModel):
 class McpSaveResult(BaseModel):
     """
     The definitive, type-safe result of an MCP response save operation.
+
+    Attributes:
+        status: The overall status of the save operation.
+        message: A human-readable summary of the outcome.
+        artifacts_saved: A list of successfully created "intelligent" artifacts.
+        fallback_artifact: An optional artifact representing the raw JSON response,
+                           created only if intelligent processing failed.
     """
 
     status: McpSaveStatus
