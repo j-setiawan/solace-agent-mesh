@@ -41,14 +41,9 @@ llm_interactions:
           response_json_matches:
             status: "processed_save_failed"
             message_to_llm: "Saving the full response as an artifact failed."
-            # The original output should still be returned to the LLM
-            mcp_tool_output:
-              content:
-                - type: "text"
-                  text: "This response should trigger a save, which will then fail."
             saved_mcp_response_artifact_details:
               status: "error"
-              message: "Failed to save content item as artifact: Disk is full"
+              message: "Content processing failed. First error: Failed to save content item as artifact: Disk is full"
 
     static_response:
       choices:
