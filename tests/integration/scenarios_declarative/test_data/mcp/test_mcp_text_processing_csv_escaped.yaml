@@ -34,10 +34,11 @@ llm_interactions:
           response_json_matches:
             status: "processed_and_saved"
             message_to_llm_matches_regex: "The full response has been saved as artifact 'get_data_stdio_csv_0_.*\\.csv' \\(version 0\\)\\."
-            mcp_tool_output:
-              content:
-                - type: "text"
-                  text: "id,name,value\\n1,Alice,100\\n2,Bob,200"
+            saved_mcp_response_artifact_details:
+              status: "success"
+              artifacts_saved:
+                - data_filename_matches_regex: "get_data_stdio_csv_0_.*\\.csv"
+                  status: "success"
     static_response:
       choices:
         - message:
