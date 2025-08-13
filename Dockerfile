@@ -9,25 +9,28 @@ RUN apt-get update && \
     git \
     curl \
     ffmpeg \
-    libnss3 \
-    libxss1 \
     libasound2 \
-    libxtst6 \
-    libgtk-3-0 \
-    libgbm1 \
-    libxrandr2 \
-    libu2f-udev \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libatspi2.0-0 \
+    libcairo2 \
+    libcups2 \
+    libdbus-1-3 \
     libdrm2 \
+    libgbm1 \
+    libglib2.0-0 \
+    libnspr4 \
+    libnss3 \
+    libpango-1.0-0 \
+    libx11-6 \
+    libxcb1 \
     libxcomposite1 \
     libxdamage1 \
+    libxext6 \
     libxfixes3 \
     libxkbcommon0 \
-    libatspi2.0-0 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    fonts-liberation \
-    fonts-dejavu-core && \
+    libxrandr2 \
+    fonts-liberation && \
     curl -sL https://deb.nodesource.com/setup_24.x | bash - && \
     apt-get install -y --no-install-recommends nodejs && \
     apt-get purge -y --auto-remove && \
