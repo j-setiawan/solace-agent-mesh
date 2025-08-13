@@ -359,7 +359,7 @@ async def handle_a2a_request(component, message: SolaceMessage):
                     logical_task_id,
                 )
 
-                peer_sub_tasks = task_context.peer_sub_tasks
+                peer_sub_tasks = task_context.active_peer_sub_tasks
                 if peer_sub_tasks:
                     for sub_task_info in peer_sub_tasks:
                         sub_task_id = sub_task_info.get("sub_task_id")

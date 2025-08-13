@@ -516,10 +516,44 @@ async def _save_mcp_response_as_artifact(
         A dictionary containing the full, structured result of the processing,
         including lists of successfully saved artifacts and any fallback artifact.
     """
-    # Delegate to the intelligent processor and return the full result.
-    return await save_mcp_response_as_artifact_intelligent(
+
+    result = await save_mcp_response_as_artifact_intelligent(
         tool, tool_context, host_component, mcp_response_dict, original_tool_args
     )
+
+    # For backward compatibility, if multiple artifacts were saved, return the first one
+    # but include information about all saved artifacts in the result
+    if result.get("artifacts_saved"):
+        primary_artifact = result["artifacts_saved"][0]
+        # Add intelligent processing metadata to the primary result
+        primary_artifact["intelligent_processing"] = {
+            "total_artifacts_saved": len(result["artifacts_saved"]),
+            "processing_status": result["status"],
+            "has_fallback": result.get("fallback_artifact") is not None,
+        }
+        return primary_artifact
+    elif result.get("fallback_artifact"):
+        # Return the fallback artifact if no intelligent artifacts were saved
+        fallback = result["fallback_artifact"]
+        fallback["intelligent_processing"] = {
+            "total_artifacts_saved": 0,
+            "processing_status": result["status"],
+            "has_fallback": True,
+            "fallback_reason": result.get("message", "Intelligent processing failed"),
+        }
+        return fallback
+    else:
+        # Return error result
+        return {
+            "status": "error",
+            "data_filename": "unknown_filename",
+            "message": result.get("message", "Failed to save MCP response as artifact"),
+            "intelligent_processing": {
+                "total_artifacts_saved": 0,
+                "processing_status": "error",
+                "has_fallback": False,
+            },
+        }
 
 
 async def manage_large_mcp_tool_responses_callback(
@@ -662,11 +696,6 @@ async def manage_large_mcp_tool_responses_callback(
             f"The response from tool '{tool.name}' was too large ({original_response_bytes} bytes) for direct display and has been truncated."
         )
         log.debug("%s MCP tool output truncated for LLM.", log_identifier)
-    else:
-        final_llm_response_dict["mcp_tool_output"] = mcp_response_dict
-        log.debug(
-            "%s MCP tool output is the full original response for LLM.", log_identifier
-        )
 
     if needs_saving_as_artifact:
         if saved_artifact_details and saved_artifact_details.get("status") in [
@@ -717,6 +746,8 @@ async def manage_large_mcp_tool_responses_callback(
                 "%s Artifact save failed, error details included in LLM response.",
                 log_identifier,
             )
+    else:
+        final_llm_response_dict["mcp_tool_output"] = mcp_response_dict
 
     if needs_saving_as_artifact and (
         saved_artifact_details
