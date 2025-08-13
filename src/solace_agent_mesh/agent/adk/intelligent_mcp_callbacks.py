@@ -66,7 +66,7 @@ async def save_mcp_response_as_artifact_intelligent(
     host_component: "SamAgentComponent",
     mcp_response_dict: Dict[str, Any],
     original_tool_args: Dict[str, Any],
-) -> Dict[str, Any]:
+) -> McpSaveResult:
     """
     Intelligently processes and saves MCP tool response content as typed artifacts.
 
@@ -84,152 +84,136 @@ async def save_mcp_response_as_artifact_intelligent(
         original_tool_args: The original arguments passed to the MCP tool.
 
     Returns:
-        A dictionary containing details of the saved artifacts, including:
-        - status: "success", "partial_success", or "error"
-        - artifacts_saved: List of saved artifact details
-        - fallback_artifact: Details if raw JSON fallback was used
-        - message: Summary of the operation
+        An McpSaveResult object containing the structured result of the operation,
+        including status, a list of successfully saved artifacts, and any
+        fallback artifact.
     """
     log_identifier = f"[IntelligentMCPCallback:{tool.name}]"
     log.debug("%s Starting intelligent MCP response artifact saving...", log_identifier)
 
-    # Get configuration for intelligent processing
     processor_config_dict = host_component.get_config("mcp_intelligent_processing", {})
     processor_config = MCPContentProcessorConfig.from_dict(processor_config_dict)
 
-    saved_artifacts = []
-    failed_artifacts = []
-    fallback_artifact = None
-    overall_status = "success"
+    saved_artifacts: List[SavedArtifactInfo] = []
+    failed_artifacts: List[Dict[str, Any]] = []
+    fallback_artifact: Optional[SavedArtifactInfo] = None
+    overall_status = McpSaveStatus.SUCCESS
 
     try:
-        # Check if intelligent processing is enabled
         if not processor_config.enable_intelligent_processing:
             log.info(
-                "%s Intelligent processing disabled, using raw JSON fallback",
+                "%s Intelligent processing disabled, using raw JSON fallback.",
                 log_identifier,
             )
-            fallback_artifact = await _save_raw_mcp_response_fallback(
+            fallback_dict = await _save_raw_mcp_response_fallback(
                 tool,
                 tool_context,
                 host_component,
                 mcp_response_dict,
                 original_tool_args,
             )
-            return {
-                "status": fallback_artifact.get("status", "error"),
-                "artifacts_saved": [],
-                "fallback_artifact": fallback_artifact,
-                "message": "Intelligent processing disabled, saved raw JSON as fallback",
-            }
+            if fallback_dict.get("status") in ["success", "partial_success"]:
+                fallback_artifact = SavedArtifactInfo(**fallback_dict)
+                status = McpSaveStatus.SUCCESS
+            else:
+                status = McpSaveStatus.ERROR
+            return McpSaveResult(
+                status=status,
+                message="Intelligent processing disabled; saved raw JSON as fallback.",
+                fallback_artifact=fallback_artifact,
+            )
 
-        # Initialize content processor
         processor = MCPContentProcessor(tool.name, original_tool_args)
-
-        # Process MCP response to extract content items
         content_items = processor.process_mcp_response(mcp_response_dict)
 
         if not content_items:
             log.warning(
-                "%s No content items found, falling back to raw JSON", log_identifier
+                "%s No content items found, falling back to raw JSON.", log_identifier
             )
-            fallback_artifact = await _save_raw_mcp_response_fallback(
+            fallback_dict = await _save_raw_mcp_response_fallback(
                 tool,
                 tool_context,
                 host_component,
                 mcp_response_dict,
                 original_tool_args,
             )
-            return {
-                "status": "partial_success",
-                "artifacts_saved": [],
-                "fallback_artifact": fallback_artifact,
-                "message": "No content items found in MCP response, saved raw JSON as fallback",
-            }
+            if fallback_dict.get("status") in ["success", "partial_success"]:
+                fallback_artifact = SavedArtifactInfo(**fallback_dict)
+            return McpSaveResult(
+                status=McpSaveStatus.PARTIAL_SUCCESS,
+                message="No content items found in MCP response; saved raw JSON as fallback.",
+                fallback_artifact=fallback_artifact,
+            )
 
         log.info(
-            "%s Processing %d content items intelligently",
+            "%s Processing %d content items intelligently.",
             log_identifier,
             len(content_items),
         )
 
-        # Save each content item as a separate artifact
-        for content_item in content_items:
+        for item in content_items:
             try:
-                # Some content items may have a 'uri' attribute as a pydantic AnyUrl type,
-                # which is not JSON serializable; convert it to string for compatibility.
-                if hasattr(content_item, "uri"):
-                    content_item.uri = str(content_item.uri)
-                artifact_result = await _save_content_item_as_artifact(
-                    content_item, tool_context, host_component
+                if hasattr(item, "uri"):
+                    item.uri = str(item.uri)
+                result_dict = await _save_content_item_as_artifact(
+                    item, tool_context, host_component
                 )
-
-                if artifact_result.get("status") in ["success", "partial_success"]:
-                    saved_artifacts.append(artifact_result)
+                if result_dict.get("status") in ["success", "partial_success"]:
+                    saved_artifacts.append(SavedArtifactInfo(**result_dict))
                 else:
                     log.warning(
                         "%s Failed to save content item: %s",
                         log_identifier,
-                        artifact_result.get("message", "Unknown error"),
+                        result_dict.get("message", "Unknown error"),
                     )
-                    overall_status = "partial_success"
-                    failed_artifacts.append(artifact_result)
-
+                    overall_status = McpSaveStatus.PARTIAL_SUCCESS
+                    failed_artifacts.append(result_dict)
             except Exception as e:
                 if not processor_config.fallback_to_raw_on_error:
-                    # If we're not falling back, this is a hard failure.
-                    # Re-raise to be caught by the main try/except block.
-                    raise e
-
+                    raise
                 log.exception("%s Error saving content item: %s", log_identifier, e)
-                overall_status = "partial_success"
+                overall_status = McpSaveStatus.PARTIAL_SUCCESS
                 failed_artifacts.append({"status": "error", "message": str(e)})
-                continue
 
-        # If no artifacts were saved successfully, check for failures before falling back
         if not saved_artifacts:
             if failed_artifacts:
+                first_error_msg = failed_artifacts[0].get("message", "Unknown error")
                 log.warning(
-                    "%s No content items saved successfully due to errors. Reporting first error.",
+                    "%s No items saved successfully. First error: %s",
                     log_identifier,
+                    first_error_msg,
                 )
-                return failed_artifacts[0]
+                return McpSaveResult(
+                    status=McpSaveStatus.ERROR,
+                    message=f"Content processing failed. First error: {first_error_msg}",
+                )
 
-            log.warning(
-                "%s No content items found or processed, falling back to raw JSON",
-                log_identifier,
-            )
-            fallback_artifact = await _save_raw_mcp_response_fallback(
+            fallback_dict = await _save_raw_mcp_response_fallback(
                 tool,
                 tool_context,
                 host_component,
                 mcp_response_dict,
                 original_tool_args,
             )
-            return {
-                "status": "partial_success",
-                "artifacts_saved": [],
-                "fallback_artifact": fallback_artifact,
-                "message": "Content processing failed for all items, saved raw JSON as fallback",
-            }
+            if fallback_dict.get("status") in ["success", "partial_success"]:
+                fallback_artifact = SavedArtifactInfo(**fallback_dict)
+            return McpSaveResult(
+                status=McpSaveStatus.PARTIAL_SUCCESS,
+                message="Content processing failed for all items; saved raw JSON as fallback.",
+                fallback_artifact=fallback_artifact,
+            )
 
-        # Optionally save raw JSON as well if configured
-        save_raw_alongside = processor_config_dict.get(
-            "save_raw_alongside_intelligent", False
-        )
-        if save_raw_alongside:
+        if processor_config_dict.get("save_raw_alongside_intelligent", False):
             try:
-                fallback_artifact = await _save_raw_mcp_response_fallback(
+                fallback_dict = await _save_raw_mcp_response_fallback(
                     tool,
                     tool_context,
                     host_component,
                     mcp_response_dict,
                     original_tool_args,
                 )
-                log.debug(
-                    "%s Also saved raw JSON alongside intelligent artifacts",
-                    log_identifier,
-                )
+                if fallback_dict.get("status") in ["success", "partial_success"]:
+                    fallback_artifact = SavedArtifactInfo(**fallback_dict)
             except Exception as e:
                 log.warning(
                     "%s Failed to save raw JSON alongside: %s", log_identifier, e
@@ -239,51 +223,50 @@ async def save_mcp_response_as_artifact_intelligent(
             "%s Intelligent processing complete: %d artifacts saved, status: %s",
             log_identifier,
             len(saved_artifacts),
-            overall_status,
+            overall_status.value,
         )
-
-        return {
-            "status": overall_status,
-            "artifacts_saved": saved_artifacts,
-            "fallback_artifact": fallback_artifact,
-            "message": f"Successfully processed {len(saved_artifacts)} content items as intelligent artifacts",
-        }
+        return McpSaveResult(
+            status=overall_status,
+            artifacts_saved=saved_artifacts,
+            fallback_artifact=fallback_artifact,
+            message=f"Successfully processed {len(saved_artifacts)} content items.",
+        )
 
     except Exception as e:
         log.exception(
             "%s Error in intelligent MCP response processing: %s", log_identifier, e
         )
-
-        # Fall back to raw JSON on any error if configured
         if processor_config.fallback_to_raw_on_error:
             log.info(
-                "%s Falling back to raw JSON due to processing error", log_identifier
+                "%s Falling back to raw JSON due to processing error.", log_identifier
             )
             try:
-                fallback_artifact = await _save_raw_mcp_response_fallback(
+                fallback_dict = await _save_raw_mcp_response_fallback(
                     tool,
                     tool_context,
                     host_component,
                     mcp_response_dict,
                     original_tool_args,
                 )
-                return {
-                    "status": "partial_success",
-                    "artifacts_saved": saved_artifacts,
-                    "fallback_artifact": fallback_artifact,
-                    "message": f"Intelligent processing failed, saved raw JSON as fallback: {e}",
-                }
+                if fallback_dict.get("status") in ["success", "partial_success"]:
+                    fallback_artifact = SavedArtifactInfo(**fallback_dict)
+                return McpSaveResult(
+                    status=McpSaveStatus.PARTIAL_SUCCESS,
+                    artifacts_saved=saved_artifacts,
+                    fallback_artifact=fallback_artifact,
+                    message=f"Intelligent processing failed, saved raw JSON as fallback: {e}",
+                )
             except Exception as fallback_error:
                 log.exception(
                     "%s Fallback also failed: %s", log_identifier, fallback_error
                 )
 
-        return {
-            "status": "error",
-            "artifacts_saved": saved_artifacts,
-            "fallback_artifact": None,
-            "message": f"Failed to save MCP response as artifact: {e}",
-        }
+        return McpSaveResult(
+            status=McpSaveStatus.ERROR,
+            artifacts_saved=saved_artifacts,
+            fallback_artifact=None,
+            message=f"Failed to save MCP response as artifact: {e}",
+        )
 
 
 async def _save_content_item_as_artifact(
