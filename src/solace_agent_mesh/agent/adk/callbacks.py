@@ -22,7 +22,10 @@ from ...common.a2a_protocol import (
 from google.genai import types as adk_types
 from google.adk.tools.mcp_tool import MCPTool
 from solace_ai_connector.common.log import log
-from .intelligent_mcp_callbacks import save_mcp_response_as_artifact_intelligent
+from .intelligent_mcp_callbacks import (
+    save_mcp_response_as_artifact_intelligent,
+    McpSaveStatus,
+)
 
 from ...agent.utils.artifact_helpers import (
     METADATA_SUFFIX,
@@ -590,19 +593,16 @@ async def manage_large_mcp_tool_responses_callback(
         needs_truncation_for_llm = False
         needs_saving_as_artifact = True
 
-    saved_artifact_details = None
+    save_result = None
     if needs_saving_as_artifact:
-        saved_artifact_details = await _save_mcp_response_as_artifact(
+        save_result = await save_mcp_response_as_artifact_intelligent(
             tool, tool_context, host_component, mcp_response_dict, cleaned_args
         )
-        if not (
-            saved_artifact_details.get("status") == "success"
-            or saved_artifact_details.get("status") == "partial_success"
-        ):
+        if save_result.status == McpSaveStatus.ERROR:
             log.warning(
                 "%s Failed to save artifact: %s. Proceeding without saved artifact details.",
                 log_identifier,
-                saved_artifact_details.get("message"),
+                save_result.message,
             )
 
     final_llm_response_dict: Dict[str, Any] = {}
@@ -631,22 +631,19 @@ async def manage_large_mcp_tool_responses_callback(
         log.debug("%s MCP tool output truncated for LLM.", log_identifier)
 
     if needs_saving_as_artifact:
-        if saved_artifact_details and saved_artifact_details.get("status") in [
-            "success",
-            "partial_success",
+        if save_result and save_result.status in [
+            McpSaveStatus.SUCCESS,
+            McpSaveStatus.PARTIAL_SUCCESS,
         ]:
             final_llm_response_dict["saved_mcp_response_artifact_details"] = (
-                saved_artifact_details
+                save_result.model_dump(exclude_none=True)
             )
 
-            artifacts_saved = saved_artifact_details.get("artifacts_saved", [])
-            fallback_artifact = saved_artifact_details.get("fallback_artifact")
-            total_artifacts = len(artifacts_saved)
-
+            total_artifacts = len(save_result.artifacts_saved)
             if total_artifacts > 0:
-                first_artifact = artifacts_saved[0]
-                filename = first_artifact.get("data_filename", "unknown_artifact")
-                version = first_artifact.get("data_version", "N/A")
+                first_artifact = save_result.artifacts_saved[0]
+                filename = first_artifact.data_filename
+                version = first_artifact.data_version
                 if total_artifacts > 1:
                     message_parts_for_llm.append(
                         f"The full response has been saved as {total_artifacts} artifacts, starting with '{filename}' (version {version})."
@@ -655,11 +652,9 @@ async def manage_large_mcp_tool_responses_callback(
                     message_parts_for_llm.append(
                         f"The full response has been saved as artifact '{filename}' (version {version})."
                     )
-            elif fallback_artifact:
-                filename = fallback_artifact.get(
-                    "data_filename", "unknown_artifact.json"
-                )
-                version = fallback_artifact.get("data_version", "N/A")
+            elif save_result.fallback_artifact:
+                filename = save_result.fallback_artifact.data_filename
+                version = save_result.fallback_artifact.data_version
                 message_parts_for_llm.append(
                     f"The full response has been saved as artifact '{filename}' (version {version})."
                 )
@@ -671,10 +666,10 @@ async def manage_large_mcp_tool_responses_callback(
             message_parts_for_llm.append(
                 "Saving the full response as an artifact failed."
             )
-            # Pass the whole error structure through
-            final_llm_response_dict["saved_mcp_response_artifact_details"] = (
-                saved_artifact_details
-            )
+            if save_result:
+                final_llm_response_dict["saved_mcp_response_artifact_details"] = (
+                    save_result.model_dump(exclude_none=True)
+                )
             log.warning(
                 "%s Artifact save failed, error details included in LLM response.",
                 log_identifier,
@@ -683,8 +678,9 @@ async def manage_large_mcp_tool_responses_callback(
         final_llm_response_dict["mcp_tool_output"] = mcp_response_dict
 
     if needs_saving_as_artifact and (
-        saved_artifact_details
-        and saved_artifact_details.get("status") in ["success", "partial_success"]
+        save_result
+        and save_result.status
+        in [McpSaveStatus.SUCCESS, McpSaveStatus.PARTIAL_SUCCESS]
     ):
         if needs_truncation_for_llm:
             final_llm_response_dict["status"] = "processed_saved_and_truncated"
