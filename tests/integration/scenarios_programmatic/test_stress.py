@@ -42,7 +42,6 @@ from .test_helpers import (
 )
 
 pytestmark = [
-    pytest.mark.all,
     pytest.mark.asyncio,
     pytest.mark.stress,
     pytest.mark.skipif(
