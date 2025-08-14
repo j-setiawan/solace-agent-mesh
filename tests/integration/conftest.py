@@ -5,6 +5,7 @@ import subprocess
 import sys
 import socket
 import httpx
+import inspect
 
 
 from solace_agent_mesh.agent.sac.app import SamAgentApp
@@ -18,7 +19,7 @@ from sam_test_infrastructure.llm_server.server import TestLLMServer
 from sam_test_infrastructure.artifact_service.service import (
     TestInMemoryArtifactService,
 )
-import sam_test_infrastructure.mcp_server.server as server_module
+from sam_test_infrastructure.mcp_server.server import TestMCPServer as server_module
 from sam_test_infrastructure.a2a_validator.validator import A2AMessageValidator
 from solace_agent_mesh.common.client.card_resolver import A2ACardResolver
 from solace_agent_mesh.common.client.client import A2AClient
@@ -46,7 +47,7 @@ def mcp_server_harness() -> Generator[Dict[str, Any], None, None]:
     """
     process = None
     port = 0
-    SERVER_PATH = server_module.__file__
+    SERVER_PATH = inspect.getfile(server_module)
 
     try:
         # Prepare stdio config
