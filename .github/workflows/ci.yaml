@@ -28,6 +28,8 @@ jobs:
       npm_package_path: client/webui/frontend
       node_version: 20
       npm_lock_file: package-lock.json
+      pre-test-run: |
+        pip install -e ./tests/sam-test-infrastructure
 
     secrets:
       SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
