@@ -149,6 +149,7 @@ markers = [
     # Markers for specific features.
     "delegation: marks tests related to agent delegation",
     "embeds: marks tests related to the embeds",
+    "mcp: marks tests related to mcp",
     "notification: marks tests related to notifications",
     "task_cancellation: marks tests related to task cancellation",
 
