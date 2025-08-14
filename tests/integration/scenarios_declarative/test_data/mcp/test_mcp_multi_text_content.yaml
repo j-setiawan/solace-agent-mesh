@@ -38,12 +38,6 @@ llm_interactions:
           response_json_matches:
             status: "processed_and_saved"
             message_to_llm_matches_regex: "The full response has been saved as 2 artifacts, starting with 'get_data_stdio_json_0_.*\\.json' \\(version 0\\)\\."
-            mcp_tool_output:
-              content:
-                - type: "text"
-                  text: '{"user_id": "user123", "name": "Alice"}'
-                - type: "text"
-                  text: "id,product\\n1,widget\\n2,gadget"
             saved_mcp_response_artifact_details:
               status: "success"
               artifacts_saved:

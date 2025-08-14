@@ -14,6 +14,7 @@ from google.adk.tools.mcp_tool.mcp_session_manager import (
 from google.adk.tools.tool_context import ToolContext
 from solace_ai_connector.common.log import log
 
+from ..utils.context_helpers import get_original_session_id
 from ...common.utils.embeds import (
     resolve_embeds_in_string,
     evaluate_embed,
@@ -104,7 +105,7 @@ class EmbedResolvingMCPTool(MCPTool):
                     resolution_context = {
                         "artifact_service": invocation_context.artifact_service,
                         "session_context": {
-                            "session_id": session_context.id,
+                            "session_id": get_original_session_id(invocation_context),
                             "user_id": session_context.user_id,
                             "app_name": session_context.app_name,
                         },

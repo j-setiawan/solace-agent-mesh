@@ -32,13 +32,11 @@ llm_interactions:
           response_json_matches:
             status: "processed_and_saved"
             message_to_llm_matches_regex: "The full response has been saved as artifact 'get_data_stdio_resource_0_image.png' \\(version 0\\)\\."
-            mcp_tool_output:
-              content:
-                - type: "resource"
-                  resource:
-                    uri: "file:///path/to/remote/image.png"
-                    blob: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-                    mimeType: "image/png"
+            saved_mcp_response_artifact_details:
+              status: "success"
+              artifacts_saved:
+                - data_filename: "get_data_stdio_resource_0_image.png"
+                  data_version: 0
     static_response:
       choices:
         - message:

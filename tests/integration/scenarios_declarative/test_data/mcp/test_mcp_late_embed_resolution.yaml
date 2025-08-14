@@ -6,6 +6,7 @@ test_runner_config_overrides:
   agent_config:
     mcp_tool_response_save_threshold_bytes: 10 # Force saving
 
+
 # Setup artifacts for late embed resolution testing
 setup_artifacts:
   - filename: "source_data.txt"
@@ -39,7 +40,7 @@ llm_interactions:
                         "content": [
                           {
                             "type": "text", 
-                            "text": "Artifact content: «artifact_content:source_data.txt»"
+                            "text": "Artifact content is «artifact_content:source_data.txt»"
                           }
                         ]
                       }
@@ -50,12 +51,12 @@ llm_interactions:
         - tool_name: "get_data_stdio"
           response_json_matches:
             status: "processed_and_saved"
-            # Verify that late embeds were resolved in the tool parameters
-            mcp_tool_output:
-              content:
-                - type: "text"
-                  # Should contain actual artifact content instead of "«artifact_content:source_data.txt»"
-                  text_contains: "Artifact content: This is test content from an artifact"
+            message_to_llm_matches_regex: "The full response has been saved as artifact 'get_data_stdio_text_0_.*\\.txt' \\(version 0\\)\\."
+            saved_mcp_response_artifact_details:
+              status: "success"
+              artifacts_saved:
+                - data_filename_matches_regex: "get_data_stdio_text_0_.*\\.txt"
+                  status: "success"
 
     static_response:
       choices:
@@ -68,3 +69,7 @@ expected_gateway_output:
     content_parts:
       - type: "text"
         text_exact: "Successfully called MCP tool with resolved late embed parameters."
+    assert_artifact_state:
+      - filename_matches_regex: "get_data_stdio_text_0_.*\\.txt$"
+        version: 0
+        expected_content_text: "Artifact content is This is test content from an artifact"

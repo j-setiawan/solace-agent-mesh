@@ -36,10 +36,6 @@ llm_interactions:
           response_json_matches:
             status: "processed_and_saved"
             message_to_llm_matches_regex: "The full response has been saved as artifact 'get_data_stdio_text_0_.*\\.txt' \\(version 0\\)\\."
-            mcp_tool_output:
-              content:
-                - type: "text"
-                  text: "This is a simple text response."
     static_response:
       choices:
         - message:
