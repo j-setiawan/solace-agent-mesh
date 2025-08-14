@@ -6,6 +6,7 @@ test_runner_config_overrides:
   agent_config:
     mcp_tool_response_save_threshold_bytes: 10 # Force saving
 
+
 # Setup artifacts for late embed resolution testing
 setup_artifacts:
   - filename: "source_data.txt"
@@ -39,7 +40,7 @@ llm_interactions:
                         "content": [
                           {
                             "type": "text", 
-                            "text": "Artifact content: «artifact_content:source_data.txt»"
+                            "text": "Artifact content is «artifact_content:source_data.txt»"
                           }
                         ]
                       }
@@ -71,4 +72,4 @@ expected_gateway_output:
     assert_artifact_state:
       - filename_matches_regex: "get_data_stdio_text_0_.*\\.txt$"
         version: 0
-        expected_content_text: "Artifact content: This is test content from an artifact"
+        expected_content_text: "Artifact content is This is test content from an artifact"

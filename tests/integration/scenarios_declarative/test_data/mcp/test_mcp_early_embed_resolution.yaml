@@ -32,7 +32,7 @@ llm_interactions:
                         "content": [
                           {
                             "type": "text", 
-                            "text": "Math result: «math:5*3» calculated at «datetime:iso»"
+                            "text": "Math result is «math:5*3» calculated at «datetime:iso»"
                           }
                         ]
                       }
@@ -64,4 +64,4 @@ expected_gateway_output:
     assert_artifact_state:
       - filename_matches_regex: "get_data_stdio_text_0_.*\\.txt$"
         version: 0
-        expected_content_text_matches_regex: "Math result: 15 calculated at \\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*"
+        expected_content_text_matches_regex: "Math result is 15 calculated at \\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*"
