@@ -56,10 +56,6 @@ jobs:
           echo "version=$(hatch version)" >> $GITHUB_OUTPUT
           echo "Found version: $(hatch version)"
 
-      - name: Install sam-test-infrastructure
-        run: |
-          python3 -m pip install -e ./tests/sam-test-infrastructure
-
       - name: Determine Release Tag
         id: release_tag
         run: |
