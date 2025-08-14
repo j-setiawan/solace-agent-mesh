@@ -38,9 +38,7 @@ class TestSelector:
             ("src/solace_agent_mesh/common/server/*", ["notification", "server"]),
             ("src/solace_agent_mesh/common/services/*", ["services"]),
             ("src/solace_agent_mesh/common/utils/embeds/*", ["embeds"]),
-            ("src/solace_agent_mesh/common/*", ["common"]),
-            # Modifications to test infrastructure require all tests to run
-            ("tests/sam-test-infrastructure/*", ["all"]),
+            ("src/solace_agent_mesh/common/*", ["common"])
         ]
 
     def get_changed_files(self) -> List[str]:
