@@ -70,11 +70,15 @@ cli = [
     "prompt-toolkit>=3.0",
     "rich>=13.0",
 ]
-dev = [
+
+[tool.hatch.envs.default]
+installer = "pip"
+dependencies = [
     "pytest>=7.0",
     "pytest-asyncio>=0.20",
     "ruff",
-    "sam-test-infrastructure @ git+https://github.com/SolaceDev/solace-agent-mesh-test-infrastructure.git"
+    "solace-agent-mesh[database,cli,gcs,vertex,employee_tools]",
+    "sam-test-infrastructure @ {root:uri}/tests/sam-test-infrastructure"
 ]
 
 [tool.hatch.envs.hatch-test]
@@ -90,17 +94,17 @@ dependencies = [
 ]
 extra-dependencies = [
     "solace-agent-mesh[database,cli,gcs,vertex,employee_tools]",
-    "sam-test-infrastructure @ git+https://github.com/SolaceDev/solace-agent-mesh-test-infrastructure.git"
+    "sam-test-infrastructure @ {root:uri}/tests/sam-test-infrastructure"
 ]
+
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.10", "3.13"]
 
 [tool.hatch.envs.hatch-test.scripts]
 run = "pytest -m \"$(python3 ./tests/test_selector.py)\" {args}"
 run-cov = "coverage run -m pytest -m \"$(python3 ./tests/test_selector.py)\" {args}"
 cov-combine = "coverage combine"
 cov-report = "coverage report"
-
-[[tool.hatch.envs.hatch-test.matrix]]
-python = ["3.10", "3.13"]
 
 [project.urls]
 Homepage = "https://github.com/SolaceLabs/solace-agent-mesh"
