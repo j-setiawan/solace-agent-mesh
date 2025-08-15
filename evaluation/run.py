@@ -85,10 +85,11 @@ class TestRun:
 class ProcessManager:
     """Manages subprocess lifecycle for the Solace AI Connector."""
 
-    def __init__(self, config: EvaluationConfig):
+    def __init__(self, config: EvaluationConfig, verbose: bool = False):
         self.config = config
         self.process: Optional[subprocess.Popen] = None
         self.namespace: Optional[str] = None
+        self.verbose = verbose
 
     def start_services(self) -> Tuple[subprocess.Popen, str]:
         """Start the Solace AI Connector and return process and namespace."""
@@ -138,9 +139,10 @@ class ProcessManager:
 class TaskService:
     """Handles task submission and tracking."""
 
-    def __init__(self, config: EvaluationConfig):
+    def __init__(self, config: EvaluationConfig, verbose: bool = False):
         self.config = config
         self.base_url = config.API_BASE_URL
+        self.verbose = verbose
 
     def submit_task(
         self, agent_name: str, message: str, artifact_paths: Optional[List[str]] = None
@@ -262,9 +264,10 @@ class TestRunBuilder:
 class TestExecutor:
     """Executes individual test runs."""
 
-    def __init__(self, task_service: TaskService, file_service: FileService):
+    def __init__(self, task_service: TaskService, file_service: FileService, verbose: bool = False):
         self.task_service = task_service
         self.file_service = file_service
+        self.verbose = verbose
 
     def execute_test(
         self,
@@ -331,13 +334,14 @@ class TestExecutor:
 class ModelEvaluator:
     """Handles the evaluation of a single model."""
 
-    def __init__(self, config: EvaluationConfig):
+    def __init__(self, config: EvaluationConfig, verbose: bool = False):
         self.config = config
-        self.process_manager = ProcessManager(config)
-        self.task_service = TaskService(config)
+        self.process_manager = ProcessManager(config, verbose=verbose)
+        self.task_service = TaskService(config, verbose=verbose)
         self.file_service = FileService()
         self.test_builder = TestRunBuilder(config)
-        self.test_executor = TestExecutor(self.task_service, self.file_service)
+        self.test_executor = TestExecutor(self.task_service, self.file_service, verbose=verbose)
+        self.verbose = verbose
 
     def evaluate_model(
         self, model_config: Dict[str, Any], base_results_path: str
@@ -444,9 +448,10 @@ class ModelEvaluator:
 class ResultsProcessor:
     """Handles post-processing of evaluation results."""
 
-    def __init__(self, file_service: FileService):
+    def __init__(self, file_service: FileService, verbose: bool = False):
         self.file_service = file_service
         self.summary_builder = SummaryBuilder()
+        self.verbose = verbose
 
     def summarize_results(self, base_results_path: str):
         """Generate summaries for all test results."""
@@ -486,11 +491,12 @@ class ResultsProcessor:
 class EvaluationRunner:
     """Main orchestrator that coordinates the entire evaluation process."""
 
-    def __init__(self):
+    def __init__(self, verbose: bool = False):
         self.config: Optional[EvaluationConfig] = None
         self.file_service = FileService()
-        self.results_processor = ResultsProcessor(self.file_service)
+        self.results_processor = ResultsProcessor(self.file_service, verbose=verbose)
         self.report_generator: Optional[ReportGenerator] = None
+        self.verbose = verbose
 
     def run_evaluation(self, config_path: str):
         """Main entry point for the evaluation process."""
@@ -543,7 +549,7 @@ class EvaluationRunner:
         model_execution_times = {}
 
         for model_config in self.config.llm_models:
-            model_evaluator = ModelEvaluator(self.config)
+            model_evaluator = ModelEvaluator(self.config, verbose=self.verbose)
             execution_time = model_evaluator.evaluate_model(
                 model_config, base_results_path
             )
@@ -593,9 +599,9 @@ class EvaluationRunner:
         print(f"Total execution time: {total_execution_time:.2f} seconds")
 
 
-def main(config_path: str):
+def main(config_path: str, verbose: bool = False):
     """Main entry point for the evaluation script."""
-    orchestrator = EvaluationRunner()
+    orchestrator = EvaluationRunner(verbose=verbose)
     orchestrator.run_evaluation(config_path)
 
 
@@ -609,5 +615,11 @@ if __name__ == "__main__":
         type=str,
         help="Path to the evaluation test_suite_config.json file.",
     )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Enable verbose output.",
+    )
     args = parser.parse_args()
-    main(args.test_suite_config_path)
+    main(args.test_suite_config_path, args.verbose)
