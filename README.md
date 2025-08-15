@@ -82,7 +82,7 @@ mkdir my-sam && cd my-sam
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 ```
-#### 3. Upgrade or Install Solace Agent Mesh (SAM)
+#### 3. Install Solace Agent Mesh (SAM)
 Check if you have a version of SAM already installed.
 ```bash
 sam -v
