@@ -87,11 +87,11 @@ Check if you have a version of SAM already installed.
 ```bash
 sam -v
 ```
-If you have an earlier version, you can upgrade to the latest version with:
+If you have an earlier version, uninstall it and **start from scratch**:
 ```bash
-pip3 install --upgrade solace-agent-mesh
+pip3 uninstall solace-agent-mesh
 ```
-Note: Optionally, you can uninstall a previous version to **start from scratch**. (`pip3 uninstall solace-agent-mesh`)
+Note: Optionally, you can try to upgrade versions but this action is not officially supported at this time. (`pip3 install --upgrade solace-agent-mesh`)
 
 If no previous version exists, install the latest version with:
 ```bash
