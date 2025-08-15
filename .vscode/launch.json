@@ -158,21 +158,15 @@
             "justMyCode": false,
         },
         {
-            "name": "Python: Pytest",
+            "name": "Python: Debug Tests",
             "type": "debugpy",
             "request": "launch",
-            "module": "pytest",
-            "args": [
-                "tests/",
-                "-v",
-                "--tb=short"
+            "program": "${file}",
+            "purpose": [
+                "debug-test"
             ],
-            "justMyCode": false,
             "console": "integratedTerminal",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}"
-            },
-            "subProcess": true
+            "justMyCode": false
         },
         {
             "name": "Python: Pytest (specific test)",

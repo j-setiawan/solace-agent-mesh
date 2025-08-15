@@ -34,6 +34,7 @@ from solace_agent_mesh.agent.sac.component import SamAgentComponent
 from google.genai import types as adk_types  # Add this import
 import re
 import json
+import builtins
 from asteval import Interpreter
 import math
 from ..scenarios_programmatic.test_helpers import (
@@ -1220,12 +1221,36 @@ async def test_declarative_scenario(
     peer_c_component: SamAgentComponent,
     peer_d_component: SamAgentComponent,
     monkeypatch: pytest.MonkeyPatch,
+    mcp_server_harness,
+    request: pytest.FixtureRequest,
 ):
     """
     Executes a single declarative test scenario discovered by pytest_generate_tests.
     """
     scenario_id = declarative_scenario.get("test_case_id", "N/A")
     scenario_description = declarative_scenario.get("description", "No description")
+
+    # --- Phase 0: MCP Configuration now handled by mcp_configured_sam_app fixture ---
+
+    if "monkeypatch_spec" in declarative_scenario:
+        for patch_spec in declarative_scenario["monkeypatch_spec"]:
+            target_str = patch_spec["target"]
+            side_effect_type = patch_spec.get("side_effect")
+
+            if side_effect_type == "exception":
+                exception_type_str = patch_spec.get("exception_type", "Exception")
+                exception_message = patch_spec.get(
+                    "exception_message", "Simulated failure"
+                )
+                exception_class = getattr(builtins, exception_type_str, Exception)
+
+                async def mock_save_fail(*args, **kwargs):
+                    raise exception_class(exception_message)
+
+                monkeypatch.setattr(target_str, mock_save_fail)
+                print(
+                    f"Scenario {scenario_id}: MONKEYPATCH APPLIED to '{target_str}' to raise {exception_type_str}."
+                )
 
     if scenario_id in SKIPPED_FAILING_EMBED_TESTS:
         pytest.skip(f"Skipping failing embed test '{scenario_id}' until fixed.")
@@ -1717,9 +1742,13 @@ def _assert_dict_subset(
         is_regex_match = False
         regex_suffix = "_matches_regex"
 
+        is_contains_match = False
         if expected_key_in_yaml.endswith(regex_suffix):
             actual_key_to_check = expected_key_in_yaml[: -len(regex_suffix)]
             is_regex_match = True
+        elif expected_key_in_yaml.endswith("_contains"):
+            actual_key_to_check = expected_key_in_yaml[: -len("_contains")]
+            is_contains_match = True
 
         current_path = f"{context_path}.{actual_key_to_check}"
 
@@ -1737,7 +1766,18 @@ def _assert_dict_subset(
             assert re.fullmatch(
                 str(expected_value), actual_value
             ), f"Scenario {scenario_id}: Event {event_index+1} - Regex mismatch for key '{current_path}' (from YAML key '{expected_key_in_yaml}'). Pattern '{expected_value}' did not fully match actual value '{actual_value}'."
-
+        elif is_contains_match:
+            assert isinstance(
+                actual_value, str
+            ), f"Scenario {scenario_id}: Event {event_index+1} - Contains match for key '{current_path}' (from YAML key '{expected_key_in_yaml}') expected a string value in actual data, but got {type(actual_value)} ('{actual_value}')."
+            expected_substrings = (
+                expected_value if isinstance(expected_value, list) else [expected_value]
+            )
+            for item_to_contain in expected_substrings:
+                assert str(item_to_contain) in actual_value, (
+                    f"Scenario {scenario_id}: Event {event_index+1} - Contains mismatch for key '{current_path}'. "
+                    f"Expected to contain '{item_to_contain}', but it was not found in actual value '{actual_value}'."
+                )
         # Check for special assertion directives in the expected_value
         elif (
             isinstance(expected_value, dict)

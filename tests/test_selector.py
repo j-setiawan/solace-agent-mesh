@@ -31,7 +31,7 @@ class TestSelector:
         # Each tuple contains (pattern, list_of_markers)
         self.pattern_mappings = [
             ("src/solace_agent_mesh/agent/tools/*", ["tools"]),
-            ("src/solace_agent_mesh/agent/*", ["agent"]),
+            ("src/solace_agent_mesh/agent/*", ["agent", "mcp"]),
             ("src/solace_agent_mesh/core_a2a/*", ["core_a2a"]),
             ("src/solace_agent_mesh/common/client/*", ["client", "delegation", "notification"]),
             ("src/solace_agent_mesh/common/middleware/*", ["middleware"]),

@@ -302,6 +302,73 @@ class SamAgentApp(App):
                     },
                 },
             },
+            # --- MCP Intelligent Processing Config ---
+            {
+                "name": "mcp_intelligent_processing",
+                "required": False,
+                "type": "object",
+                "default": {},
+                "description": "Configuration for intelligent processing of MCP tool responses into typed artifacts.",
+                "properties": {
+                    "enable_intelligent_processing": {
+                        "type": "boolean",
+                        "required": False,
+                        "default": True,
+                        "description": "Enable intelligent content-aware processing of MCP responses. When disabled, falls back to raw JSON saving.",
+                    },
+                    "enable_text_format_detection": {
+                        "type": "boolean",
+                        "required": False,
+                        "default": True,
+                        "description": "Enable detection and parsing of structured text formats (CSV, JSON, YAML) within text content.",
+                    },
+                    "enable_content_parsing": {
+                        "type": "boolean",
+                        "required": False,
+                        "default": True,
+                        "description": "Enable parsing and validation of detected content formats for enhanced metadata.",
+                    },
+                    "fallback_to_raw_on_error": {
+                        "type": "boolean",
+                        "required": False,
+                        "default": True,
+                        "description": "Fall back to raw JSON saving if intelligent processing fails.",
+                    },
+                    "save_raw_alongside_intelligent": {
+                        "type": "boolean",
+                        "required": False,
+                        "default": False,
+                        "description": "Save both intelligent artifacts and raw JSON response for debugging/comparison.",
+                    },
+                    "max_content_items": {
+                        "type": "integer",
+                        "required": False,
+                        "default": 50,
+                        "description": "Maximum number of content items to process from a single MCP response.",
+                    },
+                    "max_single_item_size_mb": {
+                        "type": "integer",
+                        "required": False,
+                        "default": 100,
+                        "description": "Maximum size in MB for a single content item before skipping intelligent processing.",
+                    },
+                },
+            },
+            # --- MCP Tool Response Thresholds ---
+            {
+                "name": "mcp_tool_response_save_threshold_bytes",
+                "required": False,
+                "type": "integer",
+                "default": 2048,
+                "description": "Threshold in bytes above which MCP tool responses are saved as artifacts.",
+            },
+            {
+                "name": "mcp_tool_llm_return_max_bytes",
+                "required": False,
+                "type": "integer",
+                "default": 4096,
+                "description": "Maximum size in bytes of MCP tool response content returned directly to the LLM.",
+            },
             # --- Artifact Handling ---
             {
                 "name": "artifact_handling_mode",
