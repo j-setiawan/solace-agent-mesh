@@ -524,6 +524,10 @@ class EvaluationRunner:
             # Generate reports
             self._generate_reports(config_path, base_results_path)
 
+            # Display verbose summary if enabled
+            if self.verbose:
+                self._display_verbose_summary(base_results_path)
+
         except Exception as e:
             print(f"Evaluation failed: {e}")
             raise
@@ -585,6 +589,80 @@ class EvaluationRunner:
         """Generate evaluation reports."""
         if self.report_generator:
             self.report_generator.generate_report(base_results_path)
+
+    def _display_verbose_summary(self, base_results_path: Path):
+        """Display a verbose summary of the evaluation results in the terminal."""
+
+        # Pre-process data to find column widths
+        summary_data = []
+        max_model_len = 0
+        max_test_case_len = 0
+
+        for model_dir in sorted(base_results_path.iterdir()):
+            if not model_dir.is_dir():
+                continue
+
+            results_file = model_dir / "results.json"
+            if not results_file.exists():
+                continue
+
+            try:
+                results_data = self.file_service.load_json(str(results_file))
+                model_name = results_data.get("model_name", model_dir.name)
+                max_model_len = max(max_model_len, len(model_name))
+
+                for test_case in results_data.get("test_cases", []):
+                    test_case_id = test_case.get("test_case_id")
+                    if not test_case_id:
+                        continue
+
+                    max_test_case_len = max(max_test_case_len, len(test_case_id))
+
+                    scores = {}
+                    tool_match = test_case.get("tool_match_scores", {}).get("average")
+                    if tool_match is not None:
+                        scores["Tool Match"] = f"{tool_match:.2f}"
+
+                    response_match = test_case.get("response_match_scores", {}).get("average")
+                    if response_match is not None:
+                        scores["Response Match"] = f"{response_match:.2f}"
+
+                    llm_eval = test_case.get("llm_eval_scores", {}).get("average")
+                    if llm_eval is not None:
+                        scores["LLM Eval"] = f"{llm_eval:.2f}"
+
+                    if scores:
+                        summary_data.append((model_name, test_case_id, scores))
+
+            except Exception as e:
+                print(f"Error processing results for {model_dir.name}: {e}")
+
+        # Print formatted output
+        if not summary_data:
+            print("No summary data to display.")
+            return
+
+        # Define headers and find max score lengths
+        headers = ["Tool Match", "Response Match", "LLM Eval"]
+
+        # Print header
+        header_line = (
+            f"{'Model':<{max_model_len}} | {'Test Case':<{max_test_case_len}} | "
+            f"{'Tool Match':<12} | {'Response Match':<16} | {'LLM Eval':<10}"
+        )
+        print(header_line)
+        print("-" * len(header_line))
+
+        # Print data rows
+        for model_name, test_case_id, scores in summary_data:
+            tool_score = scores.get("Tool Match", "N/A")
+            response_score = scores.get("Response Match", "N/A")
+            llm_score = scores.get("LLM Eval", "N/A")
+
+            print(
+                f"{model_name:<{max_model_len}} | {test_case_id:<{max_test_case_len}} | "
+                f"{tool_score:<12} | {response_score:<16} | {llm_score:<10}"
+            )
 
     def _save_execution_stats(self, base_results_path: str, start_time: float):
         """Save overall execution statistics."""
