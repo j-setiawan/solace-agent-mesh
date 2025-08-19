@@ -664,12 +664,56 @@ class EvaluationRunner:
                 f"{tool_score:<12} | {response_score:<16} | {llm_score:<10}"
             )
 
+    def _get_model_stats(self, model_path: str) -> Dict[str, Any]:
+        """Process results for a single model and return stats."""
+        model_stats = {}
+        results_file = os.path.join(model_path, "results.json")
+        if not os.path.exists(results_file):
+            return model_stats
+
+        results_data = self.file_service.load_json(results_file)
+        model_name = results_data.get("model_name", os.path.basename(model_path))
+        model_stats[model_name] = {}
+
+        for test_case in results_data.get("test_cases", []):
+            test_case_id = test_case.get("test_case_id")
+            if not test_case_id:
+                continue
+
+            scores = {}
+            tool_match = test_case.get("tool_match_scores", {}).get("average")
+            if tool_match is not None:
+                scores["avg_tool_match"] = tool_match
+
+            response_match = test_case.get("response_match_scores", {}).get("average")
+            if response_match is not None:
+                scores["avg_response_match"] = response_match
+
+            llm_eval = test_case.get("llm_eval_scores", {}).get("average")
+            if llm_eval is not None:
+                scores["avg_llm_eval"] = llm_eval
+
+            if scores:
+                model_stats[model_name][test_case_id] = scores
+        return model_stats
+
     def _save_execution_stats(self, base_results_path: str, start_time: float):
         """Save overall execution statistics."""
         end_time = time.time()
         total_execution_time = end_time - start_time
+        stats = {"total_execution_time": total_execution_time, "models": {}}
 
-        stats = {"total_execution_time": total_execution_time}
+        try:
+            for model_dir in os.listdir(base_results_path):
+                model_path = os.path.join(base_results_path, model_dir)
+                if not os.path.isdir(model_path):
+                    continue
+                model_stats = self._get_model_stats(model_path)
+                stats["models"].update(model_stats)
+
+        except Exception as e:
+            print(f"Error processing results for stats: {e}")
+
         stats_path = os.path.join(base_results_path, "stats.json")
         self.file_service.save_json(stats, stats_path)
 
