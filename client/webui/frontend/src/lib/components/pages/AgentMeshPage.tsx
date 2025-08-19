@@ -2,15 +2,15 @@ import { useState } from "react";
 
 import { Header, LayoutSelector, MessageBanner } from "@/lib/components";
 import { AgentMeshCards } from "@/lib/components/agents/AgentMeshCards";
-import { useAgents } from "@/lib/hooks";
+import { useChatContext } from "@/lib/hooks";
 import { pluginRegistry } from "@/lib/plugins";
 import { LayoutType } from "@/lib/types";
 
 export function AgentMeshPage() {
-    const { agents, isLoading, error } = useAgents();
+    const { agents, agentsLoading, agentsError } = useChatContext();
     const [currentLayout, setCurrentLayout] = useState<string>("cards");
 
-    if (isLoading) {
+    if (agentsLoading) {
         return (
             <div className="space-y-6">
                 <div className="flex h-96 items-center justify-center">
@@ -20,11 +20,11 @@ export function AgentMeshPage() {
         );
     }
 
-    if (error) {
+    if (agentsError) {
         return (
             <div className="space-y-6">
                 <div className="flex h-96 items-center justify-center">
-                    <MessageBanner variant="error" message={`Error loading agents. ${error}`} />
+                    <MessageBanner variant="error" message={`Error loading agents. ${agentsError}`} />
                 </div>
             </div>
         );

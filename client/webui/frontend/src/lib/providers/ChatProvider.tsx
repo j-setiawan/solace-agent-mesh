@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef, type FormEvent, type ReactNode } from "react";
 
-import { useConfigContext, useArtifacts } from "@/lib/hooks";
+import { useConfigContext, useArtifacts, useAgents } from "@/lib/hooks";
 import { authenticatedFetch, getAccessToken } from "@/lib/utils/api";
 import { ChatContext, type ChatContextValue } from "@/lib/contexts";
 import type { ArtifactInfo, DataPart, FileAttachment, FilePart, JSONRPCError, JSONRPCResponse, MessageFE, Notification, Task, TaskArtifactUpdateEvent, TaskStatusUpdateEvent, TextPart, ToolEvent } from "@/lib/types";
@@ -28,6 +28,14 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     const isFinalizing = useRef(false);
     const latestStatusText = useRef<string | null>(null);
     const sseEventSequenceRef = useRef<number>(0);
+
+    // Agents State
+    const {
+        agents,
+        error: agentsError,
+        isLoading: agentsLoading,
+        refetch: agentsRefetch,
+    } = useAgents();
 
     // Chat Side Panel State
     const {
@@ -894,6 +902,10 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         isResponding,
         currentTaskId,
         isCancelling,
+        agents,
+        agentsLoading,
+        agentsError,
+        agentsRefetch,
         handleNewSession,
         handleSubmit,
         handleCancel,
