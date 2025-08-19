@@ -14,6 +14,6 @@
   "evaluation": {
     "expected_tools": ["extract_content_from_artifact"],
     "expected_response": "The person who is 30 or older and lives in the USA is John Doe.",
-    "criterion": "Evaluate if the agent correctly filters the CSV data using SQL and signals the result as an artifact."
+    "criterion": "Evaluate if the agent correctly filters the CSV data."
   }
 }
