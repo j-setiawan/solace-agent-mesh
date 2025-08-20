@@ -5,7 +5,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-    { ignores: ["dist", "lib-package", "storybook-static", ".storybook"] },
+    { ignores: ["dist", "lib-package"] },
     {
         extends: [js.configs.recommended, ...tseslint.configs.recommended],
         files: ["src/**/*.{ts,tsx}"],
@@ -20,12 +20,6 @@ export default tseslint.config(
         rules: {
             ...reactHooks.configs.recommended.rules,
             "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-        },
-    },
-    {
-        files: ["src/**/*.stories.{ts,tsx}", "src/stories/**/*.{ts,tsx}"],
-        rules: {
-            "react-refresh/only-export-components": "off",
-        },
+        }
     }
 );
