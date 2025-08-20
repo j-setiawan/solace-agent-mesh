@@ -1,6 +1,6 @@
 import React, { createContext, type FormEvent } from "react";
 
-import type { ArtifactInfo, FileAttachment, MessageFE, Notification } from "@/lib/types";
+import type { AgentCard, ArtifactInfo, FileAttachment, MessageFE, Notification } from "@/lib/types";
 
 export interface ChatState {
     sessionId: string;
@@ -11,6 +11,11 @@ export interface ChatState {
     selectedAgentName: string;
     notifications: Notification[];
     isCancelling: boolean;
+    // Agents
+    agents: AgentCard[];
+    agentsError: string | null;
+    agentsLoading: boolean;
+    agentsRefetch: () => Promise<void>;
     // Chat Side Panel State
     artifacts: ArtifactInfo[];
     artifactsLoading: boolean;
