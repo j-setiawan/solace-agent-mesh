@@ -25,13 +25,13 @@ export interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ title, breadcrumbs, tabs, buttons, leadingAction }) => {
     return (
         <div className="relative flex max-h-[80px] min-h-[80px] w-full items-center border-b px-8">
-            
+
             {/* Breadcrumbs */}
             {breadcrumbs && breadcrumbs.length > 0 && (
-                <div className="absolute top-0 left-8 flex items-center h-8">
+                <div className="absolute top-1 left-8 flex items-center h-8">
                     {breadcrumbs.map((crumb, index) => (
                         <React.Fragment key={index}>
-                            {index > 0 && <span className="mx-1"><ChevronRight size={14}/></span>}
+                            {index > 0 && <span className="mx-1"><ChevronRight size={16}/></span>}
                             {crumb.onClick ? (
                                 <Button variant="link" className="p-0 m-0" onClick={crumb.onClick}>
                                     {crumb.label}
