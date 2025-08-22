@@ -187,6 +187,7 @@ def _write_agent_yaml_from_data(
 
         replacements = {
             "__AGENT_NAME__": agent_name_camel,
+            "__AGENT_SPACED_NAME__": get_formatted_names(agent_name_camel).get("SPACED_CAPITALIZED_NAME"),
             "__NAMESPACE__": config_options.get(
                 "namespace", AGENT_DEFAULTS["namespace"]
             ),
@@ -325,7 +326,7 @@ def create_agent_config(
     collected_options["namespace"] = ask_if_not_provided(
         collected_options,
         "namespace",
-        "Enter A2A namespace (e.g., myorg/dev, or leave for ${NAMESPACE})",
+        "Enter namespace (e.g., myorg/dev, or leave for ${NAMESPACE})",
         AGENT_DEFAULTS["namespace"],
         skip_interactive,
     )
@@ -582,7 +583,7 @@ def create_agent_config(
     is_flag=True,
     help="Skip interactive prompts and use defaults (CLI mode only).",
 )
-@click.option("--namespace", help="A2A namespace (e.g., myorg/dev).")
+@click.option("--namespace", help="namespace (e.g., myorg/dev).")
 @click.option("--supports-streaming", type=bool, help="Enable streaming support.")
 @click.option(
     "--model-type",
