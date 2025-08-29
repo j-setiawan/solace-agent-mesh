@@ -14,7 +14,7 @@ from ...gateway.base.component import BaseGatewayComponent
 
 info = {
     "class_name": "WebUIBackendApp",
-    "description": "Custom App class for the A2A Web UI Backend with automatic subscription generation. Tada!",
+    "description": "Custom App class for the A2A Web UI Backend with automatic subscription generation.",
 }
 
 
