@@ -47,6 +47,8 @@
     "build-types": "tsc --emitDeclarationOnly --outDir dist --project tsconfig.lib.json",
     "build-package": "npm run build-lib && npm run build-types",
     "lint": "eslint .",
+    "precommit": "eslint . && tsc -b && vite build",
+    "prepare": "husky install",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -96,6 +98,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "husky": "^9.1.7",
     "prettier-plugin-tailwindcss": "^0.6.13",
     "tw-animate-css": "^1.3.3",
     "typescript": "~5.8.3",
