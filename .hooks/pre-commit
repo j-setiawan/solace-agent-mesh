@@ -21,13 +21,5 @@ if [ -n "$FRONTEND_CHANGES" ]; then
   fi
 fi
 
-# You can add more directory-specific hooks here with similar pattern
-# For example:
-# BACKEND_CHANGES=$(git diff --cached --name-only | grep "^backend/")
-# if [ -n "$BACKEND_CHANGES" ]; then
-#   echo "Backend changes detected, running backend pre-commit hook..."
-#   (cd ./backend && ./pre-commit-hook.sh)
-# fi
-
 # If we get here, all hooks passed
 exit 0
