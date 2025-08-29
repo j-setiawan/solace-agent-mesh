@@ -77,4 +77,4 @@ The frontend connects to the backend via:
 1. Follow the existing code style and TypeScript conventions
 2. Use Tailwind CSS for styling
 3. Test components across different screen sizes
-4. There is a husky precommit hook that must pass on each commit
+4. The precommit hook must pass on each commit
