@@ -26,6 +26,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=1
 
 RUN apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg && \
     python3.11 -m pip install playwright && \
     playwright install-deps chromium && \
     apt-get clean && \
