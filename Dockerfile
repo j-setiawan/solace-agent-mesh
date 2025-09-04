@@ -26,9 +26,14 @@ ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=1
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg && \
+    apt-get install -y --no-install-recommends \
+    ffmpeg \
+    curl && \
+    curl -sL https://deb.nodesource.com/setup_24.x | bash - && \
+    apt-get install -y --no-install-recommends nodejs && \
     python3.11 -m pip install playwright && \
     playwright install-deps chromium && \
+    apt-get purge -y --auto-remove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
