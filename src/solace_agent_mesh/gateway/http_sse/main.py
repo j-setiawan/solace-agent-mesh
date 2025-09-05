@@ -50,25 +50,26 @@ def load_extensions(app: FastAPI, component: "WebUIBackendComponent", persistenc
     """
     Searches for and loads all registered extensions for the application.
     """
-    log.info("--- Searching for extensions under 'solace_agent_mesh.extensions' ---")
+    log_prefix = "[load_extensions] "
+    log.debug("%sSearching for extensions under 'solace_agent_mesh.extensions'", log_prefix)
     try:
         discovered_extensions = entry_points(group="solace_agent_mesh.extensions")
     except Exception:
-        log.info("--- No extensions found (or importlib.metadata not available). ---")
+        log.debug("%sNo extensions found (or importlib.metadata not available).", log_prefix)
         return
 
     if not discovered_extensions:
-        log.info("--- No extensions found. ---")
+        log.debug("%sNo extensions found.", log_prefix)
         return
 
     for extension in discovered_extensions:
-        log.info(f"Found extension: '{extension.name}'. Attempting to load...")
+        log.debug(f"{log_prefix}Found extension: '{extension.name}'. Attempting to load...")
         try:
             init_function = extension.load()
             init_function(app, component, persistence_service)
-            log.info(f"Successfully loaded and initialized extension: '{extension.name}'.")
+            log.debug(f"{log_prefix}Successfully loaded and initialized extension: '{extension.name}'.")
         except Exception as e:
-            log.error(f"ERROR: Failed to load extension '{extension.name}': {e}", exc_info=True)
+            log.error(f"{log_prefix}Failed to load extension '{extension.name}': {e}", exc_info=True)
             raise
 
 
