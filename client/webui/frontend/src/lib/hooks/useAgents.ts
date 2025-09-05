@@ -61,7 +61,7 @@ export const useAgents = (): UseAgentsReturn => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await authenticatedFetch(`${apiPrefix}/agents`, { credentials: "include" });
+            const response = await authenticatedFetch(`${apiPrefix}/agentCards`, { credentials: "include" });
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({ message: `Failed to fetch agents: ${response.statusText}` }));
                 throw new Error(errorData.message || `Failed to fetch agents: ${response.statusText}`);
