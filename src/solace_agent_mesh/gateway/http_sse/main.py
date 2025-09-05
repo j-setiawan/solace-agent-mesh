@@ -20,7 +20,7 @@ from starlette.staticfiles import StaticFiles
 from ...common import a2a
 from ...gateway.http_sse import dependencies
 from ...gateway.http_sse.routers import (
-    agents,
+    agent_cards,
     artifacts,
     auth,
     config,
@@ -35,6 +35,7 @@ from .api.controllers.session_controller import router as session_router
 from .api.controllers.task_controller import router as task_router
 from .api.controllers.user_controller import router as user_router
 from .infrastructure.persistence.database_service import DatabaseService
+from importlib.metadata import entry_points
 
 if TYPE_CHECKING:
     from gateway.http_sse.component import WebUIBackendComponent
@@ -44,6 +45,31 @@ app = FastAPI(
     version="1.0.0",  # Updated to reflect simplified architecture
     description="Backend API and SSE server for the A2A Web UI, hosted by Solace AI Connector.",
 )
+
+def load_extensions(app: FastAPI, component: "WebUIBackendComponent", persistence_service=None):
+    """
+    Searches for and loads all registered extensions for the application.
+    """
+    log.info("--- Searching for extensions under 'solace_agent_mesh.extensions' ---")
+    try:
+        discovered_extensions = entry_points(group="solace_agent_mesh.extensions")
+    except Exception:
+        log.info("--- No extensions found (or importlib.metadata not available). ---")
+        return
+
+    if not discovered_extensions:
+        log.info("--- No extensions found. ---")
+        return
+
+    for extension in discovered_extensions:
+        log.info(f"Found extension: '{extension.name}'. Attempting to load...")
+        try:
+            init_function = extension.load()
+            init_function(app, component, persistence_service)
+            log.info(f"Successfully loaded and initialized extension: '{extension.name}'.")
+        except Exception as e:
+            log.error(f"ERROR: Failed to load extension '{extension.name}': {e}", exc_info=True)
+            raise
 
 
 def setup_dependencies(component: "WebUIBackendComponent", persistence_service=None):
@@ -142,6 +168,9 @@ def setup_dependencies(component: "WebUIBackendComponent", persistence_service=N
 
     dependencies.set_api_config(api_config_dict)
     log.info("API configuration extracted and stored.")
+
+    # Discover and load all enterprise extensions
+    load_extensions(app, component, persistence_service)
 
     class AuthMiddleware:
         def __init__(self, app, component):
@@ -492,7 +521,7 @@ def setup_dependencies(component: "WebUIBackendComponent", persistence_service=N
 
     # Mount new A2A SDK routers with different paths to avoid conflicts
     app.include_router(config.router, prefix=api_prefix, tags=["Config"])
-    app.include_router(agents.router, prefix=api_prefix, tags=["Agents"])
+    app.include_router(agent_cards.router, prefix=api_prefix, tags=["Agent Cards"])
     # New A2A message endpoints (non-conflicting paths)
     app.include_router(
         tasks.router, prefix=api_prefix, tags=["A2A Messages"]
