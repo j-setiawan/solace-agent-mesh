@@ -17,7 +17,7 @@ MCP integration allows your agents to connect to external MCP servers and use th
 
 ## Setting Up the Environment
 
-You must [install Solace Agent Mesh and SAM CLI](../getting-started/installation.md), and then [create a new Solace Agent Mesh project](../getting-started/quick-start.md).
+You must [install Solace Agent Mesh and Solace Agent Mesh CLI](../getting-started/installation.md), and then [create a new Solace Agent Mesh project](../getting-started/quick-start.md).
 
 For this tutorial using the filesystem MCP server, you also need Node.js and NPM installed.
 
@@ -102,7 +102,7 @@ apps:
       agent_name: "FileSystemAgent"
       display_name: "File System"
       model: *general_model
-      
+
       instruction: |
         You can interact with the local filesystem using MCP tools.
         Use the available tools to read, write, and manage files as requested.
@@ -145,7 +145,7 @@ You can limit which tools from an MCP server are available by specifying a speci
 ```yaml
 tools:
   - tool_type: mcp
-    tool_name: "read_file"  # Only expose the read_file tool
+    tool_name: "read_file" # Only expose the read_file tool
     connection_params:
       type: stdio
       command: "npx"
@@ -171,12 +171,14 @@ tools:
 ## Running Your MCP-Enabled Agent
 
 1. **Create the working directory** (for filesystem example):
+
    ```sh
    mkdir -p /tmp/samv2
    echo "Hello MCP!" > /tmp/samv2/test.txt
    ```
 
 2. **Set required environment variables**:
+
    ```sh
    export NAMESPACE="myorg/dev"
    export SOLACE_BROKER_URL="ws://localhost:8080"
@@ -196,7 +198,6 @@ When your agent starts:
 2. **Discovery**: It queries the MCP server for available tools, resources, and prompts
 3. **Registration**: Available capabilities are registered as agent tools.
 4. **Communication**: The agent can use these tools through the standard A2A protocol, with the framework handling MCP protocol translation
-
 
 ## Testing Your MCP Integration
 

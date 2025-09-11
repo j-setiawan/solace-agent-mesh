@@ -5,19 +5,19 @@ sidebar_position: 50
 
 # MongoDB Integration
 
-This tutorial sets up a MongoDB agent in Solace Agent Mesh (SAM), which allows the SAM agent to answer natural language queries about a Mongo database. The agent translates user questions into MongoDB aggregation pipelines and executes them against your database.
+This tutorial sets up a MongoDB agent in Solace Agent Mesh which allows the Solace Agent Mesh agent to answer natural language queries about a Mongo database. The agent translates user questions into MongoDB aggregation pipelines and executes them against your database.
 
 ## Prerequisites
 
 Before starting this tutorial, ensure that you have installed and configured Solace Agent Mesh:
 
-- [Installed Solace Agent Mesh and the SAM CLI](../getting-started/installation.md)
+- [Installed Solace Agent Mesh and the Solace Agent Mesh CLI](../getting-started/installation.md)
 - [Created a new Solace Agent Mesh project](../getting-started/quick-start.md)
 - Access to a MongoDB database (local or remote)
 
 ## Adding the MongoDB Plugin
 
-Add the MongoDB plugin to your SAM project:
+Add the MongoDB plugin to your Solace Agent Mesh project:
 
 ```sh
 sam plugin add coffee-shop-mongo --plugin sam-mongodb
@@ -26,9 +26,9 @@ sam plugin add coffee-shop-mongo --plugin sam-mongodb
 You can use any name for your agent, in this tutorial we use `coffee-shop-mongo`.
 
 This command:
+
 - Installs the `sam-mongodb` plugin
 - Creates a new agent configuration file at `configs/agents/coffee-shop-mongo.yaml`
-
 
 #### Setting Up Your MongoDB Database
 
@@ -49,7 +49,7 @@ This tutorial assumes you have a MongoDB database with a collection containing c
     {
       "product": "Espresso",
       "quantity": 2,
-      "price": 3.50,
+      "price": 3.5,
       "category": "Coffee"
     },
     {
@@ -129,6 +129,7 @@ sam run configs/agents/coffee-shop-mongo.yaml
 ```
 
 The agent:
+
 1. Connects to the A2A control plane
 2. Initializes the MongoDB connection
 3. Detects the database schema automatically
@@ -136,7 +137,7 @@ The agent:
 
 ## Interacting with the Database
 
-After your MongoDB agent is running, you can interact with the database through any gateway in your SAM project (such as the Web UI gateway at `http://localhost:8000`).
+After your MongoDB agent is running, you can interact with the database through any gateway in your Solace Agent Mesh project (such as the Web UI gateway at `http://localhost:8000`).
 
 You can ask natural language questions about your MongoDB database, such as:
 
@@ -169,7 +170,7 @@ log:
 
 apps:
   - name: coffee-shop-mongo-app
-    app_module: solace_agent_mesh.agent.sac.app 
+    app_module: solace_agent_mesh.agent.sac.app
     broker:
       <<: *broker_connection
 
@@ -248,7 +249,7 @@ apps:
 
 ## Customizing the Agent Card
 
-The `agent_card` section is crucial as it defines how other agents in your SAM ecosystem discover and understand this MongoDB agent's capabilities. When other agents use agent discovery, they can see this information to decide whether to delegate tasks to your database agent.
+The `agent_card` section is crucial as it defines how other agents in your Solace Agent Mesh ecosystem discover and understand this MongoDB agent's capabilities. When other agents use agent discovery, they can see this information to decide whether to delegate tasks to your database agent.
 
 ### Key Agent Card Elements
 
@@ -270,6 +271,7 @@ agent_card:
 ```
 
 This detailed information helps other agents understand:
+
 - What business domain this agent covers (coffee shop operations)
 - What types of data are available (orders, customers, products, payments)
 - What kinds of questions can be answered (analytics, behavior, performance, metrics)
@@ -282,16 +284,19 @@ When configuring your own MongoDB agent, customize the description and examples 
 The MongoDB agent supports various types of queries through natural language:
 
 ### Aggregation Queries
+
 - "Show me the top 5 products by sales volume"
 - "Calculate the average order value by customer segment"
 - "Group orders by month and show revenue trends"
 
 ### Filtering and Search
+
 - "Find all orders placed in the last 24 hours"
 - "Show me orders with a total amount greater than $50"
 - "Find customers who ordered espresso drinks"
 
 ### Complex Analytics
+
 - "What's the conversion rate from browsing to purchase?"
 - "Show me the busiest hours of the day"
 - "Calculate customer lifetime value"
@@ -299,6 +304,7 @@ The MongoDB agent supports various types of queries through natural language:
 ### Output Formats
 
 The agent supports multiple output formats:
+
 - **JSON**: Default format, good for structured data
 - **YAML**: Human-readable format
 - **CSV**: Suitable for spreadsheet import
@@ -311,30 +317,38 @@ You can specify the format in your query: "Show me today's sales in CSV format"
 ### Common Issues and Solutions
 
 #### Connection Errors
+
 **Issue**: "Unable to connect to MongoDB" errors
 **Solution**:
+
 - Verify your MongoDB server is running
 - Check connection parameters (host, port, credentials)
 - Ensure network connectivity and firewall settings
 - Test connection using MongoDB client tools
 
 #### Authentication Errors
+
 **Issue**: "Authentication failed" errors
 **Solution**:
+
 - Verify username and password are correct
 - Check that the user has appropriate database permissions
 - Ensure the authentication database is correct
 
 #### Query Errors
+
 **Issue**: "Invalid aggregation pipeline" errors
 **Solution**:
+
 - The agent automatically retries with corrected pipelines
 - Check that your natural language query is clear and specific
 - Verify that referenced fields exist in your collection
 
 #### Schema Detection Issues
+
 **Issue**: Agent does not understand your data structure
 **Solution**:
+
 - Ensure `auto_detect_schema` is set to `true`
 - Provide detailed `data_description` in your configuration
 - Check that your collection has representative sample documents

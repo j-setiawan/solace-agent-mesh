@@ -5,47 +5,51 @@ sidebar_position: 40
 
 # SQL Database Integration
 
-This tutorial sets up a SQL database agent in Solace Agent Mesh (SAM), which allows the SAM agent to answer natural language queries about a sample coffee company database. This tutorial provides some sample data to set up an SQLite database, but you can use the same approach to connect to other database types, such as MySQL or PostgreSQL.
+This tutorial sets up a SQL database agent in Solace Agent Mesh which allows the Solace Agent Mesh agent to answer natural language queries about a sample coffee company database. This tutorial provides some sample data to set up an SQLite database, but you can use the same approach to connect to other database types, such as MySQL or PostgreSQL.
 
 ## Prerequisites
 
 Before starting this tutorial, ensure that you have installed and configured Solace Agent Mesh:
 
-- [Installed Solace Agent Mesh and the SAM CLI](../getting-started/installation.md)
+- [Installed Solace Agent Mesh and the Solace Agent Mesh CLI](../getting-started/installation.md)
 - [Created a new Solace Agent Mesh project](../getting-started/quick-start.md)
 - Access to a SQL database (local or remote)
 
 ## Adding the SQL Database Plugin
 
-Add the SQL Database plugin to your SAM project:
+Add the SQL Database plugin to your Solace Agent Mesh project:
 
 ```sh
 sam plugin add abc-coffee-info --plugin sam-sql-database
 ```
+
 You can use any name for your agent, in this tutorial we use `abc-coffee-info`.
 
 This command:
+
 - Installs the `sam-sql-database` plugin
 - Creates a new agent configuration file at `configs/agents/abc-coffee-info.yaml`
 
 ## Downloading Example Data
 
-For this tutorial, you can use a sample SQLite database for a fictional coffee company called ABC Coffee Co. 
+For this tutorial, you can use a sample SQLite database for a fictional coffee company called ABC Coffee Co.
 
 First, download the example data.
 
 You can either visit this link to download with your browser:
 
-  https://github.com/SolaceLabs/solace-agent-mesh-core-plugins/raw/refs/heads/main/sam-sql-database/example-data/abc_coffee_co.zip
+https://github.com/SolaceLabs/solace-agent-mesh-core-plugins/raw/refs/heads/main/sam-sql-database/example-data/abc_coffee_co.zip
 
 Or you can use the command line to download the ZIP file:
 
 #### Using wget
+
 ```sh
 wget https://github.com/SolaceLabs/solace-agent-mesh-core-plugins/raw/refs/heads/main/sam-sql-database/example-data/abc_coffee_co.zip
 ```
 
 #### Using curl
+
 ```sh
 curl -LO https://github.com/SolaceLabs/solace-agent-mesh-core-plugins/raw/refs/heads/main/sam-sql-database/example-data/abc_coffee_co.zip
 ```
@@ -103,6 +107,7 @@ sam run configs/agents/abc-coffee-info.yaml
 ```
 
 The agent:
+
 1. Connects to the A2A control plane
 2. Initializes the SQLite database and imports CSV data from the specified directory
 3. Detects the database schema automatically
@@ -110,7 +115,7 @@ The agent:
 
 ## Interacting with the Database
 
-After your SQL database agent is running, you can interact with the ABC Coffee database through any gateway in your SAM project (such as the Web UI gateway at `http://localhost:8000`).
+After your SQL database agent is running, you can interact with the ABC Coffee database through any gateway in your Solace Agent Mesh project (such as the Web UI gateway at `http://localhost:8000`).
 
 You can ask natural language questions about the ABC Coffee Co. database, such as:
 
@@ -141,7 +146,7 @@ log:
 
 apps:
   - name: abc-coffee-info-app
-    app_module: solace_agent_mesh.agent.sac.app 
+    app_module: solace_agent_mesh.agent.sac.app
     broker:
       <<: *broker_connection
 
@@ -213,7 +218,7 @@ apps:
 
 ## Customizing the Agent Card
 
-The `agent_card` section is crucial as it defines how other agents in your SAM ecosystem discover and understand this database agent's capabilities. When other agents use agent discovery, they can see this information to decide whether to delegate tasks to your database agent.
+The `agent_card` section is crucial as it defines how other agents in your Solace Agent Mesh ecosystem discover and understand this database agent's capabilities. When other agents use agent discovery, they can see this information to decide whether to delegate tasks to your database agent.
 
 ### Key Agent Card Elements
 
@@ -235,6 +240,7 @@ agent_card:
 ```
 
 This detailed information helps other agents understand:
+
 - What business domain this agent covers (coffee shop operations)
 - What types of data are available (customers, orders, products, inventory, sales)
 - What kinds of questions can be answered (metrics, analytics, performance data)

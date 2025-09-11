@@ -13,7 +13,7 @@ If you already have an [event mesh](https://solace.com/what-is-an-event-mesh/) i
 - **Event-Driven Automation**: Intelligent event processing based on patterns and AI-driven insights
 - **Scalability**: Solace Agent Mesh can dynamically participate in large-scale event-driven systems
 
-The Event Mesh Gateway connects Solace Agent Mesh (SAM) to your existing event mesh infrastructure. Through its asynchronous interfaces, applications within your event mesh can seamlessly access and utilize Solace Agent Mesh capabilities.
+The Event Mesh Gateway connects Solace Agent Mesh to your existing event mesh infrastructure. Through its asynchronous interfaces, applications within your event mesh can seamlessly access and utilize Solace Agent Mesh capabilities.
 
 This tutorial shows you how to build an Event Mesh Gateway that automatically generates and adds concise summaries to Jira bug reports, making them easier to understand at a glance.
 
@@ -34,7 +34,7 @@ This creates a streamlined workflow where bug reports are automatically enhanced
 
 ## Setting Up the Environment
 
-First, you need to [install Solace Agent Mesh and the SAM CLI](../getting-started/installation.md), and then [create a new Solace Agent Mesh project](../getting-started/quick-start.md).
+First, you need to [install Solace Agent Mesh and the Solace Agent Mesh CLI](../getting-started/installation.md), and then [create a new Solace Agent Mesh project](../getting-started/quick-start.md).
 
 For this tutorial, you need to create or use an existing [Solace Event Broker](https://solace.com/products/event-broker/) or [event mesh](https://solace.com/solutions/initiative/event-mesh/) created using PubSub+ event brokers.
 
@@ -49,6 +49,7 @@ sam plugin add jira-event-mesh --plugin sam-event-mesh-gateway
 You can use any name for your agent, in this tutorial we use `jira-event-mesh`.
 
 This command:
+
 1. Installs the `sam-event-mesh-gateway` plugin
 2. Creates a new gateway configuration named `jira-event-mesh` in your `configs/gateways/` directory
 
@@ -104,7 +105,7 @@ output_handlers:
     payload_expression: "task_response:text"
     payload_encoding: "utf-8"
     payload_format: "json"
-    
+
   - name: "error_response_handler"
     topic_expression: "template:jira/issue/error/{{text://user_data.forward_context:jira_id}}"
     payload_expression: "task_response:a2a_task_response.error"
@@ -167,7 +168,7 @@ apps:
           payload_expression: "task_response:text"
           payload_encoding: "utf-8"
           payload_format: "json"
-          
+
         - name: "error_response_handler"
           topic_expression: "template:jira/issue/error/{{text://user_data.forward_context:jira_id}}"
           payload_expression: "task_response:a2a_task_response.error"
@@ -184,6 +185,7 @@ sam run configs/gateways/jira-event-mesh.yaml
 ```
 
 The gateway:
+
 1. Connects to both the A2A control plane and the data plane event mesh
 2. Subscribes to the configured topics on the data plane
 3. Starts processing incoming events and routing them to agents
@@ -245,4 +247,3 @@ The `forward_context` configuration allows you to extract data from incoming mes
 ### Error Handling
 
 Configure separate output handlers for success and error scenarios to ensure proper error reporting and system monitoring.
-
