@@ -19,7 +19,6 @@ The SAM CLI is installed as part of the package for Solace Agent Mesh. For more 
 - You can get help on any command by running `solace-agent-mesh [COMMAND] --help`.
   :::
 
-
 ## Commands
 
 ### `init` - Initialize a SAM Application
@@ -73,7 +72,7 @@ Use the `--skip` option and provide the necessary options to run the command in 
 - `--agent-card-default-output-modes TEXT` – Agent card default output modes (comma-separated).
 - `--agent-discovery-enabled` – Enable agent discovery.
 - `--agent-card-publishing-interval INTEGER` – Agent card publishing interval (seconds).
-- `--inter-agent-communication-allow-list TEXT` – Inter-agent communication allow list (comma-separated, use * for all).
+- `--inter-agent-communication-allow-list TEXT` – Inter-agent communication allow list (comma-separated, use \* for all).
 - `--inter-agent-communication-deny-list TEXT` – Inter-agent communication deny list (comma-separated).
 - `--inter-agent-communication-timeout INTEGER` – Inter-agent communication timeout (seconds).
 - `--add-webui-gateway` – Add a default Web UI gateway configuration.
@@ -155,8 +154,6 @@ sam add gateway [OPTIONS] [NAME]
 
 For more information, see [Gateways](../concepts/gateways.md).
 
-
-
 ### `run` - Run the SAM Application
 
 To run the SAM application, use the `run` command.
@@ -207,10 +204,8 @@ If a requested page is not found, it will redirect to the main documentation pag
 
 ##### Options:
 
--   `-p, --port INTEGER` – Port to run the web server on. (default: 8585)
--   `-h, --help` – Displays the help message and exits.
-
-
+- `-p, --port INTEGER` – Port to run the web server on. (default: 8585)
+- `-h, --help` – Displays the help message and exits.
 
 ### `plugin` - Manage Plugins
 
@@ -254,7 +249,7 @@ Compiles and prepares the plugin for use.
 sam plugin build [PLUGIN_PATH]
 ```
 
-Builds the SAM plugin in the specified directory (defaults to current directory).
+Builds the Solace Agent Mesh plugin in the specified directory (defaults to current directory).
 
 ##### Options:
 
@@ -277,7 +272,7 @@ sam plugin add [OPTIONS] COMPONENT_NAME
 
 #### `catalog` - Launch Plugin Catalog
 
-Launch the SAM Plugin Catalog web interface.
+Launch the Solace Agent Mesh Plugin Catalog web interface.
 
 ```sh
 sam plugin catalog [OPTIONS]
@@ -288,4 +283,3 @@ sam plugin catalog [OPTIONS]
 - `--port INTEGER` – Port to run the plugin catalog web server on. (default: 5003)
 - `--install-command TEXT` – Command to use to install a python package. Must follow the format `command {package} args`.
 - `-h, --help` – Displays the help message and exits.
-
