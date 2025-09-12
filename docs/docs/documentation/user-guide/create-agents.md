@@ -113,7 +113,7 @@ Lifecycle functions allow you to manage resources that should persist for the ag
 Lifecycle functions are optional but recommended for managing resources effectively.
 :::
 
-## Step-by-Step Guide
+## Creating an Agent Plugin: Step-by-Step
 
 Create a simple agent that can greet users and demonstrate the core concepts.
 
