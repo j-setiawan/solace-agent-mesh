@@ -5,7 +5,7 @@ sidebar_position: 30
 
 # Using Text-to-Speech (TTS) Tools
 
-This guide provides technical documentation for the text-to-speech (TTS) tools available in Solace Agent Mesh (SAM).
+This guide provides technical documentation for the text-to-speech (TTS) tools available in Solace Agent Mesh.
 
 ## Overview
 
@@ -17,10 +17,12 @@ The `audio` tool group provides two primary TTS tools for generating high-qualit
 ## Setup and Configuration
 
 ### Prerequisites
+
 - **API Key**: A valid Google Gemini API key with access to the TTS model is required.
 - **Dependencies**: The `pydub` library is necessary for audio processing and format conversion. It can be installed via `pip install pydub`.
 
 ### Basic Configuration
+
 1.  **Environment Variable**: The Gemini API key must be set as an environment variable.
     ```bash
     export GEMINI_API_KEY="your_gemini_api_key_here"
@@ -46,8 +48,8 @@ This example shows how to set a default voice and define the mapping between ton
   tool_config:
     gemini_api_key: ${GEMINI_API_KEY}
     model: "gemini-2.5-flash-preview-tts"
-    voice_name: "Kore"  # Default voice if no tone is matched
-    language: "en-US"   # Default language
+    voice_name: "Kore" # Default voice if no tone is matched
+    language: "en-US" # Default language
     output_format: "mp3"
     # Voice selection by tone mapping
     voice_tone_mapping:
@@ -85,18 +87,21 @@ This example defines default voice configurations for up to five speakers.
 ## Features
 
 ### Intelligent Tone Selection
+
 The system supports tone-based voice selection, allowing for dynamic voice choice based on desired emotional or stylistic output, rather than explicit voice names.
 
 **Available Tones**:
 `bright`, `upbeat`, `informative`, `firm`, `excitable`, `youthful`, `breezy`, `easy-going`, `breathy`, `clear`, `smooth`, `gravelly`, `soft`, `even`, `mature`, `forward`, `friendly`, `casual`, `gentle`, `lively`, `knowledgeable`, `warm`
 
 **Tone Aliases**:
+
 - `professional` → `firm`
 - `cheerful` → `upbeat`
 - `calm` → `soft`
 - `conversational` → `casual`
 
 ### Multi-Language Support
+
 The tools support over 25 languages, specified via BCP-47 language codes (for example, `en-US`, `fr-FR`, `es-US`, `ja-JP`).
 
 ## Usage Examples
@@ -104,11 +109,13 @@ The tools support over 25 languages, specified via BCP-47 language codes (for ex
 ### Single-Voice Text-to-Speech (`text_to_speech`)
 
 **Basic Usage**
+
 ```
 Convert the following text to speech: "Welcome to the technical briefing on artificial intelligence."
 ```
 
 **With Tone Selection**
+
 ```
 Convert this text to speech with a professional tone: "Thank you for joining today's technical review."
 ```
@@ -116,6 +123,7 @@ Convert this text to speech with a professional tone: "Thank you for joining tod
 ### Multi-Speaker Text-to-Speech (`multi_speaker_text_to_speech`)
 
 **Basic Conversation**
+
 ```
 Convert this conversation to speech:
 Speaker1: Welcome to the podcast.
@@ -123,6 +131,7 @@ Speaker2: Thank you for having me.
 ```
 
 **With Custom Speaker Tones**
+
 ```
 Convert this conversation using specific tones for each speaker:
 - Speaker1 should sound professional
@@ -136,25 +145,28 @@ Speaker2: Hi everyone, let's review the agenda for today's session.
 ## Tool Reference
 
 ### `text_to_speech`
-| Parameter         | Type   | Description                   |
-| ----------------- | ------ | ----------------------------- |
-| `text`            | string | The text to be synthesized.   |
-| `output_filename` | string | (Optional) A custom MP3 filename. |
+
+| Parameter         | Type   | Description                              |
+| ----------------- | ------ | ---------------------------------------- |
+| `text`            | string | The text to be synthesized.              |
+| `output_filename` | string | (Optional) A custom MP3 filename.        |
 | `voice_name`      | string | (Optional) A specific voice name to use. |
-| `tone`            | string | (Optional) The desired voice tone.  |
-| `language`        | string | (Optional) The BCP-47 language code. |
+| `tone`            | string | (Optional) The desired voice tone.       |
+| `language`        | string | (Optional) The BCP-47 language code.     |
 
 ### `multi_speaker_text_to_speech`
-| Parameter           | Type  | Description                               |
-| ------------------- | ----- | ----------------------------------------- |
-| `conversation_text` | string| A string of text with speaker labels (for example, `S1: ...`). |
-| `output_filename`   | string| (Optional) A custom MP3 filename.           |
-| `speaker_configs`   | array | (Optional) An array to configure tones for specific speakers.  |
-| `language`          | string| (Optional) The BCP-47 language code.          |
+
+| Parameter           | Type   | Description                                                    |
+| ------------------- | ------ | -------------------------------------------------------------- |
+| `conversation_text` | string | A string of text with speaker labels (for example, `S1: ...`). |
+| `output_filename`   | string | (Optional) A custom MP3 filename.                              |
+| `speaker_configs`   | array  | (Optional) An array to configure tones for specific speakers.  |
+| `language`          | string | (Optional) The BCP-47 language code.                           |
 
 ## Output and Metadata
 
 Both tools generate an MP3 audio artifact that includes a rich set of metadata:
+
 - The source text (or a truncated version for long inputs)
 - The voice(s) and language used for synthesis
 - The generation timestamp and the specific tool invoked

@@ -5,7 +5,7 @@ sidebar_position: 40
 
 # Create Gateways
 
-Gateways in Solace Agent Mesh (SAM) serve as bridges between external systems and the A2A (Agent-to-Agent) ecosystem. They enable your agents to receive information from and send responses to diverse external platforms like chat systems, web applications, IoT devices, APIs, and file systems.
+Gateways in Solace Agent Mesh serve as bridges between external systems and the A2A (Agent-to-Agent) ecosystem. They enable your agents to receive information from and send responses to diverse external platforms like chat systems, web applications, IoT devices, APIs, and file systems.
 
 This guide walks you through the steps of creating custom gateways, from basic concepts to advanced implementations.
 
@@ -23,13 +23,14 @@ A gateway acts as a translator and coordinator that:
 
 ## Quick Start: Creating Your First Gateway
 
-You can create a gateway directly using the SAM CLI `sam add gateway`:
+You can create a gateway directly using the Solace Agent Mesh CLI `sam add gateway`:
 
 ```bash
 sam add gateway my-custom-gateway
 ```
 
 This command:
+
 - Launches an interactive setup (or use `--gui` for browser-based configuration)
 - Generates the necessary files and configuration
 - Sets up the basic gateway structure
@@ -49,21 +50,27 @@ sam add gateway my-gateway \
 ```
 
 For a complete list of options, run:
+
 ```bash
 sam add gateway --help
 ```
+
 ## Gateway Architecture
 
-Every SAM gateway consists of two main components:
+Every Solace Agent Mesh gateway consists of two main components:
 
 ### Gateway App
+
 Gateway App (`app.py`):
+
 - Defines configuration schema
 - Manages gateway-level settings
 - Links to the gateway component
 
 ### Gateway Component
+
 Gateway Component (`component.py`):
+
 - Contains the core business logic
 - Handles external system integration
 - Implements required abstract methods
@@ -76,11 +83,12 @@ You can create a gateway using either `sam add gateway <your_gateway_name>` comm
 
 :::tip[Gateway as plugin]
 
-Gateways can also be implemented as plugins. This allows you to easily package your gateway logic and reuse it across different projects. 
+Gateways can also be implemented as plugins. This allows you to easily package your gateway logic and reuse it across different projects.
 
 To create a plugin of type gateway, use the `sam plugin create <your_gateway_plugin_name> --type gateway` command.
 
 For a complete list of options, run:
+
 ```bash
 sam plugin create --help
 ```
@@ -88,13 +96,13 @@ sam plugin create --help
 To create a gateway instance based on a plugin, use the `sam plugin add <your_gateway_name> --plugin <your_gateway_plugin>` command.
 
 For a complete list of options, run:
+
 ```bash
 sam plugin add --help
 ```
 
 Although the specific directory structure may differ from standalone gateways, the core concepts remain the same. The core files remain the same: app.py, component.py, and the YAML configuration file.
 :::
-
 
 ### Step 1: Generate the Gateway Structure
 
@@ -105,6 +113,7 @@ sam add gateway dir-monitor
 ```
 
 This creates:
+
 - `configs/gateways/dir_monitor_config.yaml` - Configuration file
 - `src/dir_monitor/app.py` - Gateway app class
 - `src/dir_monitor/component.py` - Gateway component class
@@ -231,7 +240,7 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
 
         # Check if watchdog is available
         if not WATCHDOG_AVAILABLE:
-            log.error("%s Watchdog library not found. Install with: pip install watchdog", 
+            log.error("%s Watchdog library not found. Install with: pip install watchdog",
                      self.log_identifier)
             raise ImportError("Watchdog library required for directory monitoring")
 
@@ -245,9 +254,9 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
             # Validate directories
             if not os.path.isdir(self.directory_path):
                 raise ValueError(f"Monitor directory not found: {self.directory_path}")
-            
+
             os.makedirs(self.error_directory_path, exist_ok=True)
-            log.info("%s Monitoring: %s, Error dir: %s", 
+            log.info("%s Monitoring: %s, Error dir: %s",
                     self.log_identifier, self.directory_path, self.error_directory_path)
 
         except Exception as e:
@@ -262,7 +271,7 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
 
     class DirWatchEventHandler(FileSystemEventHandler):
         """Handles file system events from Watchdog."""
-        
+
         def __init__(self, component_ref: 'DirMonitorGatewayComponent'):
             super().__init__()
             self.component_ref = component_ref
@@ -282,7 +291,7 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
                     self.component_ref.async_loop
                 )
             else:
-                log.error("%s Async loop not available for file: %s", 
+                log.error("%s Async loop not available for file: %s",
                          self.log_identifier, file_path)
 
     def generate_uuid(self) -> str:
@@ -318,16 +327,16 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
         """Run the watchdog observer."""
         if not self.observer:
             return
-            
+
         log_id_prefix = f"{self.log_identifier}[Observer]"
         try:
             log.info("%s Starting file system observer...", log_id_prefix)
             self.observer.start()
-            
+
             # Wait for stop signal
             while not self.stop_signal.is_set() and self.observer.is_alive():
                 self.stop_signal.wait(timeout=1)
-                
+
             log.info("%s Observer loop exiting", log_id_prefix)
         except Exception as e:
             log.exception("%s Observer error: %s", log_id_prefix, e)
@@ -342,24 +351,24 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
         """Stop the directory monitoring listener."""
         log_id_prefix = f"{self.log_identifier}[StopListener]"
         log.info("%s Stopping directory monitor...", log_id_prefix)
-        
+
         if self.observer and self.observer.is_alive():
             log.info("%s Stopping observer...", log_id_prefix)
             self.observer.stop()
-        
+
         if self.watchdog_thread and self.watchdog_thread.is_alive():
             log.info("%s Joining observer thread...", log_id_prefix)
             self.watchdog_thread.join(timeout=5)
             if self.watchdog_thread.is_alive():
                 log.warning("%s Observer thread did not join cleanly", log_id_prefix)
-        
+
         log.info("%s Directory monitor stopped", log_id_prefix)
 
     async def _process_new_file(self, file_path: str):
         """Process a newly detected file."""
         log_id_prefix = f"{self.log_identifier}[ProcessFile:{os.path.basename(file_path)}]"
         log.info("%s Processing new file: %s", log_id_prefix, file_path)
-        
+
         error_context = {
             "file_path": file_path,
             "a2a_session_id": f"dir_monitor-error-{self.generate_uuid()}"
@@ -387,7 +396,7 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
                 return
 
             # Step 3: Submit A2A task
-            log.info("%s Submitting A2A task for file: %s to agent: %s", 
+            log.info("%s Submitting A2A task for file: %s to agent: %s",
                     log_id_prefix, file_path, target_agent_name)
             await self.submit_a2a_task(
                 target_agent_name=target_agent_name,
@@ -408,7 +417,7 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
         """Extract user identity claims from file event."""
         file_path = str(external_event_data)
         log_id_prefix = f"{self.log_identifier}[ExtractClaims:{os.path.basename(file_path)}]"
-        
+
         claims = {
             "id": self.default_user_identity_id,
             "source": "dir_monitor",
@@ -426,7 +435,7 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
 
         user_id_for_a2a = authenticated_user_identity.get("id", self.default_user_identity_id)
         a2a_session_id = f"dir_monitor-session-{self.generate_uuid()}"
-        
+
         # Prepare external request context
         external_request_context: Dict[str, Any] = {
             "file_path": file_path,
@@ -446,7 +455,7 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
             # Read file content
             with open(file_path, "rb") as f:
                 content_bytes = f.read()
-            
+
             # Determine MIME type
             mime_type, _ = mimetypes.guess_type(file_path)
             if mime_type is None:
@@ -454,7 +463,7 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
 
             # Save file as artifact
             if not self.shared_artifact_service:
-                log.error("%s Artifact service not available for file: %s", 
+                log.error("%s Artifact service not available for file: %s",
                          log_id_prefix, os.path.basename(file_path))
                 return None, [], external_request_context
 
@@ -479,14 +488,14 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
             )
 
             if save_result["status"] not in ["success", "partial_success"]:
-                log.error("%s Failed to save file as artifact: %s", 
+                log.error("%s Failed to save file as artifact: %s",
                          log_id_prefix, save_result.get("message"))
                 return None, [], external_request_context
 
             # Create artifact URI
             data_version = save_result.get("data_version", 0)
             artifact_uri = f"artifact://{self.gateway_id}/{str(user_id_for_a2a)}/{a2a_session_id}/{os.path.basename(file_path)}?version={data_version}"
-            
+
             log.info("%s Saved file as artifact: %s", log_id_prefix, artifact_uri)
 
             # Create A2A parts
@@ -522,9 +531,9 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
                 if isinstance(part, TextPart):
                     summary_text = part.text
                     break
-        
-        log.info("%s Task %s completed for file '%s'. Status: %s", 
-                log_id_prefix, task_id, os.path.basename(file_path), 
+
+        log.info("%s Task %s completed for file '%s'. Status: %s",
+                log_id_prefix, task_id, os.path.basename(file_path),
                 task_data.status.state if task_data.status else "Unknown")
         log.info("%s Summary: %s", log_id_prefix, summary_text[:200] + "..." if len(summary_text) > 200 else summary_text)
 
@@ -534,9 +543,9 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
         """Handle errors by moving files to error directory."""
         log_id_prefix = f"{self.log_identifier}[SendError]"
         file_path = external_request_context.get("file_path")
-        
+
         log.error("%s A2A Error for file '%s'. Code: %s, Message: %s",
-                 log_id_prefix, 
+                 log_id_prefix,
                  os.path.basename(file_path) if file_path else "Unknown file",
                  error_data.code, error_data.message)
 
@@ -546,7 +555,7 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
                 os.makedirs(self.error_directory_path, exist_ok=True)
                 base_name = os.path.basename(file_path)
                 error_file_path = os.path.join(self.error_directory_path, base_name)
-                
+
                 # Handle filename conflicts
                 counter = 0
                 while os.path.exists(error_file_path):
@@ -570,7 +579,7 @@ class DirMonitorGatewayComponent(BaseGatewayComponent):
         log_id_prefix = f"{self.log_identifier}[SendUpdate]"
         task_id = event_data.id
         file_path = external_request_context.get("file_path", "Unknown file")
-        
+
         log.debug("%s Received update for task %s (file %s). Updates not processed by this gateway.",
                  log_id_prefix, task_id, os.path.basename(file_path))
 
@@ -605,7 +614,7 @@ apps:
     app_config:
       namespace: ${NAMESPACE}
       gateway_id: dir-monitor-gateway
-      
+
       # Artifact service configuration
       artifact_service: *default_artifact_service
 
@@ -654,15 +663,15 @@ Gateways can implement sophisticated authentication:
 async def _extract_initial_claims(self, external_event_data: Any) -> Optional[Dict[str, Any]]:
     """Extract user claims with API key validation."""
     request = external_event_data.get("request")
-    
+
     # Validate API key
     api_key = request.headers.get("X-API-Key")
     if not api_key or not self._validate_api_key(api_key):
         return None
-    
+
     # Extract user information
     user_id = request.headers.get("X-User-ID", "anonymous")
-    
+
     return {
         "id": user_id,
         "source": "api_gateway",
@@ -676,12 +685,12 @@ async def _extract_initial_claims(self, external_event_data: Any) -> Optional[Di
 For gateways that handle files:
 
 ```python
-async def _save_file_as_artifact(self, file_content: bytes, filename: str, 
+async def _save_file_as_artifact(self, file_content: bytes, filename: str,
                                 mime_type: str, session_id: str) -> Optional[str]:
     """Save file content as artifact and return URI."""
     if not self.shared_artifact_service:
         return None
-    
+
     try:
         save_result = await save_artifact_with_metadata(
             artifact_service=self.shared_artifact_service,
@@ -697,14 +706,14 @@ async def _save_file_as_artifact(self, file_content: bytes, filename: str,
             },
             timestamp=datetime.now(timezone.utc)
         )
-        
+
         if save_result["status"] in ["success", "partial_success"]:
             version = save_result.get("data_version", 0)
             return f"artifact://{self.gateway_id}/system/{session_id}/{filename}?version={version}"
-            
+
     except Exception as e:
         log.error("Failed to save artifact: %s", e)
-    
+
     return None
 ```
 
@@ -744,7 +753,7 @@ async def _process_with_retry(self, data: Any, max_retries: int = 3):
         except TemporaryError as e:
             if attempt < max_retries - 1:
                 wait_time = 2 ** attempt  # Exponential backoff
-                log.warning("Attempt %d failed, retrying in %ds: %s", 
+                log.warning("Attempt %d failed, retrying in %ds: %s",
                            attempt + 1, wait_time, e)
                 await asyncio.sleep(wait_time)
             else:
@@ -754,21 +763,23 @@ async def _process_with_retry(self, data: Any, max_retries: int = 3):
             raise
 ```
 
-
 ## Best Practices
 
 ### 1. Configuration Management
+
 - Use environment variables for sensitive data
 - Provide sensible defaults
 - Validate configuration at startup
 
 ### 2. Error Handling
+
 - Implement comprehensive error handling
 - Use appropriate HTTP status codes
 - Log errors with sufficient context
 - Provide meaningful error messages
 
 ### 3. Security
+
 - Validate all external inputs
 - Use secure authentication methods
 - Implement rate limiting where appropriate
@@ -776,12 +787,14 @@ async def _process_with_retry(self, data: Any, max_retries: int = 3):
 - Follow principle of least privilege
 
 ### 4. Performance
+
 - Use async/await for I/O operations
 - Implement connection pooling for external APIs
 - Monitor resource usage
 - Handle backpressure appropriately
 
 ### 5. Monitoring and Logging
+
 - Use structured logging
 - Include correlation IDs
 - Monitor key metrics (latency, error rates, throughput)
@@ -803,7 +816,7 @@ class HTTPAPIGatewayComponent(BaseGatewayComponent):
         self.app = FastAPI()
         self.security = HTTPBearer()
         self._setup_routes()
-    
+
     def _setup_routes(self):
         @self.app.post("/webhook/{endpoint_id}")
         async def webhook_handler(endpoint_id: str, request: Request,
@@ -814,23 +827,23 @@ class HTTPAPIGatewayComponent(BaseGatewayComponent):
                 "endpoint_id": endpoint_id,
                 "request": request
             })
-            
+
             if not user_identity:
                 raise HTTPException(status_code=401, detail="Unauthorized")
-            
+
             # Process webhook
             body = await request.json()
             target_agent, parts, context = await self._translate_external_input(
                 body, user_identity
             )
-            
+
             task_id = await self.submit_a2a_task(
                 target_agent_name=target_agent,
                 a2a_parts=parts,
                 external_request_context=context,
                 user_identity=user_identity
             )
-            
+
             return {"task_id": task_id, "status": "accepted"}
 ```
 
@@ -846,7 +859,7 @@ class WebSocketGatewayComponent(BaseGatewayComponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.connections = {}
-    
+
     async def _start_listener(self):
         """Start WebSocket server."""
         self.server = await websockets.serve(
@@ -855,12 +868,12 @@ class WebSocketGatewayComponent(BaseGatewayComponent):
             self.get_config("websocket_port", 8765)
         )
         log.info("%s WebSocket server started", self.log_identifier)
-    
+
     async def handle_websocket(self, websocket, path):
         """Handle WebSocket connections."""
         connection_id = self.generate_uuid()
         self.connections[connection_id] = websocket
-        
+
         try:
             async for message in websocket:
                 data = json.loads(message)
@@ -869,32 +882,32 @@ class WebSocketGatewayComponent(BaseGatewayComponent):
             log.info("%s WebSocket connection closed: %s", self.log_identifier, connection_id)
         finally:
             self.connections.pop(connection_id, None)
-    
+
     async def process_websocket_message(self, connection_id: str, data: dict):
         """Process incoming WebSocket message."""
         user_identity = await self.authenticate_and_enrich_user({
             "connection_id": connection_id,
             "data": data
         })
-        
+
         if user_identity:
             target_agent, parts, context = await self._translate_external_input(
                 data, user_identity
             )
             context["connection_id"] = connection_id
-            
+
             await self.submit_a2a_task(
                 target_agent_name=target_agent,
                 a2a_parts=parts,
                 external_request_context=context,
                 user_identity=user_identity
             )
-    
+
     async def _send_final_response_to_external(self, context: Dict[str, Any], task_data: Task):
         """Send response back via WebSocket."""
         connection_id = context.get("connection_id")
         websocket = self.connections.get(connection_id)
-        
+
         if websocket:
             response = {
                 "task_id": task_data.id,
@@ -917,47 +930,47 @@ class MessageQueueGatewayComponent(BaseGatewayComponent):
         super().__init__(**kwargs)
         self.connection = None
         self.channel = None
-    
+
     async def _start_listener(self):
         """Connect to message queue and start consuming."""
         connection_url = self.get_config("rabbitmq_url")
         queue_name = self.get_config("input_queue_name")
-        
+
         self.connection = await aio_pika.connect_robust(connection_url)
         self.channel = await self.connection.channel()
-        
+
         queue = await self.channel.declare_queue(queue_name, durable=True)
         await queue.consume(self.process_message)
-        
+
         log.info("%s Started consuming from queue: %s", self.log_identifier, queue_name)
-    
+
     async def process_message(self, message: aio_pika.IncomingMessage):
         """Process incoming queue message."""
         async with message.process():
             try:
                 data = json.loads(message.body.decode())
-                
+
                 user_identity = await self.authenticate_and_enrich_user(data)
                 if not user_identity:
                     log.warning("%s Authentication failed for message", self.log_identifier)
                     return
-                
+
                 target_agent, parts, context = await self._translate_external_input(
                     data, user_identity
                 )
                 context["message_id"] = message.message_id
                 context["reply_to"] = message.reply_to
-                
+
                 await self.submit_a2a_task(
                     target_agent_name=target_agent,
                     a2a_parts=parts,
                     external_request_context=context,
                     user_identity=user_identity
                 )
-                
+
             except Exception as e:
                 log.exception("%s Error processing message: %s", self.log_identifier, e)
-    
+
     async def _send_final_response_to_external(self, context: Dict[str, Any], task_data: Task):
         """Send response back to reply queue."""
         reply_to = context.get("reply_to")
@@ -967,7 +980,7 @@ class MessageQueueGatewayComponent(BaseGatewayComponent):
                 "status": task_data.status.state.value if task_data.status else "unknown",
                 "result": self._extract_text_from_task(task_data)
             }
-            
+
             await self.channel.default_exchange.publish(
                 aio_pika.Message(json.dumps(response).encode()),
                 routing_key=reply_to
@@ -1023,21 +1036,25 @@ sam plugin add my-gateway --plugin dist/sam_my_gateway-0.1.0-py3-none-any.whl
 ### Common Issues
 
 #### Gateway Fails to Start
+
 - Check configuration schema validation
 - Verify all required parameters are provided
 - Ensure external dependencies are installed
 
 #### Tasks Not Reaching Agents
+
 - Verify namespace configuration matches agents
 - Check Solace broker connectivity
 - Confirm agent names are correct
 
 #### Authentication Failures
+
 - Validate user identity extraction logic
 - Check authorization service configuration
 - Verify claims format matches expectations
 
 #### File/Artifact Issues
+
 - Ensure artifact service is properly configured
 - Check file permissions and paths
 - Verify artifact URI construction
@@ -1045,6 +1062,7 @@ sam plugin add my-gateway --plugin dist/sam_my_gateway-0.1.0-py3-none-any.whl
 ### Debugging Tips
 
 1. **Enable Debug Logging**:
+
    ```yaml
    log:
      stdout_log_level: DEBUG
