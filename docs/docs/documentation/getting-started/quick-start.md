@@ -10,13 +10,12 @@ To get started with Solace Agent Mesh, you can either use the preset configurati
 ## Use Preset Agents
 
 ### Prerequisites
-
 1. You must have Docker (or Podman) installed.
 2. You must have an available AI provider and API key. For best results, use a state-of-the-art AI model like Anthropic Claude Sonnet 4, Google Gemini 2.5 pro, or OpenAI GPT-5.
 
 ### Run Preset Agents
 
-You can run pre-made Solace Agent Mesh agents to quickly get started with Solace Agent Mesh without needing to set up a project from scratch.
+You can run pre-made Solace Agent Mesh agents to quickly get started with Solace Agent Mesh without needing to set up a project from scratch. 
 
 ```sh
 docker run --rm -it -p 8000:8000 --platform linux/amd64  --env-file <your-env-file-path> solace/solace-agent-mesh:latest
@@ -43,7 +42,7 @@ docker run --rm -it --platform linux/amd64  -p 8000:8000 -v $(pwd):/app \
 - You can update `/app/my-agent` with the path to your agent YAML config. Note: You will still need either a `shared_config.yaml` file or to hard code the settings in your agent configuration.
 - `/preset/agents/basic` only runs the required agents, you can use `/preset/agents` to load all agents.
 - This example command only has the minimum required environment variables.
-  :::
+:::
 
 ## Create a Project
 
@@ -69,7 +68,6 @@ Run the `init` command and follow the prompts to create your project.
 ```sh
 solace-agent-mesh init
 ```
-
 During initialization, you can choose to configure your project directly in the terminal or through a web-based interface launched at `http://127.0.0.1:5002`. You are asked for your preference once you run `solace-agent-mesh init`.
 
 Alternatively, you can use the `--gui` flag to skip the prompt and directly open the web-based configuration interface:
@@ -99,8 +97,8 @@ You can run the `init` command in a non-interactive mode by passing `--skip` and
 To get a list of all the available options, run `solace-agent-mesh init --help`
 :::
 
-:::info[Model name format]
 
+:::info[Model name format]
 <details>
   <summary>Browser-based Configurations</summary>
 
@@ -151,10 +149,9 @@ If your host system architecture is not `linux/amd64`, add the `--platform linux
 
 :::info[Required Configurations]
 For deployments that use the official Docker image, ensure the following:
-
 - Do not use a local Solace PubSub+ broker container.
-- Set the environment variables `FASTAPI_HOST="0.0.0.0"` in your `.env` file or system environment variables. This is necessary to expose the FastAPI server to the host machine.
-  :::
+- Set the environment variables `FASTAPI_HOST="0.0.0.0"` in your `.env` file or system environment variables. This is necessary to expose the FastAPI server to the host machine. 
+:::
 
 :::warning
 If you are using third-party Python packages or Solace Agent Mesh plugins, you need to build a custom Docker image off the official image and install the required packages there, and then run that custom image instead.
@@ -176,9 +173,7 @@ Then build and run your custom image:
 docker build --platform linux/amd64 -t my-custom-image .
 docker run --rm -it -v "$(pwd):/app" --platform linux/amd64  -p 8000:8000 my-custom-image run
 ```
-
 :::
-
 </details>
 
 ## Interacting with Solace Agent Mesh
@@ -188,6 +183,7 @@ You can use different gateway interfaces to communicate with the system such as 
 To access the browser UI, navigate to `http://localhost:8000` in your web browser. If you specified a different port during the init step, use that port instead. For Docker deployments with custom port mappings (using the `-p` flag), use the host port specified in your port mapping configuration.
 
 Try some commands like `Suggest some good outdoor activities in London given the season and current weather conditions.`.
+
 
 ## Try a Tutorial
 

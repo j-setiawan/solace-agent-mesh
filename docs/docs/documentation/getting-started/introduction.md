@@ -24,6 +24,7 @@ Built on event-driven architecture technology from Solace with Google ADK integr
 
 Solace Agent Mesh tackles the hardest challenges in building collaborative AI systems: agent coordination, system integration, and extensibility at scale. This section reveals the key problems it solves and shows how organizations are using it today.
 
+
 - **Event-Driven Architecture at the Core:**  
   The beating heart of Solace Agent Mesh is its event mesh—a neural network for your AI components. This architecture creates a fluid, asynchronous communication layer where messages flow naturally between agents, gateways, and external systems. By decoupling senders from receivers, the mesh dramatically simplifies agent interactions, ensures message delivery even during component failures, and lets you add, remove, or restart components on the fly without disrupting workflows.
 
@@ -74,15 +75,16 @@ Solace Agent Mesh tackles the hardest challenges in building collaborative AI sy
 - **Resilient by Nature:**  
   Event-driven design creates responsive, self-healing interactions that recover gracefully from disruptions.
 
+
 ## Real-World Applications
 
 Organizations are using Solace Agent Mesh in diverse scenarios:
 
-- **Intelligent Enterprise Automation:**
+- **Intelligent Enterprise Automation:**  
   - Customer service systems that route inquiries to specialized agents based on intent and context.
   - Data processing pipelines where specialized agents transform, analyze, and enrich information from multiple sources.
 
-- **AI Task Specialization:**
+- **AI Task Specialization:**  
   - Image analysis workflows where one agent processes visual data and delegates text generation to a language specialist.
   - Document processing systems that extract text, summarize content, and translate results—each step handled by the perfect specialist.
 

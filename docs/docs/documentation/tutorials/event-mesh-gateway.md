@@ -49,7 +49,6 @@ sam plugin add jira-event-mesh --plugin sam-event-mesh-gateway
 You can use any name for your agent, in this tutorial we use `jira-event-mesh`.
 
 This command:
-
 1. Installs the `sam-event-mesh-gateway` plugin
 2. Creates a new gateway configuration named `jira-event-mesh` in your `configs/gateways/` directory
 
@@ -105,7 +104,7 @@ output_handlers:
     payload_expression: "task_response:text"
     payload_encoding: "utf-8"
     payload_format: "json"
-
+    
   - name: "error_response_handler"
     topic_expression: "template:jira/issue/error/{{text://user_data.forward_context:jira_id}}"
     payload_expression: "task_response:a2a_task_response.error"
@@ -168,7 +167,7 @@ apps:
           payload_expression: "task_response:text"
           payload_encoding: "utf-8"
           payload_format: "json"
-
+          
         - name: "error_response_handler"
           topic_expression: "template:jira/issue/error/{{text://user_data.forward_context:jira_id}}"
           payload_expression: "task_response:a2a_task_response.error"
@@ -185,7 +184,6 @@ sam run configs/gateways/jira-event-mesh.yaml
 ```
 
 The gateway:
-
 1. Connects to both the A2A control plane and the data plane event mesh
 2. Subscribes to the configured topics on the data plane
 3. Starts processing incoming events and routing them to agents
@@ -247,3 +245,4 @@ The `forward_context` configuration allows you to extract data from incoming mes
 ### Error Handling
 
 Configure separate output handlers for success and error scenarios to ensure proper error reporting and system monitoring.
+

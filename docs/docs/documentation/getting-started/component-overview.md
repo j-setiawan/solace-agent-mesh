@@ -9,7 +9,7 @@ Solace Agent Mesh is built on event-driven architecture principles using the A2A
 
 Solace Agent Mesh integrates the Google Agent Development Kit (ADK) with a Solace event mesh to provide a "Universal A2A Agent Host" that enables distributed AI agent communication. Each component is designed to perform specific roles while working together seamlessly through the A2A protocol.
 
-The key components that make up Agent Mesh are:
+The key components that make up Solace Agent Mesh are:
 
 1. **PubSub+ Event Broker or Event Mesh**: The central nervous system of the framework, facilitating A2A protocol communication between all components. [more 🔗](https://solace.com/products/event-broker/)
 
@@ -23,6 +23,6 @@ The key components that make up Agent Mesh are:
 
 6. **ADK Runtime**: The Google Agent Development Kit provides the core intelligence layer with tool execution, session management, and artifact handling capabilities.
 
-7. **Built-in Tools**: Comprehensive tool ecosystem including artifact management, data analysis, web tools, and peer agent delegation capabilities.
+8. **Built-in Tools**: Comprehensive tool ecosystem including artifact management, data analysis, web tools, and peer agent delegation capabilities.
 
-8. **Real-time Monitoring and Debugging Component**: Enables real-time monitoring of system activities and provides interactive debugging capabilities for administrators. [more 🔗](../deployment/observability.md)
+9.  **Real-time Monitoring and Debugging Component**: Enables real-time monitoring of system activities and provides interactive debugging capabilities for administrators. [more 🔗](../deployment/observability.md)

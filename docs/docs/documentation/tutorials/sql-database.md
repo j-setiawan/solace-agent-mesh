@@ -5,7 +5,7 @@ sidebar_position: 40
 
 # SQL Database Integration
 
-This tutorial sets up a SQL database agent in Solace Agent Mesh which allows the Solace Agent Mesh agent to answer natural language queries about a sample coffee company database. This tutorial provides some sample data to set up an SQLite database, but you can use the same approach to connect to other database types, such as MySQL or PostgreSQL.
+This tutorial sets up a SQL database agent in Solace Agent Mesh, which allows the Solace Agent Mesh agent to answer natural language queries about a sample coffee company database. This tutorial provides some sample data to set up an SQLite database, but you can use the same approach to connect to other database types, such as MySQL or PostgreSQL.
 
 ## Prerequisites
 
@@ -22,34 +22,30 @@ Add the SQL Database plugin to your Solace Agent Mesh project:
 ```sh
 sam plugin add abc-coffee-info --plugin sam-sql-database
 ```
-
 You can use any name for your agent, in this tutorial we use `abc-coffee-info`.
 
 This command:
-
 - Installs the `sam-sql-database` plugin
 - Creates a new agent configuration file at `configs/agents/abc-coffee-info.yaml`
 
 ## Downloading Example Data
 
-For this tutorial, you can use a sample SQLite database for a fictional coffee company called ABC Coffee Co.
+For this tutorial, you can use a sample SQLite database for a fictional coffee company called ABC Coffee Co. 
 
 First, download the example data.
 
 You can either visit this link to download with your browser:
 
-https://github.com/SolaceLabs/solace-agent-mesh-core-plugins/raw/refs/heads/main/sam-sql-database/example-data/abc_coffee_co.zip
+  https://github.com/SolaceLabs/solace-agent-mesh-core-plugins/raw/refs/heads/main/sam-sql-database/example-data/abc_coffee_co.zip
 
 Or you can use the command line to download the ZIP file:
 
 #### Using wget
-
 ```sh
 wget https://github.com/SolaceLabs/solace-agent-mesh-core-plugins/raw/refs/heads/main/sam-sql-database/example-data/abc_coffee_co.zip
 ```
 
 #### Using curl
-
 ```sh
 curl -LO https://github.com/SolaceLabs/solace-agent-mesh-core-plugins/raw/refs/heads/main/sam-sql-database/example-data/abc_coffee_co.zip
 ```
@@ -107,7 +103,6 @@ sam run configs/agents/abc-coffee-info.yaml
 ```
 
 The agent:
-
 1. Connects to the A2A control plane
 2. Initializes the SQLite database and imports CSV data from the specified directory
 3. Detects the database schema automatically
@@ -146,7 +141,7 @@ log:
 
 apps:
   - name: abc-coffee-info-app
-    app_module: solace_agent_mesh.agent.sac.app
+    app_module: solace_agent_mesh.agent.sac.app 
     broker:
       <<: *broker_connection
 
@@ -240,7 +235,6 @@ agent_card:
 ```
 
 This detailed information helps other agents understand:
-
 - What business domain this agent covers (coffee shop operations)
 - What types of data are available (customers, orders, products, inventory, sales)
 - What kinds of questions can be answered (metrics, analytics, performance data)

@@ -7,6 +7,7 @@ sidebar_position: 20
 
 Solace Agent Mesh is built on the A2A (Agent-to-Agent) protocol architecture, powered by [Solace AI Event Connector](./solace-ai-connector.md) and uses Solace PubSub+ as the communication backbone. The framework is controlled by YAML configuration files that define agents, gateways, and plugins, enabling distributed AI agent communication through event-driven messaging.
 
+
 ## Project Structure
 
 A fresh Solace Agent Mesh project follows this structure:
@@ -34,15 +35,15 @@ The `configs/` directory uses a logical organization:
 - **`gateways/`** - Contains gateway configuration files
 - **`plugins/`** - Contains plugin configuration files (created when plugins are added)
 
-Further subdirectories can be created within `agents/`, `gateways/`, and `plugins/` to organize configurations by functionality or purpose.
+Further subdirectories can be created within `agents/`, `gateways/`, and `plugins/` to organize configurations by functionality or purpose. 
+
 
 :::info[File Discovery]
 The CLI automatically crawls through the configs directory to find configuration files. Files that start with `_` (underscore) or `shared_config` are ignored and not processed by the CLI.
 For example:
-
 - `_example_agent.yaml` is ignored
 - `shared_config_for_db_agents.yaml` is ignored (Can still be included in other config files using `!include` directive)
-  :::
+:::
 
 ### Shared Configuration
 

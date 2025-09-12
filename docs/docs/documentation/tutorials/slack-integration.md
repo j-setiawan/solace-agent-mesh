@@ -116,7 +116,7 @@ After configuring your Slack App, the next step is to add the Slack gateway to S
    sam plugin add slack-bot --plugin sam-slack
    ```
 
-   You can change `slack-bot` to any name you prefer for your gateway.
+    You can change `slack-bot` to any name you prefer for your gateway.
 
 2. Configure the required environment variables:
 
@@ -127,11 +127,11 @@ After configuring your Slack App, the next step is to add the Slack gateway to S
    SLACK_APP_TOKEN=xapp-xxxxxxxxxx
    ```
 
-:::tip
+  :::tip
 
-You can further customize the Slack gateway by updating the `configs/gateways/slack-bot.yaml` file. This file contains the configuration for the Slack gateway, including the initial status message, the gateway system purpose, and response format.
+  You can further customize the Slack gateway by updating the `configs/gateways/slack-bot.yaml` file. This file contains the configuration for the Slack gateway, including the initial status message, the gateway system purpose, and response format.
 
-:::
+  :::
 
 ## Running the Slack Gateway
 

@@ -13,11 +13,11 @@ This guide covers the different patterns for creating custom tools, all of which
 
 There are three primary patterns for creating Python tools, ranging from simple to advanced. You can choose the best pattern for your needs, and even mix and match them within the same project.
 
-| Pattern                         | Best For                                                                  | Key Feature                              |
-| ------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------- |
-| **Function-Based**              | Simple, self-contained tools with static inputs.                          | Quick and easy; uses function signature. |
-| **Single `DynamicTool` Class**  | Tools that require complex logic or a programmatically defined interface. | Full control over the tool's definition. |
-| **`DynamicToolProvider` Class** | Generating multiple related tools from a single, configurable source.     | Maximum scalability and code reuse.      |
+| Pattern                   | Best For                                                                 | Key Feature                               |
+| ------------------------- | ------------------------------------------------------------------------ | ----------------------------------------- |
+| **Function-Based**        | Simple, self-contained tools with static inputs.                         | Quick and easy; uses function signature.  |
+| **Single `DynamicTool` Class** | Tools that require complex logic or a programmatically defined interface. | Full control over the tool's definition.  |
+| **`DynamicToolProvider` Class** | Generating multiple related tools from a single, configurable source.    | Maximum scalability and code reuse.       |
 
 All three patterns are configured in your agent's YAML file under the `tools` list with `tool_type: python`.
 
@@ -63,7 +63,6 @@ async def greet_user(
 ```
 
 **Key Requirements:**
-
 - The function must be `async def`.
 - The function's docstring is used as the tool's `description` for the LLM.
 - Type hints (`str`, `int`, `bool`) are used to generate the parameter schema.

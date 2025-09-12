@@ -12,7 +12,6 @@ Before running the Docker container, create two configuration files for SSO unde
 <summary>Configuration files for SSO</summary>
 
 **oauth2_server.yaml**
-
 ```yaml
 ---
 # Example gateway configuration with OAuth2 service integration
@@ -47,9 +46,8 @@ flows:
 
 **oauth2_config.yaml**
 
-In the oauth2_config.yaml file, uncomment the authentication provider you want to use.
+In the oauth2_config.yaml file, uncomment the authentication provider you want to use. 
 Note that the Azure provider is configured as the default option.
-
 ```yaml
 ---
 # OAuth2 Service Configuration
@@ -195,7 +193,7 @@ You can then access Solace Agent Mesh Enterprise UI through http://localhost:800
 
 ```bash
 -e FASTAPI_HOST="0.0.0.0" \
--e FASTAPI_PORT="8000" \
+-e FASTAPI_PORT="8000" \ 
 ```
 
 **Enable single sign-on processing on the frontend.**
@@ -235,7 +233,6 @@ You can then access Solace Agent Mesh Enterprise UI through http://localhost:800
 ```bash
 -e OAUTH2_DEV_MODE="true" \
 ```
-
 ```bash
 OAUTHLIB_RELAX_TOKEN_SCOPE="1"
 OAUTHLIB_INSECURE_TRANSPORT="1"
@@ -273,5 +270,4 @@ OAUTHLIB_INSECURE_TRANSPORT="1"
 ```bash
 -v <YOUR_NAMED_DOCKER_VOLUME>:/app/config/sso_vol/ \
 ```
-
 </details>

@@ -3,17 +3,18 @@ title: REST Gateway
 sidebar_position: 15
 ---
 
+
 Solace Agent Mesh REST API Gateway provides a standard, robust, and secure HTTP-based entry point for programmatic and system-to-system integrations. It allows external clients to submit tasks to Solace Agent Mesh agents, manage files, and discover agent capabilities using a familiar RESTful interface.
 
 The gateway is designed to be highly configurable and supports two distinct operational modes to cater to both modern, asynchronous workflows and legacy, synchronous systems.
 
 ## Key Features
 
-- **Dual API Versions**: Supports both a modern asynchronous API (v2) and a deprecated synchronous API (v1) for backward compatibility.
-- **Asynchronous by Default**: The v2 API uses a "202 Accepted + Poll" pattern, ideal for long-running agent tasks.
-- **Delegated Authentication**: Integrates with an external authentication service via bearer tokens for secure access.
-- **File Handling**: Supports file uploads for tasks and provides download URLs for generated artifacts.
-- **Dynamic Configuration**: All gateway behaviors, including server settings and authentication, are configured via the main Solace Agent Mesh Host YAML file.
+*   **Dual API Versions**: Supports both a modern asynchronous API (v2) and a deprecated synchronous API (v1) for backward compatibility.
+*   **Asynchronous by Default**: The v2 API uses a "202 Accepted + Poll" pattern, ideal for long-running agent tasks.
+*   **Delegated Authentication**: Integrates with an external authentication service via bearer tokens for secure access.
+*   **File Handling**: Supports file uploads for tasks and provides download URLs for generated artifacts.
+*   **Dynamic Configuration**: All gateway behaviors, including server settings and authentication, are configured via the main Solace Agent Mesh Host YAML file.
 
 ## Setting Up the Environment
 
@@ -30,9 +31,9 @@ sam plugin add my-http-rest --plugin sam-rest-gateway
 You can use any name for your agent, in this tutorial we use `my-http-rest`.
 
 This command:
-
 1. Installs the `sam-rest-gateway` plugin
 2. Creates a new gateway configuration named `my-http-rest` in your `configs/gateways/` directory
+
 
 ### Configuring the REST Gateway
 
@@ -61,7 +62,6 @@ You can also interact with Solace Agent Mesh via the **REST API**.
 The REST API gateway runs on `http://localhost:8080` by default. You can use either the legacy v1 API or the modern async v2 API.
 
 ### Modern API (v2) - Asynchronous
-
 ```sh
 # Submit task
 curl --location 'http://localhost:8080/api/v2/tasks' \
@@ -81,10 +81,9 @@ It might take a while for the system to respond. See the [observability](../depl
 Sample output:
 
 From `api/v2/tasks`
-
 ```json
 {
-  "taskId": "task-6a0e682f4f6c4927a5997e4fd06eea83"
+  "taskId":"task-6a0e682f4f6c4927a5997e4fd06eea83"
 }
 ```
 
@@ -98,12 +97,7 @@ From `api/v2/tasks/{taskId}`
     "state": "completed",
     "message": {
       "role": "agent",
-      "parts": [
-        {
-          "type": "text",
-          "text": "Outdoor Activities in London: Spring Edition. Today's Perfect Activities (13°C, Light Cloud): - Royal Parks Exploration : Hyde Park and Kensington Gardens..."
-        }
-      ]
+      "parts": [{ "type": "text", "text": "Outdoor Activities in London: Spring Edition. Today's Perfect Activities (13°C, Light Cloud): - Royal Parks Exploration : Hyde Park and Kensington Gardens..." }]
     },
     "timestamp": "2025-07-03T16:54:15.273085"
   },
@@ -112,8 +106,8 @@ From `api/v2/tasks/{taskId}`
 }
 ```
 
-### Legacy API (v1) - Synchronous
 
+### Legacy API (v1) - Synchronous
 ```sh
 curl --location 'http://localhost:8080/api/v1/invoke' \
 --header 'Authorization: Bearer None' \
@@ -133,10 +127,7 @@ Sample output:
     "message": {
       "role": "agent",
       "parts": [
-        {
-          "type": "text",
-          "text": "Outdoor Activities in London: Spring Edition. Today's Perfect Activities (13°C, Light Cloud): - Royal Parks Exploration : Hyde Park and Kensington Gardens..."
-        }
+        { "type": "text", "text": "Outdoor Activities in London: Spring Edition. Today's Perfect Activities (13°C, Light Cloud): - Royal Parks Exploration : Hyde Park and Kensington Gardens..." }
       ]
     },
     "timestamp": "2025-07-03T16:59:37.486480"
@@ -145,4 +136,3 @@ Sample output:
   "metadata": { "agent_name": "OrchestratorAgent" }
 }
 ```
-

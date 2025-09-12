@@ -15,7 +15,6 @@ Amazon Bedrock Agents are AI assistants that can be customized to perform specif
 Amazon Bedrock Flows are visual workflows that orchestrate multiple foundation models to solve complex problems. They allow you to chain together different AI capabilities without writing code.
 
 By integrating these services with Solace Agent Mesh, you can:
-
 - Use the extensible Solace Agent Mesh framework to combine Bedrock agents and flows with other agents.
 - Create conversational interfaces that leverage Bedrock agents and flows.
 - Connect your Solace Agent Mesh agents to enterprise data sources through Bedrock.
@@ -24,6 +23,7 @@ By integrating these services with Solace Agent Mesh, you can:
 :::info[Learn about Bedrock Agents and Flows]
 Check the official documentation for [Amazon Bedrock Agents](https://aws.amazon.com/bedrock/agents/) and [Amazon Bedrock Flows](https://aws.amazon.com/bedrock/flows/) to learn more about these features.
 :::
+
 
 ## Setting Up the Environment
 
@@ -64,6 +64,7 @@ Follow these steps to create your Bedrock resources:
 
 You must [install Solace Agent Mesh and Solace Mesh Agent CLI](../getting-started/installation.md), and then you'll want to [create a new Solace Agent Mesh project](../getting-started/quick-start.md).
 
+
 ## Integrating Bedrock with Solace Agent Mesh
 
 ### Adding the Bedrock Agent Plugin
@@ -79,9 +80,9 @@ sam plugin add aws-agent --plugin sam-bedrock-agent
 Replace `aws-agent` with a descriptive name for your agent, such as `bedrock-summarizer` or `bedrock-customer-service`.
 
 This command:
-
 - Installs the `sam-bedrock-agent` plugin
 - Creates a new agent configuration file in `configs/agents/aws-agent.yaml`
+
 
 2. **Locate the configuration file**:
 
@@ -117,20 +118,20 @@ log:
 
 apps:
   - name: aws-agent-app
-    app_base_path: .
-    app_module: solace_agent_mesh.agent.sac.app
+    app_base_path: . 
+    app_module: solace_agent_mesh.agent.sac.app 
     broker:
       <<: *broker_connection
 
     app_config:
-      namespace: ${NAMESPACE}
-      supports_streaming: true
-      agent_name: "AwsAgent"
-      display_name: "AwsAgent Component"
-      model: *general_model
+      namespace: ${NAMESPACE} 
+      supports_streaming: true 
+      agent_name: "AwsAgent" 
+      display_name: "AwsAgent Component" 
+      model: *general_model 
 
       instruction: |
-        You're AwsAgent responsible for handling user queries by
+        You're AwsAgent responsible for handling user queries by 
         interacting with Amazon Bedrock agents or flows.
 
       # AWS Connection Configuration
@@ -145,7 +146,7 @@ apps:
         # Bedrock Agent Tool
         - tool_type: python
           component_module: sam_bedrock_agent.bedrock_agent
-          component_base_path: .
+          component_base_path: . 
           function_name: invoke_bedrock_agent
           tool_name: "text_transformer" # Customizable, Name exposed to the LLM
           tool_description: "Transforms text using the Text Transformer agent which summarizes the given text and extracts key points." # Customizable, Optional description
@@ -161,7 +162,7 @@ apps:
           component_base_path: .
           function_name: invoke_bedrock_flow
           tool_name: "poem_writer" # Name exposed to the LLM
-          tool_config:
+          tool_config: 
             amazon_bedrock_runtime_config: *amazon_bedrock_runtime_config
             bedrock_flow_id: "XXXXXXXXXX" # Your actual Bedrock flow ID
             bedrock_flow_alias_id: "XXXXXXXXXX" # Your actual Bedrock flow alias ID
@@ -171,7 +172,7 @@ apps:
         description: "Agent that integrates with Amazon Bedrock agents and flows for various AI tasks."
         defaultInputModes: ["text"]
         defaultOutputModes: ["text"]
-        skills:
+        skills: 
           - id: "text_transformer"
             name: "Text Transformer"
             description: "Transforms text using the Text Transformer agent."
@@ -234,7 +235,6 @@ You must provide at least one Bedrock agent or flow tool. You can mix and match 
 The Bedrock agent integration requires standard Solace connection variables and can use AWS environment variables for authentication.
 
 #### Required Solace Variables:
-
 - **SOLACE_BROKER_URL**: URL of your Solace broker
 - **SOLACE_BROKER_USERNAME**: Username for Solace broker authentication
 - **SOLACE_BROKER_PASSWORD**: Password for Solace broker authentication
@@ -242,9 +242,7 @@ The Bedrock agent integration requires standard Solace connection variables and 
 - **SOLACE_AGENT_MESH_NAMESPACE**: Namespace for your Solace Agent Mesh project
 
 #### Optional AWS Variables:
-
 If you prefer to use environment variables for AWS authentication instead of configuration in the YAML file:
-
 - **AWS_ACCESS_KEY_ID**: Your AWS access key
 - **AWS_SECRET_ACCESS_KEY**: Your AWS secret key
 - **AWS_SESSION_TOKEN**: If using temporary credentials
@@ -252,12 +250,11 @@ If you prefer to use environment variables for AWS authentication instead of con
 
 :::tip[AWS Credentials Precedence]
 AWS credentials are loaded in this order:
-
 1. Explicit credentials in the YAML configuration
 2. Environment variables
 3. AWS configuration files (~/.aws/credentials)
 4. EC2/ECS instance profiles (if running on AWS)
-   :::
+:::
 
 ## Running and Testing Your Integration
 
@@ -282,13 +279,11 @@ You can test your Bedrock agent integration through any gateway in your Solace A
 3. Ask a question that would trigger your Bedrock agent or flow
 
 **Example**: If you configured a Bedrock agent for text transformation:
-
 ```
 Transform this text: "The quick brown fox jumps over the lazy dog. The lazy dog did not chase the fox. The fox was brown and quick, while the dog was lazy and slow. Despite their differences, they both enjoyed the sunny day in the meadow."
 ```
 
 **Example**: If you configured a Bedrock flow for poem writing:
-
 ```
 Write a poem about a sunset over the ocean.
 ```
@@ -302,14 +297,12 @@ If you have enabled file uploads for your Bedrock agent (`allow_files: true`), y
 3. The file is sent to the Bedrock agent along with your prompt
 
 **Example with file upload**:
-
 ```
 Please analyze the attached document and provide key insights.
 ```
 
 :::info[Supported File Types]
 Bedrock agents support these file types for uploads:
-
 - PDF documents (.pdf)
 - Text files (.txt)
 - Word documents (.doc, .docx)
@@ -327,7 +320,6 @@ There's a limit of 5 files with a total size of 10MB per request.
 
 **Issue**: "Unable to locate credentials" or "Access denied" errors
 **Solution**:
-
 - Verify your AWS credentials are correctly configured
 - Check that your IAM user/role has the necessary permissions
 - Try using AWS CLI to test your credentials: `aws bedrock list-foundation-models`
@@ -336,7 +328,6 @@ There's a limit of 5 files with a total size of 10MB per request.
 
 **Issue**: "Invalid agent ID" or "Invalid flow ID" errors
 **Solution**:
-
 - Double-check your Bedrock agent and flow IDs in the configuration
 - Ensure you've created aliases for your agents and flows
 - Verify the region in your configuration matches where your Bedrock resources are located
@@ -345,7 +336,6 @@ There's a limit of 5 files with a total size of 10MB per request.
 
 **Issue**: Solace Agent Mesh can't connect to Bedrock services
 **Solution**:
-
 - Check your network connectivity
 - Verify that Bedrock services are available in your configured region
 - Check for any VPC or firewall restrictions
@@ -354,7 +344,6 @@ There's a limit of 5 files with a total size of 10MB per request.
 
 **Issue**: Files aren't being processed by the Bedrock agent
 **Solution**:
-
 - Verify `allow_files` is set to `true` in your configuration
 - Check that your file type is supported
 - Ensure the file size is under the 10MB limit

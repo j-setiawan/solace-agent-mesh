@@ -11,7 +11,6 @@ This tutorial guides you through setting up and configuring Solace Agent Mesh Re
 ## What is Solace Agent Mesh RAG?
 
 The Solace Agent Mesh RAG plugin enhances your agents with the ability to perform retrieval-augmented generation. This means the agent can:
-
 - **Scan** documents from various sources (local filesystem, Google Drive, etc.).
 - **Preprocess** and **split** the text into manageable chunks.
 - **Embed** these chunks into vectors and store them in a vector database.
@@ -23,7 +22,6 @@ This allows you to build agents that can answer questions about your own private
 ## Prerequisites
 
 Before you begin, ensure you have:
-
 - [Installed Solace Agent Mesh and the Solace Agent Mesh CLI](../getting-started/installation.md).
 - [Created a new Solace Agent Mesh project](../getting-started/quick-start.md).
 - Access to a vector database (for example, Qdrant, Chroma, and Pinecone).
@@ -39,7 +37,6 @@ sam plugin add my-rag-agent --plugin sam-rag
 ```
 
 Replace `my-rag-agent` with your preferred agent name. This command:
-
 - Installs the `sam-rag` plugin.
 - Creates a new agent configuration file at `configs/agents/my-rag-agent.yaml`.
 
@@ -78,7 +75,6 @@ The RAG pipeline has several stages, each with its own configuration block withi
 The scanner discovers documents to be ingested. You can configure it to scan a local filesystem or cloud sources.
 
 **Local Filesystem Example:**
-
 ```yaml
 scanner:
   batch: true
@@ -96,7 +92,6 @@ scanner:
 
 **Multi-Cloud Source Example:**
 You can also configure multiple sources, including Google Drive, OneDrive, and S3.
-
 ```yaml
 scanner:
   batch: true
@@ -115,7 +110,6 @@ scanner:
 #### 2. Preprocessor Configuration
 
 The preprocessor cleans the text extracted from documents.
-
 ```yaml
 preprocessor:
   default_preprocessor:
@@ -125,7 +119,7 @@ preprocessor:
       normalize_whitespace: true
       remove_urls: true
   preprocessors:
-    pdf:
+    pdf: 
       type: document
       params:
         lowercase: true
@@ -137,7 +131,6 @@ preprocessor:
 #### 3. Splitter Configuration
 
 The splitter breaks down large documents into smaller chunks. Different splitters are available for different file types.
-
 ```yaml
 splitter:
   default_splitter:
@@ -161,7 +154,6 @@ splitter:
 #### 4. Embedding Configuration
 
 This section defines the model used to create vector embeddings from the text chunks.
-
 ```yaml
 embedding:
   embedder_type: "openai"
@@ -177,7 +169,6 @@ embedding:
 Configure the connection to your vector database where the embeddings are stored.
 
 **Qdrant Example:**
-
 ```yaml
 vector_db:
   db_type: "qdrant"
@@ -189,7 +180,6 @@ vector_db:
 ```
 
 **Chroma Example:**
-
 ```yaml
 vector_db:
   db_type: "chroma"
@@ -202,7 +192,6 @@ vector_db:
 #### 6. LLM Configuration
 
 Configure the LLM that is used to generate answers based on the retrieved context.
-
 ```yaml
 llm:
   load_balancer:
@@ -216,7 +205,6 @@ llm:
 #### 7. Retrieval Configuration
 
 This defines how many document chunks are retrieved to answer a query.
-
 ```yaml
 retrieval:
   top_k: 7
@@ -329,6 +317,7 @@ The RAG agent uses its `built-in` ingest_document tool to process the file you u
 
 After the agent confirms that the document has been ingested, you can immediately ask questions about its content.
 
+
 ### Querying the Knowledge Base
 
 You can interact with your RAG agent through any gateway, such as the Web UI gateway.
@@ -339,7 +328,6 @@ You can interact with your RAG agent through any gateway, such as the Web UI gat
 4.  Ask a question related to the content of the documents you provided during the initial scan.
 
 For example, if you have a document about product features, you could ask:
-
 > "What are the key features of Product X?"
 
 The agent searches its knowledge base, finds the relevant information, and generates an answer based on the content of your documents.
@@ -349,4 +337,3 @@ The agent searches its knowledge base, finds the relevant information, and gener
 - **Connection Errors**: Double-check all your URLs, API keys, and credentials for your LLM and vector database.
 - **Ingestion Issues**: Check the agent logs for errors during the scanning, preprocessing, or embedding stages. Ensure the file formats are supported and the paths are correct.
 - **No Answers**: If the agent can't answer, it might be because the information is not in the documents, or the `top_k` retrieval setting is too low.
-

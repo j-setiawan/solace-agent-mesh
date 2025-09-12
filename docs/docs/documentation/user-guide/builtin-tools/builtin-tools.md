@@ -21,11 +21,10 @@ Tool configuration is managed within the `tools` list in an agent's `app_config`
 
 For efficient configuration, built-in tools are organized into logical groups. An entire group of related tools can be enabled with a single entry. This is the recommended approach for standard functionalities.
 
-- **`tool_type`**: `builtin-group`
-- **`group_name`**: The unique identifier for the tool category.
+-   **`tool_type`**: `builtin-group`
+-   **`group_name`**: The unique identifier for the tool category.
 
 **Example:**
-
 ```yaml
 # In your agent's app_config:
 tools:
@@ -39,11 +38,10 @@ tools:
 
 For more granular control over an agent's capabilities, specific tools can be enabled individually.
 
-- **`tool_type`**: `builtin`
-- **`tool_name`**: The unique, registered name of the tool.
+-   **`tool_type`**: `builtin`
+-   **`tool_name`**: The unique, registered name of the tool.
 
 **Example:**
-
 ```yaml
 # In your agent's app_config:
 tools:
@@ -62,13 +60,11 @@ The Solace Agent Mesh framework automatically handles duplicate tool registratio
 The following sections detail the available tool groups and the individual tools they contain.
 
 ### Artifact Management
-
 **Group Name**: `artifact_management`
 
 **Description**: Tools for creating, loading, and managing file artifacts.
 
 **Individual Tools**:
-
 - `create_artifact`
 - `append_to_artifact`
 - `list_artifacts`
@@ -82,13 +78,11 @@ For a more in-depth guide on using artifact management tools, refer to the [Arti
 :::
 
 ### Data Analysis
-
 **Group Name**: `data_analysis`
 
 **Description**: Tools for querying, transforming, and visualizing data.
 
 **Individual Tools**:
-
 - `query_data_with_sql`
 - `create_sqlite_db`
 - `transform_data_with_jq`
@@ -99,48 +93,40 @@ For a more in-depth guide on using Data Analysis tools, refer to the [Data Analy
 :::
 
 ### Web
-
 **Group Name**: `web`
 
 **Description**: Tools for interacting with web resources.
 
 **Individual Tools**:
-
 - `web_request`
 
 ### Audio
-
 **Group Name**: `audio`
 
 **Description**: Tools for generating and transcribing audio content.
 
 **Individual Tools**:
-
 - `text_to_speech`
 - `multi_speaker_text_to_speech`
 - `transcribe_audio`
 
 ### Image
-
 **Group Name**: `image`
 
 **Description**: Tools for generating and analyzing images.
 
 **Individual Tools**:
-
 - `create_image_from_description`
 - `describe_image`
 - `edit_image_with_gemini`
 - `describe_audio`
 
 ### General
-
 **Group Name**: `general`
 
 **Description**: General-purpose utility tools.
 
 **Individual Tools**:
-
 - `convert_file_to_markdown`
 - `mermaid_diagram_generator`
 
@@ -176,4 +162,3 @@ app_config:
       function_name: "calculate_roi"
 
   # ... other service configurations (session_service, artifact_service, etc.)
-```
