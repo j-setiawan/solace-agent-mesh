@@ -274,6 +274,7 @@ apps:
   - name: my-hello-agent
     app_module: solace_agent_mesh.agent.sac.app 
     broker:
+      # Can be found in configs/shared_config.yaml after running sam init
       <<: *broker_connection
     
     # Agent-specific configuration
