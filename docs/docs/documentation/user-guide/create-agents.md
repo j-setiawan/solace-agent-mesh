@@ -267,6 +267,7 @@ async def farewell_tool(
 Create the main configuration file for your agent:
 
 ```yaml
+# File: config.yaml (at root of project directory)
 # ... (additional services and configurations)
 
 apps:
