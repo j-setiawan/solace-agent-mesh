@@ -47,7 +47,7 @@
     "build-types": "tsc --emitDeclarationOnly --outDir dist --project tsconfig.lib.json",
     "build-package": "npm run build-lib && npm run build-types",
     "lint": "eslint .",
-    "precommit": "eslint . && tsc -b",
+    "precommit": "eslint . && tsc -b && prettier --write .",
     "preview": "vite preview"
   },
   "dependencies": {
