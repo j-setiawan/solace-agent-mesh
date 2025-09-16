@@ -161,8 +161,10 @@ class BaseGatewayApp(App):
         self.artifact_handling_mode: str = resolved_app_config_block.get(
             "artifact_handling_mode", "reference"
         )
-        self.gateway_max_message_size_bytes: int = resolved_app_config_block.get(
-            "gateway_max_message_size_bytes", 10_000_000
+        self.gateway_max_message_size_bytes: int = (
+            resolved_app_config_block.setdefault(
+                "gateway_max_message_size_bytes", 10_000_000
+            )
         )
 
         modified_app_info = app_info.copy()
