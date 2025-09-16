@@ -130,8 +130,8 @@ export const SessionList: React.FC = () => {
                                     />
                                 ) : (
                                     <button onClick={() => handleSessionClick(session.id)} className="flex-grow text-left">
-                                        <div className="flex flex-col">
-                                            <span className="font-semibold">{getSessionDisplayName(session)}</span>
+                                        <div className="flex flex-col max-w-50">
+                                            <span className="font-semibold truncate" title={getSessionDisplayName(session)}>{getSessionDisplayName(session)}</span>
                                             <span className="text-xs text-muted-foreground">{formatSessionDate(session.updated_at)}</span>
                                         </div>
                                     </button>

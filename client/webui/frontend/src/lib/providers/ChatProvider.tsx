@@ -621,8 +621,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
         // Reset frontend state - session will be created lazily when first message is sent
         console.log(`${log_prefix} Resetting session state - new session will be created when first message is sent`);
         
-        // Clear session ID - will be set by backend when first message is sent
+        // Clear session ID and name - will be set when first message is sent
         setSessionId("");
+        setSessionName(null);
 
         // Reset UI state with empty session ID
         const welcomeMessages: MessageFE[] = configWelcomeMessage
@@ -737,7 +738,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     );
 
     const updateSessionName = useCallback(
-        async (sessionId: string, newName: string) => {
+        async (sessionId: string, newName: string, showNotification: boolean = true) => {
             try {
                 const response = await authenticatedFetch(`${apiPrefix}/sessions/${sessionId}`, {
                     method: 'PATCH',
@@ -748,7 +749,12 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                     const errorData = await response.json().catch(() => ({ detail: 'Failed to update session name' }));
                     throw new Error(errorData.detail || `HTTP error ${response.status}`);
                 }
-                addNotification('Session name updated successfully.');
+                
+                // Only show notification if explicitly requested
+                if (showNotification) {
+                    addNotification('Session name updated successfully.');
+                }
+                
                 if (typeof window !== "undefined") {
                     window.dispatchEvent(new CustomEvent("new-chat-session"));
                 }
@@ -1014,9 +1020,24 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                             : msg
                     ));
                     
-                    // Trigger session list refresh for new sessions
-                    if (isNewSession && typeof window !== "undefined") {
-                        window.dispatchEvent(new CustomEvent("new-chat-session"));
+                    // Generate and persist session name for new sessions
+                    if (isNewSession) {
+                        // Use the first user message
+                        const textParts = userMsg.parts.filter(p => p.kind === "text") as TextPart[];
+                        const combinedText = textParts.map(p => p.text).join(" ").trim();
+                        
+                        if (combinedText) {
+                            const newSessionName = combinedText.length > 100 
+                                ? `${combinedText.substring(0, 100)}...` 
+                                : combinedText;
+                            
+                            setSessionName(newSessionName);
+                            updateSessionName(responseSessionId, newSessionName, false);
+                        }
+                        
+                        if (typeof window !== "undefined") {
+                            window.dispatchEvent(new CustomEvent("new-chat-session"));
+                        }
                     }
                 }
 
@@ -1033,7 +1054,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 latestStatusText.current = null;
             }
         },
-        [userInput, isResponding, isCancelling, sessionId, selectedAgentName, apiPrefix, addNotification, closeCurrentEventSource, uploadArtifactFile]
+        [sessionId, userInput, isResponding, isCancelling, selectedAgentName, closeCurrentEventSource, addNotification, apiPrefix, uploadArtifactFile, updateSessionName]
     );
 
     useEffect(() => {
