@@ -6,7 +6,7 @@ import uuid
 from abc import abstractmethod
 from typing import Any, Dict, List, Type, Optional, Literal
 
-from pydantic import Field
+from pydantic import Field, ValidationError
 from solace_ai_connector.common.log import log
 from solace_ai_connector.common.utils import deep_merge
 from solace_ai_connector.flow.app import App
@@ -110,6 +110,17 @@ class BaseGatewayApp(App):
         resolved_app_config_block = deep_merge(
             code_config_app_block, yaml_app_config_block
         )
+
+        try:
+            # Validate the configuration against the base model
+            validated_config = BaseGatewayAppConfig.model_validate_and_clean(
+                resolved_app_config_block
+            )
+            # Use the validated model's dict representation
+            resolved_app_config_block = validated_config
+        except ValidationError as e:
+            log.error("Base Gateway configuration validation failed:\n%s", e)
+            raise ValueError(f"Invalid Base Gateway configuration: {e}") from e
 
         self.namespace: str = resolved_app_config_block.get("namespace")
         if not self.namespace:
