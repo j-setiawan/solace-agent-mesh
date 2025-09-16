@@ -124,18 +124,7 @@ class WebUIBackendApp(BaseGatewayApp):
             app_info.get("name", "WebUIBackendApp"),
         )
 
-        app_config_dict = app_info.get("app_config", {})
-        try:
-            # Validate the raw dict, cleaning None values to allow defaults to apply
-            app_config = WebUIBackendAppConfig.model_validate_and_clean(
-                app_config_dict
-            )
-            app_info["app_config"] = app_config
-        except ValidationError as e:
-            log.error("Web UI Gateway configuration validation failed:\n%s", e)
-            raise ValueError(f"Invalid Web UI Gateway configuration: {e}") from e
-
-        super().__init__(app_info, **kwargs)
+        super().__init__(app_info, gateway_app_config=WebUIBackendAppConfig, **kwargs)
 
         try:
             
