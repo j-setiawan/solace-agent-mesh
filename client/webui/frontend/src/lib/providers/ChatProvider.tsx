@@ -740,7 +740,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     const updateSessionName = useCallback(
         async (sessionId: string, newName: string, showNotification: boolean = true) => {
             if (!persistenceEnabled) return;
-            
+
             try {
                 const response = await authenticatedFetch(`${apiPrefix}/sessions/${sessionId}`, {
                     method: 'PATCH',
@@ -764,7 +764,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 addNotification(`Error updating session name: ${error instanceof Error ? error.message : 'Unknown error'}`);
             }
         },
-        [apiPrefix, addNotification]
+        [apiPrefix, persistenceEnabled, addNotification]
     );
 
     const deleteSession = useCallback(
