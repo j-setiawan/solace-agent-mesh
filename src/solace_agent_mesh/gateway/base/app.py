@@ -117,7 +117,7 @@ class BaseGatewayApp(App):
                 resolved_app_config_block
             )
             # Use the validated model's dict representation
-            resolved_app_config_block = dict(validated_config)
+            resolved_app_config_block = validated_config
         except ValidationError as e:
             log.error("Base Gateway configuration validation failed:\n%s", e)
             raise ValueError(f"Invalid Base Gateway configuration: {e}") from e
