@@ -90,7 +90,7 @@ class BaseGatewayApp(App):
     app_schema: Dict[str, List[Dict[str, Any]]] = {"config_parameters": []}
     SPECIFIC_APP_SCHEMA_PARAMS_ATTRIBUTE_NAME = "SPECIFIC_APP_SCHEMA_PARAMS"
 
-    def __init__(self, app_info: Dict[str, Any], **kwargs):
+    def __init__(self, app_info: Dict[str, Any], gateway_app_config=BaseGatewayAppConfig, **kwargs):
         """
         Initializes the BaseGatewayApp.
 
@@ -113,7 +113,7 @@ class BaseGatewayApp(App):
 
         try:
             # Validate the configuration against the base model
-            validated_config = BaseGatewayAppConfig.model_validate_and_clean(
+            validated_config = gateway_app_config.model_validate_and_clean(
                 resolved_app_config_block
             )
             # Use the validated model's dict representation
