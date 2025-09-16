@@ -376,7 +376,8 @@ def setup_dependencies(component: "WebUIBackendComponent", database_url: str = N
                             else user_identifier
                         )
                         user_profile = await identity_service.get_user_profile(
-                            {identity_service.lookup_key: lookup_value}
+                            {identity_service.lookup_key: lookup_value}, 
+                            user_info=user_info
                         )
                         if not user_profile:
                             log.error(
