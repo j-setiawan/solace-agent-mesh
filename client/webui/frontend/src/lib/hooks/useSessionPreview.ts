@@ -3,7 +3,6 @@ import { useMemo } from "react";
 import type { TextPart } from "@/lib/types";
 import { useChatContext } from "./useChatContext";
 
-
 export const useSessionPreview = (): string => {
     const { messages } = useChatContext();
 
@@ -16,7 +15,10 @@ export const useSessionPreview = (): string => {
 
         if (firstUserMessage) {
             const textParts = firstUserMessage.parts.filter(p => p.kind === "text") as TextPart[];
-            const combinedText = textParts.map(p => p.text).join(" ").trim();
+            const combinedText = textParts
+                .map(p => p.text)
+                .join(" ")
+                .trim();
 
             if (combinedText) {
                 return combinedText.length > 100 ? `${combinedText.substring(0, 100)}...` : combinedText;

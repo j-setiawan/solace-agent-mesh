@@ -36,13 +36,28 @@ const PANEL_SIZES_OPEN = {
 };
 
 export function ChatPage() {
-    const { agents, sessionId, messages, setMessages, selectedAgentName, setSelectedAgentName, isSidePanelCollapsed, setIsSidePanelCollapsed, openSidePanelTab, setTaskIdInSidePanel, isResponding, latestStatusText, sessionToDelete, closeSessionDeleteModal, confirmSessionDelete } = useChatContext();
+    const {
+        agents,
+        sessionId,
+        messages,
+        setMessages,
+        selectedAgentName,
+        setSelectedAgentName,
+        isSidePanelCollapsed,
+        setIsSidePanelCollapsed,
+        openSidePanelTab,
+        setTaskIdInSidePanel,
+        isResponding,
+        latestStatusText,
+        sessionToDelete,
+        closeSessionDeleteModal,
+        confirmSessionDelete,
+    } = useChatContext();
     const { isTaskMonitorConnected, isTaskMonitorConnecting, taskMonitorSseError, connectTaskMonitorStream } = useTaskContext();
     const [isSessionSidePanelCollapsed, setIsSessionSidePanelCollapsed] = useState(true);
     const [isSidePanelTransitioning, setIsSidePanelTransitioning] = useState(false);
     const sessionPreview = useSessionPreview();
     const [isChatSessionDialogOpen, setChatSessionDialogOpen] = useState(false);
-
 
     // Refs for resizable panel state
     const chatMessageListRef = useRef<ChatMessageListRef>(null);
@@ -251,12 +266,7 @@ export function ChatPage() {
                 </div>
             </div>
             <ChatSessionDialog isOpen={isChatSessionDialogOpen} onClose={() => setChatSessionDialogOpen(false)} />
-            <ChatSessionDeleteDialog
-                isOpen={!!sessionToDelete}
-                onClose={closeSessionDeleteModal}
-                onConfirm={confirmSessionDelete}
-                sessionName={sessionToDelete?.name || `Session ${sessionToDelete?.id.substring(0, 8)}`}
-            />
+            <ChatSessionDeleteDialog isOpen={!!sessionToDelete} onClose={closeSessionDeleteModal} onConfirm={confirmSessionDelete} sessionName={sessionToDelete?.name || `Session ${sessionToDelete?.id.substring(0, 8)}`} />
         </div>
     );
 }
