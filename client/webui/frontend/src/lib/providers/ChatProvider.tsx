@@ -29,7 +29,7 @@ const fileToBase64 = (file: File): Promise<string> => {
 };
 
 export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
-    const { configWelcomeMessage, configServerUrl } = useConfigContext();
+    const { configWelcomeMessage, configServerUrl, persistenceEnabled } = useConfigContext();
     const apiPrefix = useMemo(() => `${configServerUrl}/api/v1`, [configServerUrl]);
 
     // State Variables from useChat
@@ -739,6 +739,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
     const updateSessionName = useCallback(
         async (sessionId: string, newName: string, showNotification: boolean = true) => {
+            if (!persistenceEnabled) return;
+            
             try {
                 const response = await authenticatedFetch(`${apiPrefix}/sessions/${sessionId}`, {
                     method: 'PATCH',
@@ -1020,9 +1022,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                             : msg
                     ));
                     
-                    // Generate and persist session name for new sessions
                     if (isNewSession) {
-                        // Use the first user message
+                        // Generate and persist session name for new sessions
                         const textParts = userMsg.parts.filter(p => p.kind === "text") as TextPart[];
                         const combinedText = textParts.map(p => p.text).join(" ").trim();
                         
