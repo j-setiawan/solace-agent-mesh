@@ -45,7 +45,7 @@ export interface ToolEvent {
 /**
  * @deprecated use AgentCardInfo
  */
-export interface AgentInfo extends AgentCard  {
+export interface AgentInfo extends AgentCard {
     display_name?: string;
     last_seen?: string;
     peer_agents?: string[];
@@ -188,7 +188,6 @@ export interface NavigationContextValue {
     items: NavigationItem[];
     setItems: (items: NavigationItem[]) => void;
 }
-
 
 export interface Session {
     id: string;

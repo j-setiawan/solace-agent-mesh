@@ -1,29 +1,17 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/lib/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/lib/components/ui/dialog";
 import { Button } from "@/lib/components/ui/button";
 
 interface ChatSessionDeleteDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  sessionName: string;
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    sessionName: string;
 }
 
-export const ChatSessionDeleteDialog = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  sessionName,
-}: ChatSessionDeleteDialogProps) => {
-  if (!isOpen) {
-    return null;
-  }
+export const ChatSessionDeleteDialog = ({ isOpen, onClose, onConfirm, sessionName }: ChatSessionDeleteDialogProps) => {
+    if (!isOpen) {
+        return null;
+    }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

@@ -1,7 +1,7 @@
 /**
  * Helper function to format file size
- * @param bytes 
- * @param decimals 
+ * @param bytes
+ * @param decimals
  */
 export const formatBytes = (bytes: number, decimals = 2): string => {
     if (bytes === 0) return "0 Bytes";
@@ -14,7 +14,7 @@ export const formatBytes = (bytes: number, decimals = 2): string => {
 
 /**
  * Helper function to format date (relative time)
- * @param dateString 
+ * @param dateString
  */
 export const formatRelativeTime = (dateString: string): string => {
     try {
@@ -39,7 +39,7 @@ export const formatRelativeTime = (dateString: string): string => {
 
 /**
  * Helper function to format ISO timestamp
- * @param isoString 
+ * @param isoString
  */
 export const formatTimestamp = (isoString?: string | null): string => {
     if (!isoString) return "N/A";

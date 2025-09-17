@@ -249,12 +249,7 @@ export function ChatPage() {
                 </div>
             </div>
             <ChatSessionDialog isOpen={isChatSessionDialogOpen} onClose={() => setChatSessionDialogOpen(false)} />
-            <ChatSessionDeleteDialog
-                isOpen={!!sessionToDelete}
-                onClose={closeSessionDeleteModal}
-                onConfirm={confirmSessionDelete}
-                sessionName={sessionToDelete?.name || `Session ${sessionToDelete?.id.substring(0, 8)}`}
-            />
+            <ChatSessionDeleteDialog isOpen={!!sessionToDelete} onClose={closeSessionDeleteModal} onConfirm={confirmSessionDelete} sessionName={sessionToDelete?.name || `Session ${sessionToDelete?.id.substring(0, 8)}`} />
         </div>
     );
 }

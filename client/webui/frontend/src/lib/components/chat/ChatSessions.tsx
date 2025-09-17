@@ -15,11 +15,9 @@ export const ChatSessions = () => {
                         <div className="text-foreground truncate text-sm font-medium text-nowrap">{sessionName || "New Chat"}</div>
                         <div className="text-muted-foreground mt-1 text-xs">Current session</div>
                     </div>
-                    
+
                     {/* Multi-session notice */}
-                    <div className="text-muted-foreground mt-4 text-center text-xs">
-                        Multi-session support coming soon
-                    </div>
+                    <div className="text-muted-foreground mt-4 text-center text-xs">Multi-session support coming soon</div>
                 </div>
             </div>
         );
