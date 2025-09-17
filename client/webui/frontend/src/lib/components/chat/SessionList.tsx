@@ -111,7 +111,7 @@ export const SessionList: React.FC = () => {
     };
 
     return (
-        <div className="flex h-full flex-col gap-4 pl-6 py-6">
+        <div className="flex h-full flex-col gap-4 py-6 pl-6">
             <div className="text-lg">Chat Session History</div>
             <div className="flex-1 overflow-y-auto">
                 {sessions.length > 0 && (
@@ -131,9 +131,11 @@ export const SessionList: React.FC = () => {
                                         />
                                     ) : (
                                         <button onClick={() => handleSessionClick(session.id)} className="flex-grow text-left">
-                                            <div className="flex flex-col max-w-50">
-                                                <span className="font-semibold truncate" title={getSessionDisplayName(session)}>{getSessionDisplayName(session)}</span>
-                                                <span className="text-xs text-muted-foreground">{formatSessionDate(session.updated_at)}</span>
+                                            <div className="flex max-w-50 flex-col">
+                                                <span className="truncate font-semibold" title={getSessionDisplayName(session)}>
+                                                    {getSessionDisplayName(session)}
+                                                </span>
+                                                <span className="text-muted-foreground text-xs">{formatSessionDate(session.updated_at)}</span>
                                             </div>
                                         </button>
                                     )}
