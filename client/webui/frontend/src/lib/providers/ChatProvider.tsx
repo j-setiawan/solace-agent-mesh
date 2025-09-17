@@ -621,7 +621,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
         // Reset frontend state - session will be created lazily when first message is sent
         console.log(`${log_prefix} Resetting session state - new session will be created when first message is sent`);
-        
+
         // Clear session ID and name - will be set when first message is sent
         setSessionId("");
         setSessionName(null);
@@ -751,12 +751,12 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                     const errorData = await response.json().catch(() => ({ detail: "Failed to update session name" }));
                     throw new Error(errorData.detail || `HTTP error ${response.status}`);
                 }
-                
+
                 // Only show notification if explicitly requested
                 if (showNotification) {
-                    addNotification('Session name updated successfully.');
+                    addNotification("Session name updated successfully.");
                 }
-                
+
                 if (typeof window !== "undefined") {
                     window.dispatchEvent(new CustomEvent("new-chat-session"));
                 }
@@ -1013,26 +1013,23 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                     const isNewSession = !sessionId || sessionId === "";
                     setSessionId(responseSessionId);
                     // Update the user message metadata with the new session ID
-                    setMessages(prev => prev.map(msg => 
-                        msg.metadata?.messageId === userMsg.metadata?.messageId 
-                            ? { ...msg, metadata: { ...msg.metadata, sessionId: responseSessionId } }
-                            : msg
-                    ));
-                    
+                    setMessages(prev => prev.map(msg => (msg.metadata?.messageId === userMsg.metadata?.messageId ? { ...msg, metadata: { ...msg.metadata, sessionId: responseSessionId } } : msg)));
+
                     if (isNewSession) {
                         // Generate and persist session name for new sessions
                         const textParts = userMsg.parts.filter(p => p.kind === "text") as TextPart[];
-                        const combinedText = textParts.map(p => p.text).join(" ").trim();
-                        
+                        const combinedText = textParts
+                            .map(p => p.text)
+                            .join(" ")
+                            .trim();
+
                         if (combinedText) {
-                            const newSessionName = combinedText.length > 100 
-                                ? `${combinedText.substring(0, 100)}...` 
-                                : combinedText;
-                            
+                            const newSessionName = combinedText.length > 100 ? `${combinedText.substring(0, 100)}...` : combinedText;
+
                             setSessionName(newSessionName);
                             updateSessionName(responseSessionId, newSessionName, false);
                         }
-                        
+
                         if (typeof window !== "undefined") {
                             window.dispatchEvent(new CustomEvent("new-chat-session"));
                         }
