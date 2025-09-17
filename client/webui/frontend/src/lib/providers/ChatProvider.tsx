@@ -1,9 +1,26 @@
-import React, { useState, useCallback, useEffect, useRef, type FormEvent, type ReactNode } from "react";
+import React, { useState, useCallback, useEffect, useRef, type FormEvent, type ReactNode, useMemo } from "react";
 
-import { useConfigContext, useArtifacts, useAgents } from "@/lib/hooks";
+import { useConfigContext, useArtifacts, useAgentCards } from "@/lib/hooks";
 import { authenticatedFetch, getAccessToken } from "@/lib/utils/api";
 import { ChatContext, type ChatContextValue } from "@/lib/contexts";
-import type { ArtifactInfo, CancelTaskRequest, FileAttachment, FilePart, JSONRPCErrorResponse, Message, MessageFE, Notification, Part, SendStreamingMessageRequest, SendStreamingMessageSuccessResponse, Session, Task, TaskArtifactUpdateEvent, TaskStatusUpdateEvent, TextPart } from "@/lib/types";
+import type {
+    ArtifactInfo,
+    CancelTaskRequest,
+    FileAttachment,
+    FilePart,
+    JSONRPCErrorResponse,
+    Message,
+    MessageFE,
+    Notification,
+    Part,
+    SendStreamingMessageRequest,
+    SendStreamingMessageSuccessResponse,
+    Session,
+    Task,
+    TaskArtifactUpdateEvent,
+    TaskStatusUpdateEvent,
+    TextPart,
+} from "@/lib/types";
 
 interface ChatProviderProps {
     children: ReactNode;
@@ -12,24 +29,25 @@ interface ChatProviderProps {
 interface HistoryMessage {
     id: string;
     message: string;
-    sender_type: "user" | "llm";
-    session_id: string;
-    created_at: string;
+    senderType: "user" | "llm";
+    sessionId: string;
+    createdTime: string;
 }
 
+// File utils
+const INLINE_FILE_SIZE_LIMIT_BYTES = 1 * 1024 * 1024; // 1 MB
+const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve((reader.result as string).split(",")[1]);
+        reader.onerror = error => reject(error);
+    });
+};
+
 export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
-    const { configWelcomeMessage, configServerUrl } = useConfigContext();
-    const apiPrefix = `${configServerUrl}/api/v1`;
-
-    const INLINE_FILE_SIZE_LIMIT_BYTES = 1 * 1024 * 1024; // 1 MB
-
-    const fileToBase64 = (file: File): Promise<string> =>
-        new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve((reader.result as string).split(",")[1]);
-            reader.onerror = error => reject(error);
-        });
+    const { configWelcomeMessage, configServerUrl, persistenceEnabled } = useConfigContext();
+    const apiPrefix = useMemo(() => `${configServerUrl}/api/v1`, [configServerUrl]);
 
     // State Variables from useChat
     const [sessionId, setSessionId] = useState<string>("");
@@ -40,31 +58,25 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
     const currentEventSource = useRef<EventSource | null>(null);
     const [selectedAgentName, setSelectedAgentName] = useState<string>("");
-    const [isCancelling, setIsCancelling] = useState<boolean>(false); // New state for cancellation
-    const isCancellingRef = useRef(isCancelling);
-    useEffect(() => {
-        isCancellingRef.current = isCancelling;
-    }, [isCancelling]);
+    const [isCancelling, setIsCancelling] = useState<boolean>(false);
     const [taskIdInSidePanel, setTaskIdInSidePanel] = useState<string | null>(null);
-    const cancelTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Ref for cancel timeout
+
+    // Refs
+    const cancelTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isFinalizing = useRef(false);
     const latestStatusText = useRef<string | null>(null);
     const sseEventSequenceRef = useRef<number>(0);
+    const isCancellingRef = useRef(isCancelling);
+
+    useEffect(() => {
+        isCancellingRef.current = isCancelling;
+    }, [isCancelling]);
 
     // Agents State
-    const {
-        agents,
-        error: agentsError,
-        isLoading: agentsLoading,
-        refetch: agentsRefetch,
-    } = useAgents();
+    const { agents, error: agentsError, isLoading: agentsLoading, refetch: agentsRefetch } = useAgentCards();
 
     // Chat Side Panel State
-    const {
-        artifacts,
-        isLoading: artifactsLoading,
-        refetch: artifactsRefetch,
-    } = useArtifacts(sessionId);
+    const { artifacts, isLoading: artifactsLoading, refetch: artifactsRefetch } = useArtifacts(sessionId);
 
     // Side Panel Control State
     const [isSidePanelCollapsed, setIsSidePanelCollapsed] = useState<boolean>(true);
@@ -85,6 +97,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     const [currentPreviewedVersionNumber, setCurrentPreviewedVersionNumber] = useState<number | null>(null);
     const [previewFileContent, setPreviewFileContent] = useState<FileAttachment | null>(null);
 
+    // Session State
+    const [sessionName, setSessionName] = useState<string | null>(null);
+    const [sessionToDelete, setSessionToDelete] = useState<Session | null>(null);
 
     // Notification Helper
     const addNotification = useCallback((message: string, type?: "success" | "info" | "error") => {
@@ -105,7 +120,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
             return [...prev, newNotification];
         });
     }, []);
-
 
     const getHistory = useCallback(
         async (sessionId: string) => {
@@ -142,13 +156,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 return null;
             }
         },
-        [apiPrefix, addNotification, artifactsRefetch]
+        [apiPrefix, sessionId, addNotification, artifactsRefetch]
     );
-
-    const [sessionName, setSessionName] = useState<string | null>(null);
-    // Note: Other state variables are already declared above (lines 36-52)
-
-    const [sessionToDelete, setSessionToDelete] = useState<Session | null>(null);
 
     const deleteArtifactInternal = useCallback(
         async (filename: string) => {
@@ -167,7 +176,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 addNotification(`Error deleting file "${filename}": ${error instanceof Error ? error.message : "Unknown error"}`);
             }
         },
-        [apiPrefix, addNotification, artifactsRefetch]
+        [apiPrefix, sessionId, addNotification, artifactsRefetch]
     );
 
     const openDeleteModal = useCallback((artifact: ArtifactInfo) => {
@@ -256,7 +265,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 return null;
             }
         },
-        [apiPrefix, addNotification, artifacts]
+        [apiPrefix, sessionId, artifacts, addNotification]
     );
 
     const navigateArtifactVersion = useCallback(
@@ -291,7 +300,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 return null;
             }
         },
-        [apiPrefix, addNotification, artifacts, previewedArtifactAvailableVersions]
+        [apiPrefix, addNotification, artifacts, previewedArtifactAvailableVersions, sessionId]
     );
 
     const openMessageAttachmentForPreview = useCallback(
@@ -471,13 +480,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 const otherContentParts = newContentParts.filter(p => p.kind !== "text");
 
                 // Check if we can append to the last message
-                if (
-                    lastMessage &&
-                    !lastMessage.isUser &&
-                    !lastMessage.isComplete &&
-                    lastMessage.taskId === (result as TaskStatusUpdateEvent).taskId &&
-                    (textPartFromStream || newFileAttachments.length > 0)
-                ) {
+                if (lastMessage && !lastMessage.isUser && !lastMessage.isComplete && lastMessage.taskId === (result as TaskStatusUpdateEvent).taskId && (textPartFromStream || newFileAttachments.length > 0)) {
                     const updatedMessage: MessageFE = {
                         ...lastMessage,
                         parts: [...lastMessage.parts],
@@ -618,24 +621,25 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
         // Reset frontend state - session will be created lazily when first message is sent
         console.log(`${log_prefix} Resetting session state - new session will be created when first message is sent`);
-        
-        // Clear session ID - will be set by backend when first message is sent
+
+        // Clear session ID and name - will be set when first message is sent
         setSessionId("");
+        setSessionName(null);
 
         // Reset UI state with empty session ID
         const welcomeMessages: MessageFE[] = configWelcomeMessage
             ? [
-                {
-                    parts: [{ kind: "text", text: configWelcomeMessage }],
-                    isUser: false,
-                    isComplete: true,
-                    role: "agent",
-                    metadata: {
-                        sessionId: "", // Empty - will be populated when session is created
-                        lastProcessedEventSequence: 0,
-                    },
-                },
-            ]
+                  {
+                      parts: [{ kind: "text", text: configWelcomeMessage }],
+                      isUser: false,
+                      isComplete: true,
+                      role: "agent",
+                      metadata: {
+                          sessionId: "", // Empty - will be populated when session is created
+                          lastProcessedEventSequence: 0,
+                      },
+                  },
+              ]
             : [];
 
         setMessages(welcomeMessages);
@@ -658,7 +662,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
         // Note: No session events dispatched here since no session exists yet.
         // Session creation event will be dispatched when first message creates the actual session.
-    }, [closeCurrentEventSource, isResponding, currentTaskId, selectedAgentName, isCancelling, configWelcomeMessage, addNotification, artifactsRefetch]);
+    }, [apiPrefix, isResponding, currentTaskId, selectedAgentName, isCancelling, configWelcomeMessage, addNotification, artifactsRefetch, closeCurrentEventSource]);
 
     const handleSwitchSession = useCallback(
         async (newSessionId: string) => {
@@ -699,22 +703,22 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 const history = await getHistory(newSessionId);
                 const formattedMessages: MessageFE[] = history.map((msg: HistoryMessage) => ({
                     parts: [{ kind: "text", text: msg.message }],
-                    isUser: msg.sender_type === "user",
+                    isUser: msg.senderType === "user",
                     isComplete: true,
-                    role: msg.sender_type === "user" ? "user" : "agent",
+                    role: msg.senderType === "user" ? "user" : "agent",
                     metadata: {
-                        sessionId: msg.session_id,
+                        sessionId: msg.sessionId,
                         messageId: msg.id,
                         lastProcessedEventSequence: 0,
                     },
                 }));
-    
+
                 const sessionResponse = await authenticatedFetch(`${apiPrefix}/sessions/${newSessionId}`);
                 if (sessionResponse.ok) {
                     const sessionData = await sessionResponse.json();
                     setSessionName(sessionData.name);
                 }
-    
+
                 setSessionId(newSessionId);
                 setMessages(formattedMessages);
                 setUserInput("");
@@ -725,7 +729,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 isFinalizing.current = false;
                 latestStatusText.current = null;
                 sseEventSequenceRef.current = 0;
-
             } catch (error) {
                 console.error(`${log_prefix} Failed to fetch session history:`, error);
                 addNotification("Error switching session. Please try again.", "error");
@@ -735,39 +738,46 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     );
 
     const updateSessionName = useCallback(
-        async (sessionId: string, newName: string) => {
+        async (sessionId: string, newName: string, showNotification: boolean = true) => {
+            if (!persistenceEnabled) return;
+
             try {
                 const response = await authenticatedFetch(`${apiPrefix}/sessions/${sessionId}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ name: newName }),
                 });
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ detail: 'Failed to update session name' }));
+                    const errorData = await response.json().catch(() => ({ detail: "Failed to update session name" }));
                     throw new Error(errorData.detail || `HTTP error ${response.status}`);
                 }
-                addNotification('Session name updated successfully.');
+
+                // Only show notification if explicitly requested
+                if (showNotification) {
+                    addNotification("Session name updated successfully.");
+                }
+
                 if (typeof window !== "undefined") {
                     window.dispatchEvent(new CustomEvent("new-chat-session"));
                 }
             } catch (error) {
-                addNotification(`Error updating session name: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                addNotification(`Error updating session name: ${error instanceof Error ? error.message : "Unknown error"}`);
             }
         },
-        [apiPrefix, addNotification]
+        [apiPrefix, persistenceEnabled, addNotification]
     );
 
     const deleteSession = useCallback(
         async (sessionIdToDelete: string) => {
             try {
                 const response = await authenticatedFetch(`${apiPrefix}/sessions/${sessionIdToDelete}`, {
-                    method: 'DELETE',
+                    method: "DELETE",
                 });
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ detail: 'Failed to delete session' }));
+                    const errorData = await response.json().catch(() => ({ detail: "Failed to delete session" }));
                     throw new Error(errorData.detail || `HTTP error ${response.status}`);
                 }
-                addNotification('Session deleted successfully.');
+                addNotification("Session deleted successfully.");
                 if (sessionIdToDelete === sessionId) {
                     handleNewSession();
                 }
@@ -776,12 +786,11 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                     window.dispatchEvent(new CustomEvent("new-chat-session"));
                 }
             } catch (error) {
-                addNotification(`Error deleting session: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                addNotification(`Error deleting session: ${error instanceof Error ? error.message : "Unknown error"}`);
             }
         },
         [apiPrefix, addNotification, handleNewSession, sessionId]
     );
-
 
     const openSessionDeleteModal = useCallback((session: Session) => {
         setSessionToDelete(session);
@@ -934,9 +943,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                     }
                 });
 
-                const uploadedFileParts = (await Promise.all(filePartsPromises)).filter(
-                    (p): p is FilePart => p !== null
-                );
+                const uploadedFileParts = (await Promise.all(filePartsPromises)).filter((p): p is FilePart => p !== null);
 
                 // 2. Construct message parts
                 const messageParts: Part[] = [];
@@ -1006,15 +1013,26 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                     const isNewSession = !sessionId || sessionId === "";
                     setSessionId(responseSessionId);
                     // Update the user message metadata with the new session ID
-                    setMessages(prev => prev.map(msg => 
-                        msg.metadata?.messageId === userMsg.metadata?.messageId 
-                            ? { ...msg, metadata: { ...msg.metadata, sessionId: responseSessionId } }
-                            : msg
-                    ));
-                    
-                    // Trigger session list refresh for new sessions
-                    if (isNewSession && typeof window !== "undefined") {
-                        window.dispatchEvent(new CustomEvent("new-chat-session"));
+                    setMessages(prev => prev.map(msg => (msg.metadata?.messageId === userMsg.metadata?.messageId ? { ...msg, metadata: { ...msg.metadata, sessionId: responseSessionId } } : msg)));
+
+                    if (isNewSession) {
+                        // Generate and persist session name for new sessions
+                        const textParts = userMsg.parts.filter(p => p.kind === "text") as TextPart[];
+                        const combinedText = textParts
+                            .map(p => p.text)
+                            .join(" ")
+                            .trim();
+
+                        if (combinedText) {
+                            const newSessionName = combinedText.length > 100 ? `${combinedText.substring(0, 100)}...` : combinedText;
+
+                            setSessionName(newSessionName);
+                            updateSessionName(responseSessionId, newSessionName, false);
+                        }
+
+                        if (typeof window !== "undefined") {
+                            window.dispatchEvent(new CustomEvent("new-chat-session"));
+                        }
                     }
                 }
 
@@ -1031,7 +1049,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 latestStatusText.current = null;
             }
         },
-        [userInput, isResponding, isCancelling, sessionId, selectedAgentName, apiPrefix, addNotification, closeCurrentEventSource, uploadArtifactFile]
+        [sessionId, userInput, isResponding, isCancelling, selectedAgentName, closeCurrentEventSource, addNotification, apiPrefix, uploadArtifactFile, updateSessionName]
     );
 
     useEffect(() => {
