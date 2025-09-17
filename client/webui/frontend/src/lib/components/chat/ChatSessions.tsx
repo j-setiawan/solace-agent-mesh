@@ -24,11 +24,5 @@ export const ChatSessions = () => {
     }
 
     // When persistence is enabled, show full session list
-    return (
-        <div className="flex h-full flex-col">
-            <div className="flex-1 overflow-y-auto px-4">
-                <SessionList />
-            </div>
-        </div>
-    );
+    return <SessionList />;
 };
