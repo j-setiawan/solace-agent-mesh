@@ -1114,9 +1114,9 @@ class SamAgentComponent(SamComponentBase):
             return tool.origin
         elif hasattr(tool.func, 'origin'):
             return tool.func.origin
-        elif hasattr(tool.func, '_original_func') and hasattr(tool.func, '_tool_name'):
-            return getattr(tool.func, 'origin', 'unknown')
-        return 'unknown'
+        else:
+            return getattr(tool, "origin", "unknown")
+
 
     def get_agent_context(self) -> Dict[str, Any]:
         """Get agent context for middleware calls."""
