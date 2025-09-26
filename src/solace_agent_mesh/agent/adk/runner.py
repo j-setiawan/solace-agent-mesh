@@ -191,7 +191,13 @@ async def run_adk_async_task_thread_wrapper(
             logical_task_id,
             llm_limit_e,
         )
-    except BadRequestError:
+    except BadRequestError as e:
+        log.error(
+            "%s Bad Request for task %s: %s.",
+            component.log_identifier,
+            logical_task_id,
+            e.message
+        )
         raise
     except Exception as e:
         exception_to_finalize_with = e
@@ -332,7 +338,13 @@ async def run_adk_async_task(
 
     except TaskCancelledError:
         raise
-    except BadRequestError:
+    except BadRequestError as e:
+        log.error(
+            "%s Bad Request for task %s: %s.",
+            component.log_identifier,
+            logical_task_id,
+            e.message
+        )
         raise
     except Exception as e:
         log.exception(
